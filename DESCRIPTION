@@ -1,0 +1,28 @@
+Package: surveyjoin
+Type: Package
+Title: Combine Data from Northeast Pacific Ocean Fish Surveys
+Version: 0.0.1
+Authors@R: c(
+    person(c("Eric", "J."), "Ward", email = "eric.ward@noaa.gov",
+      role = c("aut", "cre")))
+Maintainer: Eric Ward <eric.ward@noaa.gov>
+Description: This package combines data from fish surveys in multiple regions
+License: GPL-3
+Encoding: UTF-8
+Depends:
+    R (>= 4.0.0)
+Imports:
+    dplyr (>= 1.0.2),
+    rlang (>= 0.4.1)
+Suggests:
+    testthat,
+    parallel,
+    knitr,
+    rmarkdown,
+    devtools,
+    MASS
+RoxygenNote: 7.2.0
+VignetteBuilder: knitr
+Roxygen: list(markdown = TRUE)
+SystemRequirements: GNU make
+LazyData: true
