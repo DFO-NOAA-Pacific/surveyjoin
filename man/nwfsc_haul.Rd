@@ -3,7 +3,7 @@
 \docType{data}
 \name{nwfsc_haul}
 \alias{nwfsc_haul}
-\title{Dataframe of all trawl data from NWFSC surveys}
+\title{Dataframe of all haul attributes from NWFSC trawl surveys}
 \format{
 A data frame.
 }
@@ -11,6 +11,6 @@ A data frame.
 nwfsc_haul
 }
 \description{
-Dataframe of all trawl data from NWFSC surveys
+Dataframe of all haul attributes from NWFSC trawl surveys
 }
 \keyword{datasets}
