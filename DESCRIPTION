@@ -4,7 +4,19 @@ Title: Combine Data from Northeast Pacific Ocean Fish Surveys
 Version: 0.0.1
 Authors@R: c(
     person(c("Eric", "J."), "Ward", email = "eric.ward@noaa.gov",
-      role = c("aut", "cre")))
+      role = c("aut", "cre")),
+    person(c("Sean", "C."), "Anderson", email = "sean.anderson@dfo-mpo.gc.ca",
+      role = c("aut")),
+    person(c("Lewis", "A.", "K."), "Barnett", email = "lewis.barnett@noaa.gov",
+      role = c("aut")),      
+    person(c("Bridget", "E."), "Ferriss", email = "bridget.ferriss@noaa.gov",
+      role = c("aut")),
+    person(c("Chantel","R."), "Wetzel",role = c("aut")),
+    person(c("Kelli", "F."), "Johnson",role = c("aut")),
+    person(c("Curt", "E."), "Whitmire",role = c("aut")),
+    person(c("Philina", "A."), "English",role = c("aut")),
+    person(c("James", "T."), "Thorson",role = c("aut"))
+    )
 Maintainer: Eric Ward <eric.ward@noaa.gov>
 Description: This package combines data from fish surveys in multiple regions
 License: GPL-3
