@@ -37,17 +37,18 @@ haul$date = ymd_hms(paste(ymd(haul$date_yyyymmdd), haul$sampling_start),
                         tz = "US/Pacific")
 
 haul <- dplyr::rename(haul,
-                      "area_swept" = "area_swept_ha_der",
+                      "effort" = "area_swept_ha_der",
                       "lat_start" = "vessel_start_latitude_dd",
                       "lon_start" = "vessel_start_longitude_dd",
                       "lat_end" = "vessel_end_latitude_dd",
                       "lon_end" = "vessel_end_longitude_dd",
-                      "depth_m" = "depth_hi_prec_m")
-haul$area_swept_units <- "ha"
+                      "depth_m" = "depth_hi_prec_m",
+                      "event_id" = "trawl_id")
+haul$effort_units <- "ha"
 
 nwfsc_haul <- dplyr::select(haul,
                       survey_name,
-                      trawl_id,
+                      event_id,
                       date,
                       pass,
                       vessel,
@@ -56,8 +57,11 @@ nwfsc_haul <- dplyr::select(haul,
                       lat_end,
                       lon_end,
                       depth_m,
-                      area_swept,
-                      area_swept_units,
+                      effort,
+                      effort_units,
                       performance)
+
+# enforce types
+#nwfsc_haul$vessel = as.character(nwfsc_haul$vessel)
 
 usethis::use_data(nwfsc_haul, overwrite = TRUE)

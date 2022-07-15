@@ -37,17 +37,22 @@ catch <- rbind(catch_nwfsc_combo,
               catch_nwfsc_tri)
 
 catch <- dplyr::rename(catch,
-                       trawl_id = Trawl_id,
-                       common_name = Common_name) %>%
-  dplyr::select(trawl_id, common_name, total_catch_numbers,
-                total_catch_wt_kg)
+                       event_id = Trawl_id,
+                       common_name = Common_name,
+                       catch_numbers = total_catch_numbers,
+                       catch_wt = total_catch_wt_kg) %>%
+  dplyr::select(event_id, common_name, catch_numbers,
+                catch_wt)
+
 catch$common_name <- tolower(catch$common_name)
 
 nwfsc_catch <- dplyr::left_join(catch, species) %>%
   dplyr::select(-common_name)
 
+nwfsc_catch$catch_wt_units = "kg"
+
 nwfsc_catch = dplyr::group_by(nwfsc_catch, scientific_name) %>%
-  dplyr::mutate(n = length(which(total_catch_wt_kg > 0))) %>%
+  dplyr::mutate(n = length(which(catch_wt > 0))) %>%
   dplyr::filter(n >= min_threshold) %>%
   dplyr::select(-n)
 
