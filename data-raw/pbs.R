@@ -19,15 +19,15 @@ dat <- purrr::map(1:2, function(i) {
 
 haul <- dat[[1]]
 haul$performance <- NA_integer_
-haul$area_swept_units <- "ha"
+haul$effort_units <- "ha"
 haul$area_swept <- haul$area_swept * 0.0001 # from m^2 to ha
 haul$pass <- NA_integer_
-# haul$date <- lubridate::ymd(paste(haul$year, haul$month, haul$day, sep = "-"))
 haul$vessel <- NA_character_
+
 pbs_haul <- dplyr::select(
   haul,
   survey_name = survey_abbrev,
-  trawl_id = fishing_event_id,
+  event_id = fishing_event_id,
   date = time_deployed,
   pass,
   vessel,
@@ -36,18 +36,21 @@ pbs_haul <- dplyr::select(
   lat_end = latitude_end,
   lon_end = longitude_end,
   depth_m = longitude_end,
-  area_swept = area_swept,
-  area_swept_units,
+  effort = area_swept,
+  effort_units,
   performance
 )
+pbs_haul$event_id <- as.integer(pbs_haul$event_id)
 usethis::use_data(pbs_haul, overwrite = TRUE)
 
 pbs_catch <- dat %>%
   dplyr::bind_rows() %>%
+  dplyr::left_join(select(spp, species_science_name, itis_tsn), by = "species_science_name") %>%
   dplyr::select(
-    trawl_id = fishing_event_id,
-    scientific_name = species_science_name,
-    total_catch_numbers = catch_count,
-    total_catch_wt_kg = catch_weight
+    event_id = fishing_event_id,
+    itis = itis_tsn,
+    catch_numbers = catch_count,
+    catch_weight = catch_weight
   )
+pbs_catch$event_id <- as.integer(pbs_catch$event_id)
 usethis::use_data(pbs_catch, overwrite = TRUE)
