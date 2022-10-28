@@ -6,6 +6,8 @@ library(dplyr)
 api_link <- "https://origin-tst-ods-st.fisheries.noaa.gov/ods/foss/afsc_groundfish_survey/"
 
 res <- httr::GET(url = api_link)
+res
+
 dat <- jsonlite::fromJSON(base::rawToChar(res$content))
 
 afsc <- dat[[1]] %>% dplyr::select(
