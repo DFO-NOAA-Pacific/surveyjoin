@@ -12,14 +12,16 @@ dat <- jsonlite::fromJSON(base::rawToChar(res$content))
 
 afsc <- dat[[1]] %>% dplyr::select(
   survey_name = srvy,
-  event_id = haul, #change to hauljoin when available via API
+  event_id = hauljoin,
   date = date_time,
   vessel = vessel_name,
-  lat_start = latitude_dd,
-  lon_start = longitude_dd,
+  lat_start = latitude_dd_start,
+  lon_start = longitude_dd_start,
+  lat_end = latitude_dd_end,
+  lon_end = longitude_dd_end,
   depth_m,
   effort = area_swept_ha,
-  itis = scientific_name, #change to itis when available via API
+  itis = itis,
   #itis_confidence = taxon_confidence, #consider adding this?
   catch_numbers = count,
   catch_weight = weight_kg,
@@ -30,8 +32,8 @@ afsc <- dat[[1]] %>% dplyr::select(
     pass = NA_integer_,
     lat_start = as.numeric(lat_start),
     lon_start = as.numeric(lon_start),
-    lat_end = as.numeric(NA), #need to make accessible via API first
-    lon_end = as.numeric(NA), #need to make accessible via API first
+    lat_end = as.numeric(lat_end),
+    lon_end = as.numeric(lon_end),
     depth_m = as.numeric(depth_m),
     effort = as.numeric(effort),
     effort_units = "ha",
