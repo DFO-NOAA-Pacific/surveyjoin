@@ -20,6 +20,7 @@ afsc <- dat[[1]] %>% dplyr::select(
   lat_end = latitude_dd_end,
   lon_end = longitude_dd_end,
   depth_m,
+  performance,
   effort = area_swept_ha,
   itis = itis,
   #itis_confidence = taxon_confidence, #consider adding this?
@@ -37,7 +38,7 @@ afsc <- dat[[1]] %>% dplyr::select(
     depth_m = as.numeric(depth_m),
     effort = as.numeric(effort),
     effort_units = "ha",
-    performance = NA_integer_,
+    performance = as.integer(performance),
     catch_numbers = as.numeric(catch_numbers),
     catch_weight = as.numeric(catch_weight),
     catch_weight_units = "kg"
