@@ -63,7 +63,8 @@ catch <- RODBC::sqlQuery(channel, "SELECT * FROM RACEBASE_FOSS.JOIN_FOSS_CPUE_CA
 names(catch) <- tolower(names(catch))
 afsc_catch <- catch %>% dplyr::select(
   event_id = hauljoin,
-  itis = itis,
+  itis,
+  scientific_name,
   catch_numbers = count,
   catch_weight = weight_kg,
   ) %>%
