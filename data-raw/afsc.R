@@ -25,6 +25,7 @@ afsc_haul <- haul %>% dplyr::select(
   depth_m,
   performance,
   effort = area_swept_ha,
+  bottom_temp_c = bottom_temperature_c
   ) %>%
   mutate(
     event_id = as.numeric(event_id),
@@ -37,7 +38,8 @@ afsc_haul <- haul %>% dplyr::select(
     depth_m = as.numeric(depth_m),
     effort = as.numeric(effort),
     effort_units = "ha",
-    performance = as.integer(performance)
+    performance = as.integer(performance),
+    bottom_temp_c = as.numeric(bottom_temp_c)
   ) %>%
   select(
     survey_name,
@@ -52,7 +54,8 @@ afsc_haul <- haul %>% dplyr::select(
     depth_m,
     effort,
     effort_units,
-    performance
+    performance,
+    bottom_temp_c
   )
 usethis::use_data(afsc_haul, overwrite = TRUE)
 
