@@ -35,7 +35,7 @@ pbs_haul <- dplyr::select(
   lon_start = longitude,
   lat_end = latitude_end,
   lon_end = longitude_end,
-  depth_m = longitude_end, # looks like a copy/paste error, need to get correct depth column name
+  depth_m = depth_m,
   effort = area_swept,
   effort_units,
   performance
