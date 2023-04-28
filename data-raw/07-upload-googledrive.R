@@ -19,10 +19,25 @@ f <- c(
   "nwfsc-haul.rds"
 )
 
+# drop those with no join in ITIS spp dictionary:
+dir.create("data-raw/data-itis-filtered/", showWarnings = FALSE)
+purrr::walk(f[grepl("catch", f)], function(x) {
+  d <- readRDS(paste0("data-raw/data/", x))
+  d <- dplyr::semi_join(d, spp_dictionary, by = join_by(itis))
+  saveRDS(d, paste0("data-raw/data-itis-filtered/", x),
+    compress = "bzip2", version = 3)
+})
+purrr::walk(f[grepl("haul", f)], function(x) {
+  d <- readRDS(paste0("data-raw/data/", x))
+  saveRDS(d, paste0("data-raw/data-itis-filtered/", x),
+    compress = "bzip2", version = 3)
+})
+
 upload <- function(x) {
   googledrive::drive_upload(
-    media = file.path("data-raw/data", x),
-    path = drive
+    media = file.path("data-raw/data-itis-filtered", x),
+    path = drive,
+    overwrite = TRUE
   )
 }
 

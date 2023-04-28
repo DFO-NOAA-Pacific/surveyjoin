@@ -71,22 +71,64 @@ cache_data <- function(region = c("nwfsc", "pbs", "afsc")) {
   cli::cli_alert_success(msg)
 }
 
-# load_data <- function() {
-#
-#   f <- cache_files()
-#   f_haul <- sort(f[grepl("haul", f)])
-#   f_catch <- sort(f[grepl("catch", f)])
-#   stopifnot(length(f_haul) == length(f_catch))
-#
-#   d <- purrr::map_dfr(, function(x) {
-#     out <- readRDS(file.path(cache_folder(), x))
-#     out$region <- gsub("([a-z]+)-[a-z]+.rds", "\\1", x)
-#     out
-#   })
-#   d[]
-#
-#   # assign("survdat", survdat, envir = globalenv())
-# }
+load_sql_data <- function() {
+  f <- cache_files()
+  f_haul <- sort(f[grepl("haul", f)])
+  f_catch <- sort(f[grepl("catch", f)])
+  stopifnot(length(f_haul) == length(f_catch))
+  haul <- purrr::map_dfr(f_haul, function(x) {
+    out <- readRDS(file.path(cache_folder(), x))
+    out$region <- gsub("([a-z]+)-[a-z]+.rds", "\\1", x)
+    out$performance <- as.character(out$performance)
+    out
+  })
+  catch <- purrr::map_dfr(f_catch, function(x) {
+    out <- readRDS(file.path(cache_folder(), x))
+    out$region <- gsub("([a-z]+)-[a-z]+.rds", "\\1", x)
+    out
+  })
+
+  catch <- left_join(catch, spp_dictionary, by = join_by(itis))
+  stopifnot(sum(is.na(catch$scientific_name)) == 0L)
+
+  db <- RSQLite::dbConnect(RSQLite::SQLite(), dbname = sql_folder())
+  on.exit(suppressWarnings(suppressMessages(DBI::dbDisconnect(db))))
+  RSQLite::dbWriteTable(db, "haul", haul, overwrite = TRUE, append = FALSE)
+  RSQLite::dbWriteTable(db, "catch", catch, overwrite = TRUE, append = FALSE)
+}
 
 
-x <- readRDS(file.path(cache_folder(), "afsc-catch.rds"))
+sql_folder <- function() {
+  file.path(cache_folder(), "surveyjoin.sqlite")
+}
+
+# library(dplyr)
+
+surv_db <- function() {
+  RSQLite::dbConnect(RSQLite::SQLite(), dbname = sql_folder())
+}
+
+get_itis_spp <- function(itis) {
+  out <- taxize::get_ids(spp, db = "itis", verbose = FALSE)
+  as.integer(unlist(out))
+}
+
+
+
+# get_data <- function(species, survey)
+
+# # db <-
+#
+
+
+
+
+# make_itis_spp_table()
+
+# results <- bird_tracking %>%
+#   filter(device_info_serial == 860) %>%
+#   select(date_time, latitude, longitude, altitude) %>%
+#   filter(date_time < "2014-07-01") %>%
+#   filter(date_time > "2014-03-01")
+# head(results)
+
