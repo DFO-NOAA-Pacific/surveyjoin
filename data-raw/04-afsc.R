@@ -57,7 +57,8 @@ afsc_haul <- haul %>% dplyr::select(
     performance,
     bottom_temp_c
   )
-usethis::use_data(afsc_haul, overwrite = TRUE)
+# usethis::use_data(afsc_haul, overwrite = TRUE)
+save_raw_data(afsc_haul, "afsc-haul")
 
 catch <- RODBC::sqlQuery(channel, "SELECT * FROM RACEBASE_FOSS.JOIN_FOSS_CPUE_CATCH")
 names(catch) <- tolower(names(catch))
@@ -74,8 +75,52 @@ afsc_catch <- catch %>% dplyr::select(
     catch_weight = as.numeric(catch_weight),
     catch_weight_units = "kg"
   )
-usethis::use_data(afsc_catch, overwrite = TRUE)
+# usethis::use_data(afsc_catch, overwrite = TRUE)
 
+# filter this down to something manageable size-wise:
+# (to slow to load)
+x <- group_by(afsc_catch, scientific_name) |>
+  summarise(total_weight = sum(catch_weight), itis = itis[1]) |> arrange(-total_weight)
+
+filter(x, total_weight > 3000) |> summarise(r = sum(total_weight) / sum(x$total_weight)) |> pull(r)
+
+filter(x, total_weight > 3000) |>
+  nrow()
+
+na <- filter(x, is.na(itis)) |> summarise(s = sum(total_weight))
+notna <- filter(x, !is.na(itis)) |> summarise(s = sum(total_weight))
+
+na$s[1] / notna$s[1]
+
+N <- group_by(afsc_catch, scientific_name) |>
+  mutate(total_weight = sum(catch_weight)) |>
+  filter(total_weight > 3000) |>
+  nrow()
+
+N / nrow(afsc_catch)
+
+filter(afsc_catch, is.na(itis)) |> nrow()
+filter(afsc_catch, !is.na(itis)) |> nrow()
+
+tokeep <- afsc_catch |>
+  filter(!is.na(itis)) |>
+  group_by(itis) |>
+  summarise(total_weight = sum(catch_weight)) |>
+  filter(total_weight > 3000) |>
+  select(itis) |>
+  distinct()
+
+afsc_catch_keep <- semi_join(afsc_catch, tokeep, by = join_by(itis))
+sum(afsc_catch_keep$catch_weight) / sum(afsc_catch$catch_weight)
+
+nrow(afsc_catch_keep) / nrow(afsc_catch)
+
+afsc_catch_keep$catch_weight_units <- NULL
+afsc_catch_keep$scientific_name <- NULL
+
+glimpse(afsc_catch_keep)
+
+save_raw_data(afsc_catch_keep, "afsc-catch")
 
 #---- Via API (currently broken)
 # link to the API generated at [AFSC RACE Groundfish and Shellfish Survey Public Data](https://github.com/afsc-gap-products/gap_public_data)

@@ -66,4 +66,5 @@ nwfsc_haul <- dplyr::select(haul,
 # enforce types
 #nwfsc_haul$vessel = as.character(nwfsc_haul$vessel)
 
-usethis::use_data(nwfsc_haul, overwrite = TRUE)
+# usethis::use_data(nwfsc_haul, overwrite = TRUE)
+save_raw_data(nwfsc_haul, "nwfsc-haul")
