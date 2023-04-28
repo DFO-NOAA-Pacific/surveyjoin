@@ -18,7 +18,8 @@ Authors@R: c(
     person(c("James", "T."), "Thorson",role = c("aut"))
     )
 Maintainer: Eric Ward <eric.ward@noaa.gov>
-Description: This package combines data from fish surveys in multiple regions
+Description: This package combines data from fish surveys in multiple regions.
+    The data are cached locally in a SQLite database.
 License: GPL-3
 Encoding: UTF-8
 Depends:
