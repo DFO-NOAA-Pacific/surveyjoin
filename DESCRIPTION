@@ -25,7 +25,14 @@ Depends:
     R (>= 4.0.0)
 Imports:
     dplyr (>= 1.0.2),
-    rlang (>= 0.4.1)
+    rlang (>= 0.4.1),
+    RSQLite,
+    purrr,
+    checkmate,
+    cli,
+    googledrive,
+    rappdirs,
+    DBI
 Suggests:
     testthat,
     parallel,

@@ -49,6 +49,18 @@ cache_files <- function() {
   )
 }
 
+#' Cache data
+#'
+#' @param region Region name(s)
+#'
+#' @return
+#' Nothing returned; data files are cached locally.
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' cache_data()
+#' }
 cache_data <- function(region = c("nwfsc", "pbs", "afsc")) {
   # valid region(s)?
   r <- purrr::map_chr(region, function(region) {
@@ -71,6 +83,15 @@ cache_data <- function(region = c("nwfsc", "pbs", "afsc")) {
   cli::cli_alert_success(msg)
 }
 
+#' Load SQLite database
+#'
+#' @return Nothing; data is inserted into a local SQLite database.
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' load_sql_data()
+#' }
 load_sql_data <- function() {
   f <- cache_files()
   f_haul <- sort(f[grepl("haul", f)])
@@ -80,6 +101,11 @@ load_sql_data <- function() {
     out <- readRDS(file.path(cache_folder(), x))
     out$region <- gsub("([a-z]+)-[a-z]+.rds", "\\1", x)
     out$performance <- as.character(out$performance)
+    out$year <- as.integer(lubridate::year(out$date))
+    out$date <- as.character(lubridate::as_date(out$date))
+    # FIXME: do this long before! Alaska
+    out$lon_start <- ifelse(out$lon_start > 0, out$lon_start * -1, out$lon_start)
+    out$lon_end <- ifelse(out$lon_end > 0, out$lon_end * -1, out$lon_end)
     out
   })
   catch <- purrr::map_dfr(f_catch, function(x) {
@@ -87,14 +113,18 @@ load_sql_data <- function() {
     out$region <- gsub("([a-z]+)-[a-z]+.rds", "\\1", x)
     out
   })
+  cli::cli_alert_success("Raw data read into memory")
 
-  catch <- left_join(catch, spp_dictionary, by = join_by(itis))
+  catch <- dplyr::left_join(catch, spp_dictionary, by = dplyr::join_by(itis))
   stopifnot(sum(is.na(catch$scientific_name)) == 0L)
+  cli::cli_alert_success("Taxonomic data joined to catch data")
 
   db <- RSQLite::dbConnect(RSQLite::SQLite(), dbname = sql_folder())
   on.exit(suppressWarnings(suppressMessages(DBI::dbDisconnect(db))))
   RSQLite::dbWriteTable(db, "haul", haul, overwrite = TRUE, append = FALSE)
   RSQLite::dbWriteTable(db, "catch", catch, overwrite = TRUE, append = FALSE)
+
+  cli::cli_alert_success("SQLite database created")
 }
 
 
@@ -102,8 +132,16 @@ sql_folder <- function() {
   file.path(cache_folder(), "surveyjoin.sqlite")
 }
 
-# library(dplyr)
-
+#' Load the survey database
+#'
+#' @return a [RSQLite::dbConnect()] connection to the database
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' db <- surv_db()
+#'
+#' }
 surv_db <- function() {
   RSQLite::dbConnect(RSQLite::SQLite(), dbname = sql_folder())
 }
@@ -112,7 +150,6 @@ get_itis_spp <- function(itis) {
   out <- taxize::get_ids(spp, db = "itis", verbose = FALSE)
   as.integer(unlist(out))
 }
-
 
 
 # get_data <- function(species, survey)
