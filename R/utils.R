@@ -87,6 +87,7 @@ cache_data <- function(region = c("nwfsc", "pbs", "afsc")) {
 #'
 #' @return Nothing; data is inserted into a local SQLite database.
 #' @export
+#' @importFrom rlang .data
 #'
 #' @examples
 #' \dontrun{
@@ -115,7 +116,7 @@ load_sql_data <- function() {
   })
   cli::cli_alert_success("Raw data read into memory")
 
-  catch <- dplyr::left_join(catch, spp_dictionary, by = dplyr::join_by(itis))
+  catch <- dplyr::left_join(catch, surveyjoin::spp_dictionary, by = dplyr::join_by(.data$itis))
   stopifnot(sum(is.na(catch$scientific_name)) == 0L)
   cli::cli_alert_success("Taxonomic data joined to catch data")
 
@@ -134,7 +135,7 @@ sql_folder <- function() {
 
 #' Load the survey database
 #'
-#' @return a [RSQLite::dbConnect()] connection to the database
+#' @return a [DBI::dbConnect()] connection to the database
 #' @export
 #'
 #' @examples
@@ -146,7 +147,7 @@ surv_db <- function() {
   RSQLite::dbConnect(RSQLite::SQLite(), dbname = sql_folder())
 }
 
-get_itis_spp <- function(itis) {
+get_itis_spp <- function(spp) {
   out <- taxize::get_ids(spp, db = "itis", verbose = FALSE)
   as.integer(unlist(out))
 }

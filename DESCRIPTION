@@ -32,14 +32,17 @@ Imports:
     cli,
     googledrive,
     rappdirs,
-    DBI
+    DBI,
+    taxize,
+    lubridate
 Suggests:
     testthat,
     parallel,
     knitr,
     rmarkdown,
     devtools,
-    MASS
+    MASS,
+    ggplot2
 RoxygenNote: 7.2.3
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
