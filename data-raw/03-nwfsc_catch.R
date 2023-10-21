@@ -56,4 +56,48 @@ nwfsc_catch = dplyr::group_by(nwfsc_catch, scientific_name) %>%
   dplyr::filter(n >= min_threshold) %>%
   dplyr::select(-n)
 
-usethis::use_data(nwfsc_catch, overwrite = TRUE)
+nwfsc_catch <- rename(nwfsc_catch, catch_weight = catch_wt)
+
+tokeep <- nwfsc_catch |>
+  # filter(!is.na(itis)) |>
+  group_by(scientific_name) |>
+  summarise(total_weight = sum(catch_weight)) |>
+  filter(total_weight > 1000) |>
+  select(scientific_name) |>
+  distinct()
+nrow(tokeep)
+
+nwfsc_catch_keep <- semi_join(nwfsc_catch, tokeep, by = join_by(scientific_name))
+sum(nwfsc_catch_keep$catch_weight) / sum(nwfsc_catch$catch_weight)
+
+# FIXME: maybe this already in the database!?
+get_itis <- function(spp) {
+  out <- taxize::get_ids(spp, db = "itis", verbose = FALSE)
+  as.integer(unlist(out))
+}
+
+spp <- sort(unique(nwfsc_catch_keep$scientific_name))
+itis_codes <- get_itis(spp)
+spp_df <- tibble(scientific_name = spp, itis = itis_codes)
+
+filter(spp_df, is.na(itis))
+
+nwfsc_catch_keep <- left_join(nwfsc_catch_keep, spp_df, by = join_by(scientific_name))
+
+nwfsc_catch_keep <- filter(nwfsc_catch_keep, !is.na(itis))
+
+nrow(nwfsc_catch_keep) / nrow(nwfsc_catch)
+sum(nwfsc_catch_keep$catch_weight) / sum(nwfsc_catch$catch_weight)
+
+# save space:
+nwfsc_catch_keep$catch_wt_units <- NULL
+nwfsc_catch_keep$scientific_name <- NULL
+nwfsc_catch_keep$trawl_id <- as.numeric(nwfsc_catch_keep$trawl_id)
+glimpse(nwfsc_catch_keep)
+
+nwfsc_catch_keep <- rename(nwfsc_catch_keep, event_id = trawl_id) |>
+  select(event_id, itis, catch_numbers, catch_weight)
+glimpse(nwfsc_catch_keep)
+
+# usethis::use_data(nwfsc_catch, overwrite = TRUE)
+save_raw_data(nwfsc_catch_keep, "nwfsc-catch")

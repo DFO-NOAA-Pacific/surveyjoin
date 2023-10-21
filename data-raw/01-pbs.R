@@ -1,23 +1,37 @@
+dir.create("data-raw/data", showWarnings = FALSE)
 library(dplyr)
 ssids <- c(1, 3, 4, 16)
 
 dir.create("data-raw/pbs-cache", showWarnings = FALSE)
 spp <- gfsynopsis::get_spp_names()
-# dat <- purrr::map(seq_len(nrow(spp)), function(i) {
-dat <- purrr::map(1:2, function(i) {
+
+sean_cache <- "../gfsynopsis-2021/report/data-cache-feb-2023/"
+user <- Sys.info()[["user"]]
+
+dat <- purrr::map(seq_len(nrow(spp)), function(i) {
   s <- spp$spp_w_hyphens[i]
   cat(s, "\n")
   f <- paste0("data-raw/pbs-cache/", s, ".rds")
   if (file.exists(f)) {
     readRDS(f)
   } else {
-    d <- gfdata::get_survey_sets(species = spp$species_code[i], ssid = ssids)
+    if (user == "seananderson") {
+      d <- readRDS(paste0(sean_cache, s, ".rds"))$survey_sets
+      if ("survey_series_id.x" %in% names(d)) {
+        d$survey_series_id <- d$survey_series_id.x
+        d$survey_series_id.x <- NULL
+        d$survey_series_id.y <- NULL
+        d <- dplyr::filter(d, survey_series_id %in% ssids)
+      }
+    } else {
+      d <- gfdata::get_survey_sets(species = spp$species_code[i], ssid = ssids)
+    }
     saveRDS(d, file = f)
     d
   }
 })
 
-haul <- dat[[1]]
+haul <- dat[[1]] # pick one
 haul$performance <- NA_integer_
 haul$effort_units <- "ha"
 haul$area_swept <- haul$area_swept * 0.0001 # from m^2 to ha
@@ -35,13 +49,13 @@ pbs_haul <- dplyr::select(
   lon_start = longitude,
   lat_end = latitude_end,
   lon_end = longitude_end,
-  depth_m = longitude_end, # looks like a copy/paste error, need to get correct depth column name
+  depth_m = depth_m,
   effort = area_swept,
   effort_units,
   performance
 )
 pbs_haul$event_id <- as.integer(pbs_haul$event_id)
-usethis::use_data(pbs_haul, overwrite = TRUE)
+save_raw_data(pbs_haul, "pbs-haul")
 
 pbs_catch <- dat %>%
   dplyr::bind_rows() %>%
@@ -52,5 +66,8 @@ pbs_catch <- dat %>%
     catch_numbers = catch_count,
     catch_weight = catch_weight
   )
-pbs_catch$event_id <- as.integer(pbs_catch$event_id)
-usethis::use_data(pbs_catch, overwrite = TRUE)
+pbs_catch$event_id <- as.numeric(pbs_catch$event_id)
+
+glimpse(pbs_catch)
+
+save_raw_data(pbs_catch, "pbs-catch")

@@ -43,7 +43,8 @@ haul <- dplyr::rename(haul,
                       "lat_end" = "vessel_end_latitude_dd",
                       "lon_end" = "vessel_end_longitude_dd",
                       "depth_m" = "depth_hi_prec_m",
-                      "event_id" = "trawl_id")
+                      "event_id" = "trawl_id",
+                      "bottom_temp_c" = "temperature_at_gear_c_der")
 haul$effort_units <- "ha"
 
 nwfsc_haul <- dplyr::select(haul,
@@ -59,9 +60,11 @@ nwfsc_haul <- dplyr::select(haul,
                       depth_m,
                       effort,
                       effort_units,
-                      performance)
+                      performance,
+                      bottom_temp_c)
 
 # enforce types
 #nwfsc_haul$vessel = as.character(nwfsc_haul$vessel)
 
-usethis::use_data(nwfsc_haul, overwrite = TRUE)
+# usethis::use_data(nwfsc_haul, overwrite = TRUE)
+save_raw_data(nwfsc_haul, "nwfsc-haul")

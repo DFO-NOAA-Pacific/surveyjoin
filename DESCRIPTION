@@ -18,22 +18,33 @@ Authors@R: c(
     person(c("James", "T."), "Thorson",role = c("aut"))
     )
 Maintainer: Eric Ward <eric.ward@noaa.gov>
-Description: This package combines data from fish surveys in multiple regions
+Description: This package combines data from fish surveys in multiple regions.
+    The data are cached locally in a SQLite database.
 License: GPL-3
 Encoding: UTF-8
 Depends:
     R (>= 4.0.0)
 Imports:
     dplyr (>= 1.0.2),
-    rlang (>= 0.4.1)
+    rlang (>= 0.4.1),
+    RSQLite,
+    purrr,
+    checkmate,
+    cli,
+    googledrive,
+    rappdirs,
+    DBI,
+    taxize,
+    lubridate
 Suggests:
     testthat,
     parallel,
     knitr,
     rmarkdown,
     devtools,
-    MASS
-RoxygenNote: 7.2.0
+    MASS,
+    ggplot2
+RoxygenNote: 7.2.3
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
 SystemRequirements: GNU make

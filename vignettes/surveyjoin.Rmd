@@ -1,0 +1,59 @@
+---
+title: "surveyjoin"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{surveyjoin}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(surveyjoin)
+library(dplyr)
+library(ggplot2)
+```
+
+```{r get-data, eval=FALSE}
+cache_data()
+load_sql_data()
+```
+
+```{r, eval=FALSE}
+# this would be wrapped up in helper functions
+db <- surv_db()
+catch <- tbl(db, "catch")
+haul <- tbl(db, "haul")
+
+d <- catch |> 
+  filter(common_name == "arrowtooth flounder") |> 
+  left_join(haul) |> 
+  collect(n = Inf)
+
+g <- d |> 
+  ggplot(aes(
+    lon_start, 
+    lat_start, 
+    colour = catch_weight / effort, 
+    size = catch_weight / effort
+  )) +
+  geom_point(pch = 21) + 
+  facet_wrap(~year) +
+  scale_colour_viridis_c(trans = "log10") +
+  theme_light() +
+  coord_fixed()
+ggsave("map-example.png", width = 20, height = 12, dpi = 150)
+
+sum(is.na(d$effort)) # FIXME!
+sum(is.na(d$year)) # FIXME!
+sum(is.na(d$date)) # FIXME!
+ 
+DBI::dbDisconnect(conn = db) # would be called on.exit() in helper functions
+```
+
