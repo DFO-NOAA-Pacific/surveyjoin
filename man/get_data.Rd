@@ -35,10 +35,36 @@ of "Aleutian Islands Bottom Trawl Survey", "Eastern Bering Sea Crab/Groundfish B
 }
 \value{
 a dataframe of joined haul and catch data
+\itemize{
+\item \strong{event_id}: Unique haul identifier.
+\item \strong{itis}: ITIS identifier for species.
+\item \strong{catch_numbers}: Numbers of fish for this haul - species.
+\item \strong{catch_weight}: Weight (kg) of fish for this haul - species.
+\item \strong{region}: Region this survey originated in ("pbs", "nwfsc", "afsc").
+\item \strong{scientific_name}: Scientific name for this species.
+\item \strong{common_name}: Common name for this species.
+\item \strong{survey_name}: Name of the survey this haul is part of.
+\item \strong{date}: String representation of the date, format YYYY-MM-DD.
+\item \strong{pass}: Optional pass identifier (1 or 2), only used for NWFSC surveys.
+\item \strong{vessel}: Optional unique vessel identifier, not included in all surveys.
+\item \strong{lat_start}: Starting latitude of haul, decimal degrees.
+\item \strong{lon_start}: Starting longitude of haul, decimal degrees.
+\item \strong{lat_end}: Ending latitude of haul, decimal degrees.
+\item \strong{lon_end}: Ending longitude of haul, decimal degrees.
+\item \strong{depth_m}: Haul bottom depth (meters).
+\item \strong{effort}: Amount of units corresponding to this haul.
+\item \strong{effort_units}: Units of effort.
+\item \strong{performance}: Optional performance indicator for each haul, not used for all surveys. If not
+indicated, assume performance is satisfactory
+\item \strong{bottom_temp_c}: Bottom temperature recorded at the gear, in degrees Celsius.
+\item \strong{year}: Calendar year corresponding to the haul.
+}
 }
 \description{
 Query the survey database
 }
 \examples{
-\dontrun{}
+\dontrun{
+d <- get_data(common = "arrowtooth flounder", years = 2013:2018, region="pbs")
+}
 }

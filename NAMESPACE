@@ -2,7 +2,12 @@
 
 export(cache_data)
 export(get_data)
+export(get_itis_spp)
 export(load_sql_data)
 export(surv_db)
 import(dplyr)
+importFrom(DBI,dbDisconnect)
+importFrom(RSQLite,SQLite)
+importFrom(RSQLite,dbConnect)
 importFrom(rlang,.data)
+importFrom(taxize,get_ids)

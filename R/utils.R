@@ -137,18 +137,28 @@ sql_folder <- function() {
 #'
 #' @return a [DBI::dbConnect()] connection to the database
 #' @export
-#'
+#' @importFrom RSQLite dbConnect SQLite
 #' @examples
 #' \dontrun{
 #' db <- surv_db()
 #'
 #' }
 surv_db <- function() {
-  RSQLite::dbConnect(RSQLite::SQLite(), dbname = sql_folder())
+  dbConnect(SQLite(), dbname = sql_folder())
 }
 
+#' Get the ITIS identifier of a species
+#' @param spp (character) Taxonomic name to query
+#' @return an integer representing the ITIS identifier
+#' @export
+#' @importFrom taxize get_ids
+#' @examples
+#' \dontrun{
+#' id <- get_itis_spp("darkblotched rockfish")
+#'
+#' }
 get_itis_spp <- function(spp) {
-  out <- taxize::get_ids(spp, db = "itis", verbose = FALSE)
+  out <- get_ids(spp, db = "itis", verbose = FALSE)
   as.integer(unlist(out))
 }
 
@@ -168,7 +178,32 @@ get_itis_spp <- function(spp) {
 #' "SYN HS", "SYN WCVI", "SYN WCHG". If NULL, all are returned
 #' @param years a vector of years, e.g. `year = 2013:2018`. If NULL, all are returned
 #' @return a dataframe of joined haul and catch data
+#' \itemize{
+#'   \item \strong{event_id}: Unique haul identifier.
+#'   \item \strong{itis}: ITIS identifier for species.
+#'   \item \strong{catch_numbers}: Numbers of fish for this haul - species.
+#'   \item \strong{catch_weight}: Weight (kg) of fish for this haul - species.
+#'   \item \strong{region}: Region this survey originated in ("pbs", "nwfsc", "afsc").
+#'   \item \strong{scientific_name}: Scientific name for this species.
+#'   \item \strong{common_name}: Common name for this species.
+#'   \item \strong{survey_name}: Name of the survey this haul is part of.
+#'   \item \strong{date}: String representation of the date, format YYYY-MM-DD.
+#'   \item \strong{pass}: Optional pass identifier (1 or 2), only used for NWFSC surveys.
+#'   \item \strong{vessel}: Optional unique vessel identifier, not included in all surveys.
+#'   \item \strong{lat_start}: Starting latitude of haul, decimal degrees.
+#'   \item \strong{lon_start}: Starting longitude of haul, decimal degrees.
+#'   \item \strong{lat_end}: Ending latitude of haul, decimal degrees.
+#'   \item \strong{lon_end}: Ending longitude of haul, decimal degrees.
+#'   \item \strong{depth_m}: Haul bottom depth (meters).
+#'   \item \strong{effort}: Amount of units corresponding to this haul.
+#'   \item \strong{effort_units}: Units of effort.
+#'   \item \strong{performance}: Optional performance indicator for each haul, not used for all surveys. If not
+#'   indicated, assume performance is satisfactory
+#'   \item \strong{bottom_temp_c}: Bottom temperature recorded at the gear, in degrees Celsius.
+#'   \item \strong{year}: Calendar year corresponding to the haul.
+#' }
 #' @import dplyr
+#' @importFrom DBI dbDisconnect
 #' @export
 #'
 #' @examples
@@ -218,7 +253,7 @@ get_data <- function(common = NULL, scientific = NULL, itis_id = NULL, regions =
     d <- d |>
       filter(region %in% regions)
   }
-  DBI::dbDisconnect(conn = db)
+  dbDisconnect(conn = db)
 
   return(d)
 }
