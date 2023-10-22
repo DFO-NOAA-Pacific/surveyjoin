@@ -26,7 +26,7 @@ load_sql_data()
 ```
 
 ```{r, eval=FALSE}
-d <- get_data(common_name == "arrowtooth flounder")
+d <- get_data(common = "arrowtooth flounder")
 
 g <- d |> 
   ggplot(aes(
@@ -42,8 +42,8 @@ g <- d |>
   coord_fixed()
 ggsave("map-example.png", width = 20, height = 12, dpi = 150)
 
-sum(is.na(d$effort)) # FIXME!
-sum(is.na(d$year)) # FIXME!
-sum(is.na(d$date)) # FIXME!
+# sum(is.na(d$effort)) # FIXME!
+# sum(is.na(d$year)) # FIXME!
+# sum(is.na(d$date)) # FIXME!
 ```
 

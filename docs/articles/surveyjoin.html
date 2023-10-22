@@ -85,7 +85,7 @@
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cache_data.html">cache_data</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/load_sql_data.html">load_sql_data</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_data.html">get_data</a></span><span class="op">(</span><span class="va">common_name</span> <span class="op">==</span> <span class="st">"arrowtooth flounder"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_data.html">get_data</a></span><span class="op">(</span>common <span class="op">=</span> <span class="st">"arrowtooth flounder"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">g</span> <span class="op">&lt;-</span> <span class="va">d</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span></span>
@@ -101,9 +101,9 @@
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_fixed</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">"map-example.png"</span>, width <span class="op">=</span> <span class="fl">20</span>, height <span class="op">=</span> <span class="fl">12</span>, dpi <span class="op">=</span> <span class="fl">150</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">d</span><span class="op">$</span><span class="va">effort</span><span class="op">)</span><span class="op">)</span> <span class="co"># FIXME!</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">d</span><span class="op">$</span><span class="va">year</span><span class="op">)</span><span class="op">)</span> <span class="co"># FIXME!</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">d</span><span class="op">$</span><span class="va">date</span><span class="op">)</span><span class="op">)</span> <span class="co"># FIXME!</span></span></code></pre></div>
+<span><span class="co"># sum(is.na(d$effort)) # FIXME!</span></span>
+<span><span class="co"># sum(is.na(d$year)) # FIXME!</span></span>
+<span><span class="co"># sum(is.na(d$date)) # FIXME!</span></span></code></pre></div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
