@@ -116,7 +116,7 @@ load_sql_data <- function() {
   })
   cli::cli_alert_success("Raw data read into memory")
 
-  catch <- dplyr::left_join(catch, surveyjoin::spp_dictionary, by = dplyr::join_by(.data$itis))
+  catch <- dplyr::left_join(catch, surveyjoin::spp_dictionary)
   stopifnot(sum(is.na(catch$scientific_name)) == 0L)
   cli::cli_alert_success("Taxonomic data joined to catch data")
 
@@ -152,14 +152,76 @@ get_itis_spp <- function(spp) {
   as.integer(unlist(out))
 }
 
+#' Query the survey database
+#'
+#' @param common A string, or vector of strings of common names for species
+#' @param scientific A string, or vector of strings of scientific names for species
+#' @param itis_id An integer or vector of integers corresponding to ITIS identifiers
+#' @param regions A string, or vector of strings of common names for regions. May be one or more
+#' of "afsc", "nwfsc", "pbs". Surveys are nested within region, so returning data from a region will
+#' return more than one survey.
+#' @param surveys A string, or vector of strings of common names for surveys. May be one or more
+#' of "Aleutian Islands Bottom Trawl Survey", "Eastern Bering Sea Crab/Groundfish Bottom Trawl Survey",
+#' "Eastern Bering Sea Slope Bottom Trawl Survey", "Gulf of Alaska Bottom Trawl Survey",
+#' "Northern Bering Sea Crab/Groundfish Survey - Eastern Bering Sea Shelf Survey Extension",
+#' "NWFSC.Combo", "NWFSC.Shelf", "NWFSC.Hypoxia", "NWFSC.Hypoxia", "Triennial", "SYN QCS",
+#' "SYN HS", "SYN WCVI", "SYN WCHG". If NULL, all are returned
+#' @param years a vector of years, e.g. `year = 2013:2018`. If NULL, all are returned
+#' @return a dataframe of joined haul and catch data
+#' @import dplyr
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' d <- get_data(common = "arrowtooth flounder", years = 2013:2018, region="pbs")
+#' }
+get_data <- function(common = NULL, scientific = NULL, itis_id = NULL, regions = NULL, surveys = NULL, years = NULL) {
 
-# get_data <- function(species, survey)
+  db <- surv_db() # create connection to database; need error checking
+  catch <- tbl(db, "catch")
+  haul <- tbl(db, "haul")
 
-# # db <-
-#
+  if(!is.null(common)) common <- tolower(common)
+  if(!is.null(scientific)) scientific <- tolower(scientific)
+  if(!is.null(itis_id)) itis_id <- as.integer(itis_id)
+  if(!is.null(years)) years <- as.integer(years)
 
+  # Filter species as needed, default returns all
+  if(!is.null(common)) {
+    catch <- catch |>
+      filter(common %in% common)
+  }
+  if(!is.null(scientific)) {
+    catch <- catch |>
+      filter(scientific %in% scientific)
+  }
+  if(!is.null(itis_id)) {
+    catch <- catch |>
+      filter(itis_id %in% itis_id)
+  }
 
+  # Filter hauls as needed, default returns all
+  if(!is.null(surveys)) {
+    haul <- haul |>
+      filter(survey_name %in% surveys)
+  }
 
+  # Join data and filter years if specified
+  d <- catch |>
+    left_join(haul) |>
+    collect(n = Inf)
+  if(!is.null(years)) {
+    d <- d |>
+      filter(year %in% years)
+  }
+  if(!is.null(regions)) {
+    d <- d |>
+      filter(region %in% regions)
+  }
+  DBI::dbDisconnect(conn = db)
+
+  return(d)
+}
 
 # make_itis_spp_table()
 

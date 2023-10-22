@@ -26,15 +26,7 @@ load_sql_data()
 ```
 
 ```{r, eval=FALSE}
-# this would be wrapped up in helper functions
-db <- surv_db()
-catch <- tbl(db, "catch")
-haul <- tbl(db, "haul")
-
-d <- catch |> 
-  filter(common_name == "arrowtooth flounder") |> 
-  left_join(haul) |> 
-  collect(n = Inf)
+d <- get_data(common_name == "arrowtooth flounder")
 
 g <- d |> 
   ggplot(aes(
@@ -53,7 +45,5 @@ ggsave("map-example.png", width = 20, height = 12, dpi = 150)
 sum(is.na(d$effort)) # FIXME!
 sum(is.na(d$year)) # FIXME!
 sum(is.na(d$date)) # FIXME!
- 
-DBI::dbDisconnect(conn = db) # would be called on.exit() in helper functions
 ```
 
