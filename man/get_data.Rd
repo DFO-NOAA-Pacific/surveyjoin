@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{get_data}
 \alias{get_data}
-\title{Query the survey database}
+\title{Main function to query the survey database}
 \usage{
 get_data(
   common = NULL,
@@ -61,7 +61,7 @@ indicated, assume performance is satisfactory
 }
 }
 \description{
-Query the survey database
+Main function to query the survey database
 }
 \examples{
 \dontrun{

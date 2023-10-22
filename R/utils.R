@@ -49,7 +49,7 @@ cache_files <- function() {
   )
 }
 
-#' Cache data
+#' Function to cache the data files locally
 #'
 #' @param region Region name(s)
 #'
@@ -133,10 +133,9 @@ sql_folder <- function() {
   file.path(cache_folder(), "surveyjoin.sqlite")
 }
 
-#' Load the survey database
+#' Function to create a connection to the database
 #'
 #' @return a [DBI::dbConnect()] connection to the database
-#' @export
 #' @importFrom RSQLite dbConnect SQLite
 #' @examples
 #' \dontrun{
@@ -162,7 +161,7 @@ get_itis_spp <- function(spp) {
   as.integer(unlist(out))
 }
 
-#' Query the survey database
+#' Main function to query the survey database
 #'
 #' @param common A string, or vector of strings of common names for species
 #' @param scientific A string, or vector of strings of scientific names for species

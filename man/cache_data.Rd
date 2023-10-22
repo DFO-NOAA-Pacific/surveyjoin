@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{cache_data}
 \alias{cache_data}
-\title{Cache data}
+\title{Function to cache the data files locally}
 \usage{
 cache_data(region = c("nwfsc", "pbs", "afsc"))
 }
@@ -13,7 +13,7 @@ cache_data(region = c("nwfsc", "pbs", "afsc"))
 Nothing returned; data files are cached locally.
 }
 \description{
-Cache data
+Function to cache the data files locally
 }
 \examples{
 \dontrun{

@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{surv_db}
 \alias{surv_db}
-\title{Load the survey database}
+\title{Function to create a connection to the database}
 \usage{
 surv_db()
 }
@@ -10,7 +10,7 @@ surv_db()
 a \code{\link[DBI:dbConnect]{DBI::dbConnect()}} connection to the database
 }
 \description{
-Load the survey database
+Function to create a connection to the database
 }
 \examples{
 \dontrun{
