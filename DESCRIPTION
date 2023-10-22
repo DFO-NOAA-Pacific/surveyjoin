@@ -11,6 +11,7 @@ Authors@R: c(
       role = c("aut")),      
     person(c("Bridget", "E."), "Ferriss", email = "bridget.ferriss@noaa.gov",
       role = c("aut")),
+    person(c("Chris"), "Rooper",role = c("aut")),
     person(c("Chantel","R."), "Wetzel",role = c("aut")),
     person(c("Kelli", "F."), "Johnson",role = c("aut")),
     person(c("Curt", "E."), "Whitmire",role = c("aut")),
