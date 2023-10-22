@@ -3,9 +3,12 @@ make_itis_spp_table <- function() {
   # haul <- dplyr::tbl(db, "haul")
   # catch <- dplyr::tbl(db, "catch")
 
-  catch <- readRDS("data-raw/data/afsc-catch.rds") |>
-    bind_rows(readRDS("data-raw/data/nwfsc-catch.rds")) |>
-    bind_rows(readRDS("data-raw/data/pbs-catch.rds"))
+  afsc_dir <- readRDS("data-raw/data/afsc-catch.rds")
+  nwfsc_dir <- readRDS("data-raw/data/nwfsc-catch.rds")
+  pbs_dir <- readRDS("data-raw/data/pbs-catch.rds")
+  catch <- readRDS(afsc_dir) |>
+    bind_rows(nwfsc_dir) |>
+    bind_rows(pbs_dir)
 
   itis <- catch |>
     select(itis) |>
