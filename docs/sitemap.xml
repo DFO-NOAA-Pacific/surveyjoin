@@ -25,6 +25,15 @@
     <loc>/reference/get_itis_spp.html</loc>
   </url>
   <url>
+    <loc>/reference/get_metadata.html</loc>
+  </url>
+  <url>
+    <loc>/reference/get_rawdata.html</loc>
+  </url>
+  <url>
+    <loc>/reference/get_shapefiles.html</loc>
+  </url>
+  <url>
     <loc>/reference/index.html</loc>
   </url>
   <url>

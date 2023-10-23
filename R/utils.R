@@ -55,6 +55,9 @@ cache_files <- function() {
 #'
 #' @return
 #' Nothing returned; data files are cached locally.
+#' @importFrom purrr map_chr walk map
+#' @importFrom checkmate assert_choice
+#' @importFrom cli cli_alert_success
 #' @export
 #'
 #' @examples
@@ -63,24 +66,24 @@ cache_files <- function() {
 #' }
 cache_data <- function(region = c("nwfsc", "pbs", "afsc")) {
   # valid region(s)?
-  r <- purrr::map_chr(region, function(region) {
-    checkmate::assert_choice(
+  r <- map_chr(region, function(region) {
+    assert_choice(
       region,
       c("nwfsc", "pbs", "afsc"))}
   )
 
   # subset files?
   files <- cache_files()
-  f <- purrr::map(r, ~files[grepl(., files)])
+  f <- map(r, ~files[grepl(., files)])
   f <- unlist(f)
 
   # download/uncompress for speed
   dir.create(cache_folder(), showWarnings = FALSE)
-  purrr::walk(f, download)
-  purrr::walk(f, uncompress)
+  walk(f, download)
+  walk(f, uncompress)
 
   msg <- "All data downloaded and uncompressed"
-  cli::cli_alert_success(msg)
+  cli_alert_success(msg)
 }
 
 #' Load SQLite database
@@ -88,6 +91,7 @@ cache_data <- function(region = c("nwfsc", "pbs", "afsc")) {
 #' @return Nothing; data is inserted into a local SQLite database.
 #' @export
 #' @importFrom rlang .data
+#' @import cli dplyr purrr RSQLite
 #'
 #' @examples
 #' \dontrun{
@@ -98,7 +102,7 @@ load_sql_data <- function() {
   f_haul <- sort(f[grepl("haul", f)])
   f_catch <- sort(f[grepl("catch", f)])
   stopifnot(length(f_haul) == length(f_catch))
-  haul <- purrr::map_dfr(f_haul, function(x) {
+  haul <- map_dfr(f_haul, function(x) {
     out <- readRDS(file.path(cache_folder(), x))
     out$region <- gsub("([a-z]+)-[a-z]+.rds", "\\1", x)
     out$performance <- as.character(out$performance)
@@ -109,23 +113,23 @@ load_sql_data <- function() {
     out$lon_end <- ifelse(out$lon_end > 0, out$lon_end * -1, out$lon_end)
     out
   })
-  catch <- purrr::map_dfr(f_catch, function(x) {
+  catch <- map_dfr(f_catch, function(x) {
     out <- readRDS(file.path(cache_folder(), x))
     out$region <- gsub("([a-z]+)-[a-z]+.rds", "\\1", x)
     out
   })
-  cli::cli_alert_success("Raw data read into memory")
+  cli_alert_success("Raw data read into memory")
 
-  catch <- dplyr::left_join(catch, surveyjoin::spp_dictionary)
+  catch <- left_join(catch, surveyjoin::spp_dictionary)
   stopifnot(sum(is.na(catch$scientific_name)) == 0L)
-  cli::cli_alert_success("Taxonomic data joined to catch data")
+  cli_alert_success("Taxonomic data joined to catch data")
 
-  db <- RSQLite::dbConnect(RSQLite::SQLite(), dbname = sql_folder())
+  db <- dbConnect(RSQLite::SQLite(), dbname = sql_folder())
   on.exit(suppressWarnings(suppressMessages(DBI::dbDisconnect(db))))
-  RSQLite::dbWriteTable(db, "haul", haul, overwrite = TRUE, append = FALSE)
-  RSQLite::dbWriteTable(db, "catch", catch, overwrite = TRUE, append = FALSE)
+  dbWriteTable(db, "haul", haul, overwrite = TRUE, append = FALSE)
+  dbWriteTable(db, "catch", catch, overwrite = TRUE, append = FALSE)
 
-  cli::cli_alert_success("SQLite database created")
+  cli_alert_success("SQLite database created")
 }
 
 
@@ -161,100 +165,49 @@ get_itis_spp <- function(spp) {
   as.integer(unlist(out))
 }
 
-#' Main function to query the survey database
-#'
-#' @param common A string, or vector of strings of common names for species
-#' @param scientific A string, or vector of strings of scientific names for species
-#' @param itis_id An integer or vector of integers corresponding to ITIS identifiers
-#' @param regions A string, or vector of strings of common names for regions. May be one or more
-#' of "afsc", "nwfsc", "pbs". Surveys are nested within region, so returning data from a region will
-#' return more than one survey.
-#' @param surveys A string, or vector of strings of common names for surveys. May be one or more
-#' of "Aleutian Islands Bottom Trawl Survey", "Eastern Bering Sea Crab/Groundfish Bottom Trawl Survey",
-#' "Eastern Bering Sea Slope Bottom Trawl Survey", "Gulf of Alaska Bottom Trawl Survey",
-#' "Northern Bering Sea Crab/Groundfish Survey - Eastern Bering Sea Shelf Survey Extension",
-#' "NWFSC.Combo", "NWFSC.Shelf", "NWFSC.Hypoxia", "NWFSC.Hypoxia", "Triennial", "SYN QCS",
-#' "SYN HS", "SYN WCVI", "SYN WCHG". If NULL, all are returned
-#' @param years a vector of years, e.g. `year = 2013:2018`. If NULL, all are returned
-#' @return a dataframe of joined haul and catch data
-#' \itemize{
-#'   \item \strong{event_id}: Unique haul identifier.
-#'   \item \strong{itis}: ITIS identifier for species.
-#'   \item \strong{catch_numbers}: Numbers of fish for this haul - species.
-#'   \item \strong{catch_weight}: Weight (kg) of fish for this haul - species.
-#'   \item \strong{region}: Region this survey originated in ("pbs", "nwfsc", "afsc").
-#'   \item \strong{scientific_name}: Scientific name for this species.
-#'   \item \strong{common_name}: Common name for this species.
-#'   \item \strong{survey_name}: Name of the survey this haul is part of.
-#'   \item \strong{date}: String representation of the date, format YYYY-MM-DD.
-#'   \item \strong{pass}: Optional pass identifier (1 or 2), only used for NWFSC surveys.
-#'   \item \strong{vessel}: Optional unique vessel identifier, not included in all surveys.
-#'   \item \strong{lat_start}: Starting latitude of haul, decimal degrees.
-#'   \item \strong{lon_start}: Starting longitude of haul, decimal degrees.
-#'   \item \strong{lat_end}: Ending latitude of haul, decimal degrees.
-#'   \item \strong{lon_end}: Ending longitude of haul, decimal degrees.
-#'   \item \strong{depth_m}: Haul bottom depth (meters).
-#'   \item \strong{effort}: Amount of units corresponding to this haul.
-#'   \item \strong{effort_units}: Units of effort.
-#'   \item \strong{performance}: Optional performance indicator for each haul, not used for all surveys. If not
-#'   indicated, assume performance is satisfactory
-#'   \item \strong{bottom_temp_c}: Bottom temperature recorded at the gear, in degrees Celsius.
-#'   \item \strong{year}: Calendar year corresponding to the haul.
-#' }
-#' @import dplyr
-#' @importFrom DBI dbDisconnect
+#' Get the metadata URLs for each dataset
+#' @return a dataframe with the metadata URL for each region
 #' @export
-#'
 #' @examples
 #' \dontrun{
-#' d <- get_data(common = "arrowtooth flounder", years = 2013:2018, region="pbs")
+#' m <- get_metadata()
 #' }
-get_data <- function(common = NULL, scientific = NULL, itis_id = NULL, regions = NULL, surveys = NULL, years = NULL) {
+get_metadata <- function() {
+  df <- data.frame(region = c("afsc","pbs","nwfsc"),
+                   url = c("https://www.fisheries.noaa.gov/foss/f?p=215:29:13633082383464:::::",
+                           NA, "https://www.fisheries.noaa.gov/inport/item/18418"))
+  return(df)
+}
 
-  db <- surv_db() # create connection to database; need error checking
-  catch <- tbl(db, "catch")
-  haul <- tbl(db, "haul")
 
-  if(!is.null(common)) common <- tolower(common)
-  if(!is.null(scientific)) scientific <- tolower(scientific)
-  if(!is.null(itis_id)) itis_id <- as.integer(itis_id)
-  if(!is.null(years)) years <- as.integer(years)
+#' Get the survey grid shapefiles for each dataset
+#' @return a dataframe with the URL for each region
+#' @export
+#' @examples
+#' \dontrun{
+#' m <- get_shapefiles()
+#' }
+get_shapefiles <- function() {
+  df <- data.frame(region = c("afsc","pbs","nwfsc"),
+                   url = c("https://github.com/afsc-gap-products/akgfmaps",
+                           "https://github.com/pbs-assess/gfplot/tree/master/data",
+                           "https://www.webapps.nwfsc.noaa.gov/portal7/home/item.html?id=32f29675457e44d3b2e88f454f130ac9"))
+  return(df)
+}
 
-  # Filter species as needed, default returns all
-  if(!is.null(common)) {
-    catch <- catch |>
-      filter(common %in% common)
-  }
-  if(!is.null(scientific)) {
-    catch <- catch |>
-      filter(scientific %in% scientific)
-  }
-  if(!is.null(itis_id)) {
-    catch <- catch |>
-      filter(itis_id %in% itis_id)
-  }
-
-  # Filter hauls as needed, default returns all
-  if(!is.null(surveys)) {
-    haul <- haul |>
-      filter(survey_name %in% surveys)
-  }
-
-  # Join data and filter years if specified
-  d <- catch |>
-    left_join(haul) |>
-    collect(n = Inf)
-  if(!is.null(years)) {
-    d <- d |>
-      filter(year %in% years)
-  }
-  if(!is.null(regions)) {
-    d <- d |>
-      filter(region %in% regions)
-  }
-  dbDisconnect(conn = db)
-
-  return(d)
+#' Get the URLs to raw data for each dataset
+#' @return a dataframe with the URL for each region
+#' @export
+#' @examples
+#' \dontrun{
+#' m <- get_rawdata()
+#' }
+get_rawdata <- function() {
+  df <- data.frame(region = c("afsc","pbs","nwfsc"),
+                   url = c("https://www.fisheries.noaa.gov/foss/f?p=215:28",
+                           NA,
+                           "https://www.webapps.nwfsc.noaa.gov/data"))
+  return(df)
 }
 
 # make_itis_spp_table()
