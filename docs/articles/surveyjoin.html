@@ -135,6 +135,43 @@ is 1980).</p>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="va">g</span>, filename <span class="op">=</span> <span class="st">"map-example.png"</span>, </span>
 <span>       width <span class="op">=</span> <span class="fl">6</span>, height <span class="op">=</span> <span class="fl">7</span>, dpi <span class="op">=</span> <span class="fl">150</span><span class="op">)</span></span></code></pre></div>
 <p><img src="../reference/figures/map-example.png"></p>
+<p>Additional information on specific species can be found in our
+species dictionary</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"spp_dictionary"</span><span class="op">)</span></span></code></pre></div>
+<p>And the full list of survey names can be found with</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/get_survey_names.html">get_survey_names</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt;                                                                                    survey</span></span>
+<span><span class="co">#&gt; 1                                                    Aleutian Islands Bottom Trawl Survey</span></span>
+<span><span class="co">#&gt; 2                                  Eastern Bering Sea Crab/Groundfish Bottom Trawl Survey</span></span>
+<span><span class="co">#&gt; 3                                            Eastern Bering Sea Slope Bottom Trawl Survey</span></span>
+<span><span class="co">#&gt; 4                                                      Gulf of Alaska Bottom Trawl Survey</span></span>
+<span><span class="co">#&gt; 5  Northern Bering Sea Crab/Groundfish Survey - Eastern Bering Sea Shelf Survey Extension</span></span>
+<span><span class="co">#&gt; 6                                                                             NWFSC.Combo</span></span>
+<span><span class="co">#&gt; 7                                                                             NWFSC.Shelf</span></span>
+<span><span class="co">#&gt; 8                                                                           NWFSC.Hypoxia</span></span>
+<span><span class="co">#&gt; 9                                                                           NWFSC.Hypoxia</span></span>
+<span><span class="co">#&gt; 10                                                                              Triennial</span></span>
+<span><span class="co">#&gt; 11                                                                                SYN QCS</span></span>
+<span><span class="co">#&gt; 12                                                                                 SYN HS</span></span>
+<span><span class="co">#&gt; 13                                                                               SYN WCVI</span></span>
+<span><span class="co">#&gt; 14                                                                               SYN WCHG</span></span>
+<span><span class="co">#&gt;    region</span></span>
+<span><span class="co">#&gt; 1    afsc</span></span>
+<span><span class="co">#&gt; 2    afsc</span></span>
+<span><span class="co">#&gt; 3    afsc</span></span>
+<span><span class="co">#&gt; 4    afsc</span></span>
+<span><span class="co">#&gt; 5    afsc</span></span>
+<span><span class="co">#&gt; 6   nwfsc</span></span>
+<span><span class="co">#&gt; 7   nwfsc</span></span>
+<span><span class="co">#&gt; 8   nwfsc</span></span>
+<span><span class="co">#&gt; 9   nwfsc</span></span>
+<span><span class="co">#&gt; 10  nwfsc</span></span>
+<span><span class="co">#&gt; 11    pbs</span></span>
+<span><span class="co">#&gt; 12    pbs</span></span>
+<span><span class="co">#&gt; 13    pbs</span></span>
+<span><span class="co">#&gt; 14    pbs</span></span></code></pre></div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

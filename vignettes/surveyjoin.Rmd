@@ -74,4 +74,16 @@ ggsave(g, filename = "map-example.png",
 # knitr::include_graphics("map-example.png")
 ```
 
+Additional information on specific species can be found in our species dictionary
+
+```{r eval=FALSE}
+data("spp_dictionary")
+```
+
+And the full list of survey names can be found with
+
+```{r}
+get_survey_names()
+```
+
 

@@ -4,8 +4,13 @@ save_raw_data <- function(x, name = "pbs-haul") {
     compress = "bzip2", version = 3)
 }
 
-cache_folder <- function(name = "surveyjoin") {
-  rappdirs::user_cache_dir(name)
+#' Identify the local folder used for caching
+#' @param name the directory name, default is the package name "surveyjoin"
+#' @return The directory location used for caching
+#' @importFrom rappdirs user_cache_dir
+#' @export
+get_cache_folder <- function(name = "surveyjoin") {
+  user_cache_dir(name)
 }
 
 drive_folder <- function(path = "West Coast Survey Data Join/data") {
@@ -176,6 +181,23 @@ get_metadata <- function() {
   df <- data.frame(region = c("afsc","pbs","nwfsc"),
                    url = c("https://www.fisheries.noaa.gov/foss/f?p=215:29:13633082383464:::::",
                            NA, "https://www.fisheries.noaa.gov/inport/item/18418"))
+  return(df)
+}
+
+#' Get the name for each survey and corresponding region
+#' @return a dataframe with the survey name and associated region
+#' @export
+#' @examples
+#' \dontrun{
+#' m <- get_survey_names()
+#' }
+get_survey_names <- function() {
+  df <- data.frame(survey = c("Aleutian Islands Bottom Trawl Survey", "Eastern Bering Sea Crab/Groundfish Bottom Trawl Survey",
+  "Eastern Bering Sea Slope Bottom Trawl Survey", "Gulf of Alaska Bottom Trawl Survey",
+  "Northern Bering Sea Crab/Groundfish Survey - Eastern Bering Sea Shelf Survey Extension",
+  "NWFSC.Combo", "NWFSC.Shelf", "NWFSC.Hypoxia", "NWFSC.Hypoxia", "Triennial", "SYN QCS",
+  "SYN HS", "SYN WCVI", "SYN WCHG"),
+  region = c(rep("afsc",5), rep("nwfsc",5), rep("pbs",4)))
   return(df)
 }
 
