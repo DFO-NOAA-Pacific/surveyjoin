@@ -28,7 +28,7 @@ download <- function(x) {
   googledrive::local_drive_quiet()
   googledrive::drive_download(
     file = file.path(drive_folder(), x),
-    path = file.path(cache_folder(), x),
+    path = file.path(get_cache_folder(), x),
     overwrite = TRUE
   )
 }
@@ -38,7 +38,7 @@ uncompress <- function(x) { # for reading speed:
     "Uncompressing {x} ",
     msg_done = "{x} uncompressed"
   )
-  p <- file.path(cache_folder(), x)
+  p <- file.path(get_cache_folder(), x)
   d <- readRDS(p)
   saveRDS(p, x, compress = FALSE, version = 3)
 }
@@ -83,7 +83,7 @@ cache_data <- function(region = c("nwfsc", "pbs", "afsc")) {
   f <- unlist(f)
 
   # download/uncompress for speed
-  dir.create(cache_folder(), showWarnings = FALSE)
+  dir.create(get_cache_folder(), showWarnings = FALSE)
   walk(f, download)
   walk(f, uncompress)
 
@@ -108,7 +108,7 @@ load_sql_data <- function() {
   f_catch <- sort(f[grepl("catch", f)])
   stopifnot(length(f_haul) == length(f_catch))
   haul <- map_dfr(f_haul, function(x) {
-    out <- readRDS(file.path(cache_folder(), x))
+    out <- readRDS(file.path(get_cache_folder(), x))
     out$region <- gsub("([a-z]+)-[a-z]+.rds", "\\1", x)
     out$performance <- as.character(out$performance)
     out$year <- as.integer(lubridate::year(out$date))
@@ -119,7 +119,7 @@ load_sql_data <- function() {
     out
   })
   catch <- map_dfr(f_catch, function(x) {
-    out <- readRDS(file.path(cache_folder(), x))
+    out <- readRDS(file.path(get_cache_folder(), x))
     out$region <- gsub("([a-z]+)-[a-z]+.rds", "\\1", x)
     out
   })
@@ -139,7 +139,7 @@ load_sql_data <- function() {
 
 
 sql_folder <- function() {
-  file.path(cache_folder(), "surveyjoin.sqlite")
+  file.path(get_cache_folder(), "surveyjoin.sqlite")
 }
 
 #' Function to create a connection to the database
