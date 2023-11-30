@@ -60,11 +60,11 @@ get_data <- function(common = NULL, scientific = NULL, itis_id = NULL, regions =
   # Filter species as needed, default returns all
   if(!is.null(common)) {
     catch <- catch |>
-      filter(common %in% common)
+      filter(common_name %in% common)
   }
   if(!is.null(scientific)) {
     catch <- catch |>
-      filter(scientific %in% scientific)
+      filter(scientific_name %in% scientific)
   }
   if(!is.null(itis_id)) {
     catch <- catch |>
