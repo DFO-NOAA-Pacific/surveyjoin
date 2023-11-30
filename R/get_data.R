@@ -68,7 +68,7 @@ get_data <- function(common = NULL, scientific = NULL, itis_id = NULL, regions =
   }
   if(!is.null(itis_id)) {
     catch <- catch |>
-      filter(itis_id %in% itis_id)
+      filter(itis %in% itis_id)
   }
 
   # Filter hauls as needed, default returns all
