@@ -5,7 +5,7 @@
 \alias{afsc_grid}
 \title{Data frame containing multiple survey grids for surveys collected by NOAA's Alaska
 Fisheries Science Center. Columns include the latitude
-and longitude in decimal degrees, area of each survey cell (in km2), the survey
+and longitude in decimal degrees, area of each survey cell (in hectares), the survey
 name (\code{survey}) year of update (\code{survey_domain_year}) and depth (currently NA
 for this dataset and must be joined in separately). Survey names generally match
 those for data in \code{get_data()}}
@@ -18,7 +18,7 @@ afsc_grid
 \description{
 Data frame containing multiple survey grids for surveys collected by NOAA's Alaska
 Fisheries Science Center. Columns include the latitude
-and longitude in decimal degrees, area of each survey cell (in km2), the survey
+and longitude in decimal degrees, area of each survey cell (in hectares), the survey
 name (\code{survey}) year of update (\code{survey_domain_year}) and depth (currently NA
 for this dataset and must be joined in separately). Survey names generally match
 those for data in \code{get_data()}
