@@ -10,7 +10,7 @@
 #' of "Aleutian Islands Bottom Trawl Survey", "Eastern Bering Sea Crab/Groundfish Bottom Trawl Survey",
 #' "Eastern Bering Sea Slope Bottom Trawl Survey", "Gulf of Alaska Bottom Trawl Survey",
 #' "Northern Bering Sea Crab/Groundfish Survey - Eastern Bering Sea Shelf Survey Extension",
-#' "NWFSC.Combo", "NWFSC.Shelf", "NWFSC.Hypoxia", "NWFSC.Hypoxia", "Triennial", "SYN QCS",
+#' "NWFSC.Combo", "NWFSC.Shelf", "NWFSC.Hypoxia", "Triennial", "SYN QCS",
 #' "SYN HS", "SYN WCVI", "SYN WCHG". If NULL, all are returned
 #' @param years a vector of years, e.g. `year = 2013:2018`. If NULL, all are returned
 #' @return a dataframe of joined haul and catch data
