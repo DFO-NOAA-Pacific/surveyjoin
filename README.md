@@ -1,19 +1,25 @@
 
 # surveyjoin
 
-This is a repository for combining trawl survey datasets from NOAA and
-Fisheries and Oceans Canada in the Northeast Pacific Ocean.
+Our objective is to facilitate robust marine research by providing a 
+reliable repository of quality-controlled trawl survey data from NOAA 
+and Fisheries and Oceans Canada (DFO) in the Northeast Pacific Ocean. 
+Data includes surveys conducted by the Northwest Fisheries Science
+Center (NWFSC) off the west coast of the United States, surveys
+collected by Fisheries and Oceans Canada (DFO) in the waters of British
+Columbia, and surveys conducted by the Alaska Fisheries Science Center
+(AFSC) in Alaska. We are delivering these datasets in a standardized 
+format to support a variety of analyses, including species distribution 
+models, biomass trend evaluation, and species richness modelling. This 
+repository serves as a resource for researchers and as an intermediate 
+data product for other warehouses, such as the DisMap portal.
 
 The pkdown site can be found
 [here](https://dfo-noaa-pacific.github.io/surveyjoin/)
 
+Citation via Zenodo:
 [![DOI](https://zenodo.org/badge/484561620.svg)](https://zenodo.org/doi/10.5281/zenodo.10031852)
 
-This data includes surveys conducted by the Northwest Fisheries Science
-Center (NWFSC) off the west coast of the United States, surveys
-collected by Fisheries and Oceans Canada (DFO) in the waters of British
-Columbia, and surveys conducted by the Alaska Fisheries Science Center
-(AFSC) in Alaska.
 
 ## Disclaimer
 
