@@ -79,7 +79,7 @@ get_data <- function(common = NULL, scientific = NULL, itis_id = NULL, regions =
 
   # Join data and filter years if specified
   d <- catch |>
-    left_join(haul) |>
+    suppressWarnings(left_join(haul)) |>
     collect(n = Inf)
   if(!is.null(years)) {
     d <- d |>

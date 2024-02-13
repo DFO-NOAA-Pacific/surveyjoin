@@ -125,7 +125,7 @@ load_sql_data <- function() {
   })
   cli_alert_success("Raw data read into memory")
 
-  catch <- left_join(catch, surveyjoin::spp_dictionary)
+  catch <- suppressMessages(left_join(catch, surveyjoin::spp_dictionary))
   stopifnot(sum(is.na(catch$scientific_name)) == 0L)
   cli_alert_success("Taxonomic data joined to catch data")
 
