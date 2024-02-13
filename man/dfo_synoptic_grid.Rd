@@ -6,7 +6,7 @@
 \title{Data frame containing the survey grid for the Fisheries and Oceans Canada's
 synoptic trawl survey collected by DFO's Pacific Biological Station.
 Columns include the latitude and longitude in decimal degrees, area of each
-survey cell (in km2), the survey name (\code{survey}) and year of update
+survey cell (in hectares), the survey name (\code{survey}) and year of update
 (\code{survey_domain_year}) and depth}
 \format{
 A data frame.
@@ -18,7 +18,7 @@ dfo_synoptic_grid
 Data frame containing the survey grid for the Fisheries and Oceans Canada's
 synoptic trawl survey collected by DFO's Pacific Biological Station.
 Columns include the latitude and longitude in decimal degrees, area of each
-survey cell (in km2), the survey name (\code{survey}) and year of update
+survey cell (in hectares), the survey name (\code{survey}) and year of update
 (\code{survey_domain_year}) and depth
 }
 \keyword{datasets}
