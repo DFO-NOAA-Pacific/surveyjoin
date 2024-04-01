@@ -1,15 +1,10 @@
-library(dplyr)
-
 #---- Via Oracle internal server (requires credentials)
+library(dplyr)
 library(RODBC)
 library(getPass)
+library(gapindex)
 
-get.connected <- function(schema='AFSC'){(echo=FALSE)
-  username <- getPass(msg = "Enter your ORACLE Username: ")
-  password <- getPass(msg = "Enter your ORACLE Password: ")
-  channel  <- RODBC::odbcDriverConnect(paste0("Driver={Oracle in OraClient12Home1};Dbq=", schema, ";Uid=", username, ";Pwd=", password, ";"))
-}
-channel <- get.connected()
+channel <- gapindex::get_connected()
 
 haul <- RODBC::sqlQuery(channel, "SELECT * FROM RACEBASE_FOSS.JOIN_FOSS_CPUE_HAUL")
 names(haul) <- tolower(names(haul))
