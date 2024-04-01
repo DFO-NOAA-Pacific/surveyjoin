@@ -179,7 +179,7 @@ get_itis_spp <- function(spp) {
 #' }
 get_metadata <- function() {
   df <- data.frame(region = c("afsc","pbs","nwfsc"),
-                   url = c("https://www.fisheries.noaa.gov/foss/f?p=215:29:13633082383464:::::",
+                   url = c("https://afsc-gap-products.github.io/gap_products/content/foss-metadata.html",
                            NA, "https://www.fisheries.noaa.gov/inport/item/18418"))
   return(df)
 }
