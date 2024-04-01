@@ -192,11 +192,9 @@ get_metadata <- function() {
 #' m <- get_survey_names()
 #' }
 get_survey_names <- function() {
-  df <- data.frame(survey = c("Aleutian Islands Bottom Trawl Survey", "Eastern Bering Sea Crab/Groundfish Bottom Trawl Survey",
-  "Eastern Bering Sea Slope Bottom Trawl Survey", "Gulf of Alaska Bottom Trawl Survey",
-  "Northern Bering Sea Crab/Groundfish Survey - Eastern Bering Sea Shelf Survey Extension",
-  "NWFSC.Combo", "NWFSC.Shelf", "NWFSC.Hypoxia", "NWFSC.Hypoxia", "Triennial", "SYN QCS",
-  "SYN HS", "SYN WCVI", "SYN WCHG"),
+  df <- data.frame(survey = c("Aleutian Islands", "Gulf of Alaska", "eastern Bering Sea", 
+  "northern Bering Sea", "Bering Sea Slope", "NWFSC.Combo", "NWFSC.Shelf", "NWFSC.Hypoxia", 
+  "NWFSC.Hypoxia", "Triennial", "SYN QCS", "SYN HS", "SYN WCVI", "SYN WCHG"),
   region = c(rep("afsc",5), rep("nwfsc",5), rep("pbs",4)))
   return(df)
 }
