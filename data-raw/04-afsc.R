@@ -55,7 +55,7 @@ afsc_haul <- haul %>% dplyr::select(
 # usethis::use_data(afsc_haul, overwrite = TRUE)
 save_raw_data(afsc_haul, "afsc-haul")
 
-catch <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.FOSS_CATCH")
+catch <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.FOSS_CPUE_PRESONLY")
 names(catch) <- tolower(names(catch))
 afsc_catch <- catch %>% dplyr::select(
   event_id = hauljoin,
