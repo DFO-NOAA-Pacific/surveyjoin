@@ -6,10 +6,10 @@ library(gapindex)
 
 channel <- gapindex::get_connected()
 
-haul <- RODBC::sqlQuery(channel, "SELECT * FROM RACEBASE_FOSS.JOIN_FOSS_CPUE_HAUL")
+haul <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.FOSS_HAUL")
 names(haul) <- tolower(names(haul))
 afsc_haul <- haul %>% dplyr::select(
-  survey_name = survey,
+  survey_name = survey, # or = survey_name for full description if beyond trawl
   event_id = hauljoin,
   date = date_time,
   vessel = vessel_name,
@@ -19,7 +19,7 @@ afsc_haul <- haul %>% dplyr::select(
   lon_end = longitude_dd_end,
   depth_m,
   performance,
-  effort = area_swept_ha,
+  area_swept_km2,
   bottom_temp_c = bottom_temperature_c
   ) %>%
   mutate(
@@ -31,7 +31,7 @@ afsc_haul <- haul %>% dplyr::select(
     lat_end = as.numeric(lat_end),
     lon_end = as.numeric(lon_end),
     depth_m = as.numeric(depth_m),
-    effort = as.numeric(effort),
+    effort = as.numeric(area_swept_km2 * 100), # convert to ha
     effort_units = "ha",
     performance = as.integer(performance),
     bottom_temp_c = as.numeric(bottom_temp_c)
@@ -55,7 +55,7 @@ afsc_haul <- haul %>% dplyr::select(
 # usethis::use_data(afsc_haul, overwrite = TRUE)
 save_raw_data(afsc_haul, "afsc-haul")
 
-catch <- RODBC::sqlQuery(channel, "SELECT * FROM RACEBASE_FOSS.JOIN_FOSS_CPUE_CATCH")
+catch <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.FOSS_CATCH")
 names(catch) <- tolower(names(catch))
 afsc_catch <- catch %>% dplyr::select(
   event_id = hauljoin,
