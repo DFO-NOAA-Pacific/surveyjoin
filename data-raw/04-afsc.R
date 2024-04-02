@@ -57,7 +57,8 @@ save_raw_data(afsc_haul, "afsc-haul")
 
 catch <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.FOSS_CPUE_PRESONLY")
 names(catch) <- tolower(names(catch))
-afsc_catch <- catch %>% filter(id_rank == "species") %>% # drop not ID to species
+afsc_catch <- catch %>%
+  #filter(id_rank == "species") %>% # removes many invertebrates
   select(
     event_id = hauljoin,
     itis,
@@ -71,12 +72,12 @@ afsc_catch <- catch %>% filter(id_rank == "species") %>% # drop not ID to specie
       catch_weight = as.numeric(catch_weight),
       catch_weight_units = "kg"
   ) %>%
-  filter(!is.na(scientific_name))
+  filter(!is.na(itis))
 # usethis::use_data(afsc_catch, overwrite = TRUE)
 
 # filter this down to something manageable size-wise: ----
 # (too slow to load)
-# filter by frequency of occurrence among all surveys
+# filter by frequency of occurrence among all surveys (get a lot of inverts)
 freq <- group_by(afsc_catch, scientific_name) |>
   summarise(freq = n() / nrow(afsc_haul)) |>
   arrange(-freq)
@@ -86,8 +87,19 @@ nrow(filter(freq, freq > 0.10))
 nrow(filter(freq, freq > 0.15))
 nrow(filter(freq, freq > 0.20))
 
+# filter by frequency of occurrence and catch weights
+large <- group_by(afsc_catch, scientific_name) |>
+  summarise(freq = n() / nrow(afsc_haul), total_weight = sum(catch_weight), itis = itis[1]) |>
+  filter(total_weight > 25000) |>
+  arrange(-freq)
+hist(large$freq, breaks = 150)
+nrow(filter(large, freq > 0.01))
+nrow(filter(large, freq > 0.05))
+nrow(filter(large, freq > 0.10))
+nrow(filter(large, freq > 0.15))
+nrow(filter(large, freq > 0.20))
 
-# filter by sum of catch weights ----
+# filter by sum of catch weights
 x <- group_by(afsc_catch, scientific_name) |>
   summarise(total_weight = sum(catch_weight), itis = itis[1]) |> arrange(-total_weight)
 
