@@ -8,7 +8,7 @@ channel <- gapindex::get_connected()
 
 haul <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.FOSS_HAUL")
 names(haul) <- tolower(names(haul))
-afsc_haul <- haul %>% dplyr::select(
+afsc_haul <- haul %>% select(
   survey_name = survey, # or = survey_name for full description if beyond trawl
   event_id = hauljoin,
   date = date_time,
@@ -57,18 +57,19 @@ save_raw_data(afsc_haul, "afsc-haul")
 
 catch <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.FOSS_CPUE_PRESONLY")
 names(catch) <- tolower(names(catch))
-afsc_catch <- catch %>% dplyr::select(
-  event_id = hauljoin,
-  itis,
-  scientific_name,
-  catch_numbers = count,
-  catch_weight = weight_kg,
+afsc_catch <- catch %>% filter(id_rank == "species") %>% # drop not ID to species
+  select(
+    event_id = hauljoin,
+    itis,
+    scientific_name,
+    catch_numbers = count,
+    catch_weight = weight_kg,
   ) %>%
-  mutate(
-    event_id = as.numeric(event_id),
-    catch_numbers = as.numeric(catch_numbers),
-    catch_weight = as.numeric(catch_weight),
-    catch_weight_units = "kg"
+    mutate(
+      event_id = as.numeric(event_id),
+      catch_numbers = as.numeric(catch_numbers),
+      catch_weight = as.numeric(catch_weight),
+      catch_weight_units = "kg"
   ) %>%
   filter(!is.na(scientific_name))
 # usethis::use_data(afsc_catch, overwrite = TRUE)
