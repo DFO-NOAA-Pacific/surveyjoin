@@ -69,11 +69,24 @@ afsc_catch <- catch %>% dplyr::select(
     catch_numbers = as.numeric(catch_numbers),
     catch_weight = as.numeric(catch_weight),
     catch_weight_units = "kg"
-  )
+  ) %>%
+  filter(!is.na(scientific_name))
 # usethis::use_data(afsc_catch, overwrite = TRUE)
 
-# filter this down to something manageable size-wise:
-# (to slow to load)
+# filter this down to something manageable size-wise: ----
+# (too slow to load)
+# filter by frequency of occurrence among all surveys
+freq <- group_by(afsc_catch, scientific_name) |>
+  summarise(freq = n() / nrow(afsc_haul)) |>
+  arrange(-freq)
+hist(freq$freq, breaks = 150)
+nrow(filter(freq, freq > 0.05))
+nrow(filter(freq, freq > 0.10))
+nrow(filter(freq, freq > 0.15))
+nrow(filter(freq, freq > 0.20))
+
+
+# filter by sum of catch weights ----
 x <- group_by(afsc_catch, scientific_name) |>
   summarise(total_weight = sum(catch_weight), itis = itis[1]) |> arrange(-total_weight)
 
