@@ -65,6 +65,7 @@ afsc_catch <- catch %>%
     scientific_name,
     catch_numbers = count,
     catch_weight = weight_kg,
+    species_code
   ) %>%
     mutate(
       event_id = as.numeric(event_id),
@@ -74,6 +75,13 @@ afsc_catch <- catch %>%
   ) %>%
   filter(!is.na(itis))
 # usethis::use_data(afsc_catch, overwrite = TRUE)
+
+afsc_catch_fish <- afsc_catch %>%
+  filter(species_code < 32000) %>%
+  select(-species_code)
+afsc_catch_inv <- afsc_catch %>%
+  filter(species_code > 40000) %>%
+  select(-species_code)
 
 # filter this down to something manageable size-wise: ----
 # (too slow to load)
