@@ -76,14 +76,11 @@ afsc_catch <- catch %>%
 # filter this to most prevalent species, by category ----
 afsc_catch_fish <- afsc_catch %>%
   filter(species_code < 32000) %>%
-  filter(id_rank == "species") %>%
-  select(-species_code, -id_rank)
+  filter(id_rank == "species")
 afsc_catch_sfi <- afsc_catch %>%
-  filter(species_code %in% c(41000:45000, 91000:91999, 99981:99988)) %>% # corals and sponges
-  select(-species_code, -id_rank)
+  filter(species_code %in% c(41000:45000, 91000:91999, 99981:99988)) # corals and sponges
 afsc_catch_inv <- afsc_catch %>%
-  filter(species_code %in% c(40000:40999, 45001:90999, 92000:99981)) %>% # other inverts
-  select(-species_code, -id_rank)
+  filter(species_code %in% c(40000:40999, 45001:90999, 92000:99981)) # other inverts
 
 # filter by frequency of occurrence and catch weights
 fish_high <- group_by(afsc_catch_fish, scientific_name) |>
@@ -122,76 +119,18 @@ inv_low <- group_by(afsc_catch_inv, scientific_name) |>
   arrange(-freq)
 nrow(inv_low)
 
+afsc_catch <- select(afsc_catch, -scientific_name, - species_code, -id_rank)
 
-tokeep <- afsc_catch |>
-  select(itis) |>
-  distinct()
+afsc_catch_fish_h <- semi_join(afsc_catch, select(fish_high, itis), by = join_by(itis))
+afsc_catch_fish_l <- semi_join(afsc_catch, select(fish_low, itis), by = join_by(itis))
+afsc_catch_sfi_h <- semi_join(afsc_catch, select(sfi_high, itis), by = join_by(itis))
+afsc_catch_sfi_l <- semi_join(afsc_catch, select(sfi_low, itis), by = join_by(itis))
+afsc_catch_inv_h <- semi_join(afsc_catch, select(inv_high, itis), by = join_by(itis))
+afsc_catch_inv_l <- semi_join(afsc_catch, select(inv_low, itis), by = join_by(itis))
 
-afsc_catch_keep <- semi_join(afsc_catch, tokeep, by = join_by(itis))
-
-glimpse(afsc_catch_keep)
-
-save_raw_data(afsc_catch_keep, "afsc-catch")
-
-#---- Via API (currently broken)
-# link to the API generated at [AFSC RACE Groundfish and Shellfish Survey Public Data](https://github.com/afsc-gap-products/gap_public_data)
-#library(httr)
-#library(jsonlite)
-#
-# api_link <- "https://origin-tst-ods-st.fisheries.noaa.gov/ods/foss/afsc_groundfish_survey/"
-#
-# res <- httr::GET(url = api_link)
-# res
-#
-# dat <- jsonlite::fromJSON(base::rawToChar(res$content))
-#
-# afsc <- dat[[1]] %>% dplyr::select(
-#   survey_name = srvy,
-#   event_id = hauljoin,
-#   date = date_time,
-#   vessel = vessel_name,
-#   lat_start = latitude_dd_start,
-#   lon_start = longitude_dd_start,
-#   lat_end = latitude_dd_end,
-#   lon_end = longitude_dd_end,
-#   depth_m,
-#   performance,
-#   effort = area_swept_ha,
-#   itis = itis,
-#   catch_numbers = count,
-#   catch_weight = weight_kg,
-# ) %>%
-#   mutate(
-#     event_id = as.numeric(event_id),
-#     date = as.POSIXct(date,format="%m/%d/%Y %H:%M:%S",tz=Sys.timezone()),
-#     pass = NA_integer_,
-#     lat_start = as.numeric(lat_start),
-#     lon_start = as.numeric(lon_start),
-#     lat_end = as.numeric(lat_end),
-#     lon_end = as.numeric(lon_end),
-#     depth_m = as.numeric(depth_m),
-#     effort = as.numeric(effort),
-#     effort_units = "ha",
-#     performance = as.integer(performance),
-#     catch_numbers = as.numeric(catch_numbers),
-#     catch_weight = as.numeric(catch_weight),
-#     catch_weight_units = "kg"
-#   ) %>%
-#   select(
-#     survey_name,
-#     event_id,
-#     date,
-#     pass,
-#     vessel,
-#     lat_start,
-#     lon_start,
-#     lat_end,
-#     lon_end,
-#     depth_m,
-#     effort,
-#     effort_units,
-#     performance,
-#     itis,
-#     catch_numbers,
-#     catch_weight
-#   )
+save_raw_data(afsc_catch_fish_h, "afsc-catch-fish-h")
+save_raw_data(afsc_catch_fish_l, "afsc-catch-fish-l")
+save_raw_data(afsc_catch_sfi_h, "afsc-catch-sfi-h")
+save_raw_data(afsc_catch_sfi_l, "afsc-catch-sfi-l")
+save_raw_data(afsc_catch_inv_h, "afsc-catch-inv-h")
+save_raw_data(afsc_catch_inv_l, "afsc-catch-inv-l")
