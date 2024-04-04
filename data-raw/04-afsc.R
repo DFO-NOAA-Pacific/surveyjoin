@@ -52,100 +52,82 @@ afsc_haul <- haul %>% select(
     performance,
     bottom_temp_c
   )
-# usethis::use_data(afsc_haul, overwrite = TRUE)
 save_raw_data(afsc_haul, "afsc-haul")
 
 catch <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.FOSS_CPUE_PRESONLY")
 names(catch) <- tolower(names(catch))
 afsc_catch <- catch %>%
-  #filter(id_rank == "species") %>% # removes many invertebrates
   select(
     event_id = hauljoin,
     itis,
     scientific_name,
     catch_numbers = count,
     catch_weight = weight_kg,
-    species_code
+    species_code,
+    id_rank
   ) %>%
     mutate(
       event_id = as.numeric(event_id),
       catch_numbers = as.numeric(catch_numbers),
-      catch_weight = as.numeric(catch_weight),
-      catch_weight_units = "kg"
+      catch_weight = as.numeric(catch_weight)
   ) %>%
   filter(!is.na(itis))
-# usethis::use_data(afsc_catch, overwrite = TRUE)
 
+# filter this to most prevalent species, by category ----
 afsc_catch_fish <- afsc_catch %>%
   filter(species_code < 32000) %>%
-  select(-species_code)
+  filter(id_rank == "species") %>%
+  select(-species_code, -id_rank)
+afsc_catch_sfi <- afsc_catch %>%
+  filter(species_code %in% c(41000:45000, 91000:91999, 99981:99988)) %>% # corals and sponges
+  select(-species_code, -id_rank)
 afsc_catch_inv <- afsc_catch %>%
-  filter(species_code > 40000) %>%
-  select(-species_code)
-
-# filter this down to something manageable size-wise: ----
-# (too slow to load)
-# filter by frequency of occurrence among all surveys (get a lot of inverts)
-freq <- group_by(afsc_catch, scientific_name) |>
-  summarise(freq = n() / nrow(afsc_haul)) |>
-  arrange(-freq)
-hist(freq$freq, breaks = 150)
-nrow(filter(freq, freq > 0.05))
-nrow(filter(freq, freq > 0.10))
-nrow(filter(freq, freq > 0.15))
-nrow(filter(freq, freq > 0.20))
+  filter(species_code %in% c(40000:40999, 45001:90999, 92000:99981)) %>% # other inverts
+  select(-species_code, -id_rank)
 
 # filter by frequency of occurrence and catch weights
-large <- group_by(afsc_catch, scientific_name) |>
+fish_high <- group_by(afsc_catch_fish, scientific_name) |>
   summarise(freq = n() / nrow(afsc_haul), total_weight = sum(catch_weight), itis = itis[1]) |>
-  filter(total_weight > 25000) |>
+  filter(total_weight > 1000) |> # freq > 0.01 gives 79 species vs 94
   arrange(-freq)
-hist(large$freq, breaks = 150)
-nrow(filter(large, freq > 0.01))
-nrow(filter(large, freq > 0.05))
-nrow(filter(large, freq > 0.10))
-nrow(filter(large, freq > 0.15))
-nrow(filter(large, freq > 0.20))
+nrow(fish_high)
 
-# filter by sum of catch weights
-x <- group_by(afsc_catch, scientific_name) |>
-  summarise(total_weight = sum(catch_weight), itis = itis[1]) |> arrange(-total_weight)
+fish_low <- group_by(afsc_catch_fish, scientific_name) |>
+  summarise(freq = n() / nrow(afsc_haul), total_weight = sum(catch_weight), itis = itis[1]) |>
+  filter(total_weight > 1000, freq > 0.1) |>
+  arrange(-freq)
+nrow(fish_low)
 
-filter(x, total_weight > 3000) |> summarise(r = sum(total_weight) / sum(x$total_weight)) |> pull(r)
+sfi_high <- group_by(afsc_catch_sfi, scientific_name) |>
+  summarise(freq = n() / nrow(afsc_haul), total_weight = sum(catch_weight), itis = itis[1]) |>
+  filter(total_weight > 500) |>
+  arrange(-freq)
+nrow(sfi_high)
 
-filter(x, total_weight > 3000) |>
-  nrow()
+sfi_low <- group_by(afsc_catch_sfi, scientific_name) |>
+  summarise(freq = n() / nrow(afsc_haul), total_weight = sum(catch_weight), itis = itis[1]) |>
+  filter(total_weight > 500, freq > 0.02) |>
+  arrange(-freq)
+nrow(sfi_low)
 
-na <- filter(x, is.na(itis)) |> summarise(s = sum(total_weight))
-notna <- filter(x, !is.na(itis)) |> summarise(s = sum(total_weight))
+inv_high <- group_by(afsc_catch_inv, scientific_name) |>
+  summarise(freq = n() / nrow(afsc_haul), total_weight = sum(catch_weight), itis = itis[1]) |>
+  filter(total_weight > 500, freq > 0.05) |>
+  arrange(-freq)
+nrow(inv_high)
 
-na$s[1] / notna$s[1]
+inv_low <- group_by(afsc_catch_inv, scientific_name) |>
+  summarise(freq = n() / nrow(afsc_haul), total_weight = sum(catch_weight), itis = itis[1]) |>
+  filter(total_weight > 500, freq > 0.15) |>
+  arrange(-freq)
+nrow(inv_low)
 
-N <- group_by(afsc_catch, scientific_name) |>
-  mutate(total_weight = sum(catch_weight)) |>
-  filter(total_weight > 3000) |>
-  nrow()
-
-N / nrow(afsc_catch)
-
-filter(afsc_catch, is.na(itis)) |> nrow()
-filter(afsc_catch, !is.na(itis)) |> nrow()
 
 tokeep <- afsc_catch |>
-  filter(!is.na(itis)) |>
-  group_by(itis) |>
-  summarise(total_weight = sum(catch_weight)) |>
-  filter(total_weight > 3000) |>
   select(itis) |>
   distinct()
 
 afsc_catch_keep <- semi_join(afsc_catch, tokeep, by = join_by(itis))
-sum(afsc_catch_keep$catch_weight) / sum(afsc_catch$catch_weight)
-
-nrow(afsc_catch_keep) / nrow(afsc_catch)
-
-afsc_catch_keep$catch_weight_units <- NULL
-afsc_catch_keep$scientific_name <- NULL
 
 glimpse(afsc_catch_keep)
 
