@@ -54,83 +54,128 @@ afsc_haul <- haul %>% select(
   )
 save_raw_data(afsc_haul, "afsc-haul")
 
-catch <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.FOSS_CPUE_PRESONLY")
-names(catch) <- tolower(names(catch))
-afsc_catch <- catch %>%
+# get catch data for fishes only, then apply common filters (maybe by survey?)
+catch <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.FOSS_CATCH
+                         WHERE SPECIES_CODE < 32000")
+catch_spp <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.FOSS_SPECIES
+                         WHERE SPECIES_CODE < 32000")
+catchjoin <- left_join(catch, catch_spp)
+names(catchjoin) <- tolower(names(catchjoin))
+afsc_catch <- catchjoin %>%
   select(
     event_id = hauljoin,
     itis,
     scientific_name,
+    common_name,
     catch_numbers = count,
-    catch_weight = weight_kg,
-    species_code,
-    id_rank
+    catch_weight = weight_kg
+    #species_code,
+    #id_rank
   ) %>%
     mutate(
       event_id = as.numeric(event_id),
       catch_numbers = as.numeric(catch_numbers),
       catch_weight = as.numeric(catch_weight)
-  ) %>%
-  filter(!is.na(itis))
+  ) #%>%
+  #filter(!is.na(itis))
 
-# filter this to most prevalent species, by category ----
-afsc_catch_fish <- afsc_catch %>%
-  filter(species_code < 32000) %>%
-  filter(id_rank == "species")
-afsc_catch_sfi <- afsc_catch %>%
-  filter(species_code %in% c(41000:45000, 91000:91999, 99981:99988)) # corals and sponges
-afsc_catch_inv <- afsc_catch %>%
-  filter(species_code %in% c(40000:40999, 45001:90999, 92000:99981)) # other inverts
-
-# filter by frequency of occurrence and catch weights
-fish_high <- group_by(afsc_catch_fish, scientific_name) |>
+percent5 <- group_by(afsc_catch, common_name) |>
   summarise(freq = n() / nrow(afsc_haul), total_weight = sum(catch_weight), itis = itis[1]) |>
-  filter(total_weight > 1000) |> # freq > 0.01 gives 79 species vs 94
-  arrange(-freq)
-nrow(fish_high)
+  filter(freq > 0.05) |>
+  distinct(common_name)
 
-fish_low <- group_by(afsc_catch_fish, scientific_name) |>
+percent20 <- group_by(afsc_catch, common_name) |>
   summarise(freq = n() / nrow(afsc_haul), total_weight = sum(catch_weight), itis = itis[1]) |>
-  filter(total_weight > 1000, freq > 0.1) |>
-  arrange(-freq)
-nrow(fish_low)
+  filter(freq > 0.2) |>
+  distinct(common_name)
 
-sfi_high <- group_by(afsc_catch_sfi, scientific_name) |>
-  summarise(freq = n() / nrow(afsc_haul), total_weight = sum(catch_weight), itis = itis[1]) |>
-  filter(total_weight > 500) |>
-  arrange(-freq)
-nrow(sfi_high)
+total_yr <- left_join(afsc_catch, afsc_haul) |>
+  mutate(year = lubridate::year(date)) |>
+  group_by(year) |>
+  summarise(total = sum(catch_weight))
+total_mean <- mean(total_yr$total)
 
-sfi_low <- group_by(afsc_catch_sfi, scientific_name) |>
-  summarise(freq = n() / nrow(afsc_haul), total_weight = sum(catch_weight), itis = itis[1]) |>
-  filter(total_weight > 500, freq > 0.02) |>
-  arrange(-freq)
-nrow(sfi_low)
+percent5_biomass_025 <- left_join(afsc_catch, afsc_haul) |>
+  filter(common_name %in% percent5$common_name) |>
+  group_by(common_name) |>
+  summarise(mean_catch = sum(catch_weight) / 41) |>
+  filter(mean_catch > 0.025 * total_mean)
 
-inv_high <- group_by(afsc_catch_inv, scientific_name) |>
-  summarise(freq = n() / nrow(afsc_haul), total_weight = sum(catch_weight), itis = itis[1]) |>
-  filter(total_weight > 500, freq > 0.05) |>
-  arrange(-freq)
-nrow(inv_high)
+percent5_biomass_1 <- left_join(afsc_catch, afsc_haul) |>
+  filter(common_name %in% percent5$common_name) |>
+  group_by(common_name) |>
+  summarise(mean_catch = sum(catch_weight) / 41) |>
+  filter(mean_catch > 0.1 * total_mean)
 
-inv_low <- group_by(afsc_catch_inv, scientific_name) |>
-  summarise(freq = n() / nrow(afsc_haul), total_weight = sum(catch_weight), itis = itis[1]) |>
-  filter(total_weight > 500, freq > 0.15) |>
-  arrange(-freq)
-nrow(inv_low)
+max_n = max(nrow(percent5), nrow(percent20),
+          nrow(percent5_biomass_025), nrow(percent5_biomass_1))
 
-afsc_catch <- select(afsc_catch, -scientific_name, - species_code, -id_rank)
+percent5 = c(percent5$common_name, rep(NA, max_n - nrow(percent5)))
+percent20 = c(percent20$common_name, rep(NA, max_n - nrow(percent20)))
+percent5_biomass_025 = c(percent5_biomass_025$common_name, rep(NA, max_n - nrow(percent5_biomass_025)))
+percent5_biomass_1 = c(percent5_biomass_1$common_name, rep(NA, max_n - nrow(percent5_biomass_1)))
 
-afsc_catch_fish_h <- semi_join(afsc_catch, select(fish_high, itis), by = join_by(itis))
-afsc_catch_fish_l <- semi_join(afsc_catch, select(fish_low, itis), by = join_by(itis))
-afsc_catch_sfi_h <- semi_join(afsc_catch, select(sfi_high, itis), by = join_by(itis))
-afsc_catch_sfi_l <- semi_join(afsc_catch, select(sfi_low, itis), by = join_by(itis))
-afsc_catch_inv_h <- semi_join(afsc_catch, select(inv_high, itis), by = join_by(itis))
-afsc_catch_inv_l <- semi_join(afsc_catch, select(inv_low, itis), by = join_by(itis))
+afsc_spp_lists <- data.frame(percent5, percent20, percent5_biomass_025, percent5_biomass_1)
+saveRDS(afsc_spp_lists, "afsc_spp_lists.rds")
 
-save_raw_data(afsc_catch_fish_h, "afsc-catch-fish-h")
-save_raw_data(afsc_catch_fish_l, "afsc-catch-fish-l")
-save_raw_data(afsc_catch_sfi_h, "afsc-catch-sfi-h")
-save_raw_data(afsc_catch_sfi_l, "afsc-catch-sfi-l")
-save_raw_data(afsc_catch_inv_h, "afsc-catch-inv-h")
-save_raw_data(afsc_catch_inv_l, "afsc-catch-inv-l")
+# # filter this to most prevalent species, by category ----
+# afsc_catch_fish <- afsc_catch %>%
+#   filter(species_code < 32000) %>%
+#   filter(id_rank == "species")
+# afsc_catch_sfi <- afsc_catch %>%
+#   filter(species_code %in% c(41000:45000, 91000:91999, 99981:99988)) # corals and sponges
+# afsc_catch_inv <- afsc_catch %>%
+#   filter(species_code %in% c(40000:40999, 45001:90999, 92000:99981)) # other inverts
+#
+# # filter by frequency of occurrence and catch weights
+# fish_high <- group_by(afsc_catch_fish, scientific_name) |>
+#   summarise(freq = n() / nrow(afsc_haul), total_weight = sum(catch_weight), itis = itis[1]) |>
+#   filter(total_weight > 1000) |> # freq > 0.01 gives 79 species vs 94
+#   arrange(-freq)
+# nrow(fish_high)
+#
+# fish_low <- group_by(afsc_catch_fish, scientific_name) |>
+#   summarise(freq = n() / nrow(afsc_haul), total_weight = sum(catch_weight), itis = itis[1]) |>
+#   filter(total_weight > 1000, freq > 0.1) |>
+#   arrange(-freq)
+# nrow(fish_low)
+#
+# sfi_high <- group_by(afsc_catch_sfi, scientific_name) |>
+#   summarise(freq = n() / nrow(afsc_haul), total_weight = sum(catch_weight), itis = itis[1]) |>
+#   filter(total_weight > 500) |>
+#   arrange(-freq)
+# nrow(sfi_high)
+#
+# sfi_low <- group_by(afsc_catch_sfi, scientific_name) |>
+#   summarise(freq = n() / nrow(afsc_haul), total_weight = sum(catch_weight), itis = itis[1]) |>
+#   filter(total_weight > 500, freq > 0.02) |>
+#   arrange(-freq)
+# nrow(sfi_low)
+#
+# inv_high <- group_by(afsc_catch_inv, scientific_name) |>
+#   summarise(freq = n() / nrow(afsc_haul), total_weight = sum(catch_weight), itis = itis[1]) |>
+#   filter(total_weight > 500, freq > 0.05) |>
+#   arrange(-freq)
+# nrow(inv_high)
+#
+# inv_low <- group_by(afsc_catch_inv, scientific_name) |>
+#   summarise(freq = n() / nrow(afsc_haul), total_weight = sum(catch_weight), itis = itis[1]) |>
+#   filter(total_weight > 500, freq > 0.15) |>
+#   arrange(-freq)
+# nrow(inv_low)
+#
+# afsc_catch <- select(afsc_catch, -scientific_name, - species_code, -id_rank)
+#
+# afsc_catch_fish_h <- semi_join(afsc_catch, select(fish_high, itis), by = join_by(itis))
+# afsc_catch_fish_l <- semi_join(afsc_catch, select(fish_low, itis), by = join_by(itis))
+# afsc_catch_sfi_h <- semi_join(afsc_catch, select(sfi_high, itis), by = join_by(itis))
+# afsc_catch_sfi_l <- semi_join(afsc_catch, select(sfi_low, itis), by = join_by(itis))
+# afsc_catch_inv_h <- semi_join(afsc_catch, select(inv_high, itis), by = join_by(itis))
+# afsc_catch_inv_l <- semi_join(afsc_catch, select(inv_low, itis), by = join_by(itis))
+#
+# save_raw_data(afsc_catch_fish_h, "afsc-catch-fish-h")
+# save_raw_data(afsc_catch_fish_l, "afsc-catch-fish-l")
+# save_raw_data(afsc_catch_sfi_h, "afsc-catch-sfi-h")
+# save_raw_data(afsc_catch_sfi_l, "afsc-catch-sfi-l")
+# save_raw_data(afsc_catch_inv_h, "afsc-catch-inv-h")
+# save_raw_data(afsc_catch_inv_l, "afsc-catch-inv-l")
