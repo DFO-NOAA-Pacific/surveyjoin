@@ -79,15 +79,15 @@ afsc_catch <- catchjoin %>%
   ) #%>%
   #filter(!is.na(itis))
 
-percent5 <- group_by(afsc_catch, common_name) |>
+percent5 <- group_by(afsc_catch, scientific_name) |>
   summarise(freq = n() / nrow(afsc_haul), total_weight = sum(catch_weight), itis = itis[1]) |>
   filter(freq > 0.05) |>
-  distinct(common_name)
+  distinct(scientific_name)
 
-percent20 <- group_by(afsc_catch, common_name) |>
+percent20 <- group_by(afsc_catch, scientific_name) |>
   summarise(freq = n() / nrow(afsc_haul), total_weight = sum(catch_weight), itis = itis[1]) |>
   filter(freq > 0.2) |>
-  distinct(common_name)
+  distinct(scientific_name)
 
 total_yr <- left_join(afsc_catch, afsc_haul) |>
   mutate(year = lubridate::year(date)) |>
@@ -96,44 +96,44 @@ total_yr <- left_join(afsc_catch, afsc_haul) |>
 total_mean <- mean(total_yr$total)
 
 percent5_biomass_025 <- left_join(afsc_catch, afsc_haul) |>
-  filter(common_name %in% percent5$common_name) |>
-  group_by(common_name) |>
+  filter(scientific_name %in% percent5$scientific_name) |>
+  group_by(scientific_name) |>
   summarise(mean_catch = sum(catch_weight) / 41) |>
-  filter(mean_catch > 0.025 * total_mean)
+  filter(mean_catch > 0.0025 * total_mean)
 
 percent5_biomass_1 <- left_join(afsc_catch, afsc_haul) |>
-  filter(common_name %in% percent5$common_name) |>
-  group_by(common_name) |>
+  filter(scientific_name %in% percent5$scientific_name) |>
+  group_by(scientific_name) |>
   summarise(mean_catch = sum(catch_weight) / 41) |>
-  filter(mean_catch > 0.1 * total_mean)
+  filter(mean_catch > 0.001 * total_mean)
 
 max_n = max(nrow(percent5), nrow(percent20),
           nrow(percent5_biomass_025), nrow(percent5_biomass_1))
 
-percent5 = c(percent5$common_name, rep(NA, max_n - nrow(percent5)))
-percent20 = c(percent20$common_name, rep(NA, max_n - nrow(percent20)))
-percent5_biomass_025 = c(percent5_biomass_025$common_name, rep(NA, max_n - nrow(percent5_biomass_025)))
-percent5_biomass_1 = c(percent5_biomass_1$common_name, rep(NA, max_n - nrow(percent5_biomass_1)))
+percent5 = c(percent5$scientific_name, rep(NA, max_n - nrow(percent5)))
+percent20 = c(percent20$scientific_name, rep(NA, max_n - nrow(percent20)))
+percent5_biomass_025 = c(percent5_biomass_025$scientific_name, rep(NA, max_n - nrow(percent5_biomass_025)))
+percent5_biomass_1 = c(percent5_biomass_1$scientific_name, rep(NA, max_n - nrow(percent5_biomass_1)))
 
 afsc_spp_lists <- data.frame(percent5, percent20, percent5_biomass_025, percent5_biomass_1)
-saveRDS(afsc_spp_lists, "afsc_spp_lists.rds")
+saveRDS(afsc_spp_lists, "data-raw/afsc_spp_lists.rds")
 
 #or splitting region into Bering vs GOA and AI surveys
 goaai_haul <- filter(afsc_haul, survey_name %in% c("Aleutian Islands", "Gulf of Alaska"))
 
 percent5 <-  left_join(afsc_catch, afsc_haul) |>
   filter(survey_name %in% c("Aleutian Islands", "Gulf of Alaska")) |>
-  group_by(common_name) |>
+  group_by(scientific_name) |>
   summarise(freq = n() / nrow(goaai_haul), total_weight = sum(catch_weight), itis = itis[1]) |>
   filter(freq > 0.05) |>
-  distinct(common_name)
+  distinct(scientific_name)
 
 percent20 <- left_join(afsc_catch, afsc_haul) |>
   filter(survey_name %in% c("Aleutian Islands", "Gulf of Alaska")) |>
-  group_by(common_name) |>
+  group_by(scientific_name) |>
   summarise(freq = n() / nrow(goaai_haul), total_weight = sum(catch_weight), itis = itis[1]) |>
   filter(freq > 0.2) |>
-  distinct(common_name)
+  distinct(scientific_name)
 
 total_yr <- left_join(afsc_catch, afsc_haul) |>
   filter(survey_name %in% c("Aleutian Islands", "Gulf of Alaska")) |>
@@ -144,47 +144,47 @@ total_mean <- mean(total_yr$total)
 
 percent5_biomass_025 <- left_join(afsc_catch, afsc_haul) |>
   filter(survey_name %in% c("Aleutian Islands", "Gulf of Alaska")) |>
-  filter(common_name %in% percent5$common_name) |>
-  group_by(common_name) |>
+  filter(scientific_name %in% percent5$scientific_name) |>
+  group_by(scientific_name) |>
   mutate(year = lubridate::year(date)) |>
   summarise(mean_catch = sum(catch_weight) / length(unique(year))) |>
-  filter(mean_catch > 0.025 * total_mean)
+  filter(mean_catch > 0.0025 * total_mean)
 
 percent5_biomass_1 <- left_join(afsc_catch, afsc_haul) |>
   filter(survey_name %in% c("Aleutian Islands", "Gulf of Alaska")) |>
-  filter(common_name %in% percent5$common_name) |>
-  group_by(common_name) |>
+  filter(scientific_name %in% percent5$scientific_name) |>
+  group_by(scientific_name) |>
   mutate(year = lubridate::year(date)) |>
   summarise(mean_catch = sum(catch_weight) / length(unique(year))) |>
-  filter(mean_catch > 0.1 * total_mean)
+  filter(mean_catch > 0.001 * total_mean)
 
 max_n = max(nrow(percent5), nrow(percent20),
           nrow(percent5_biomass_025), nrow(percent5_biomass_1))
 
-percent5 = c(percent5$common_name, rep(NA, max_n - nrow(percent5)))
-percent20 = c(percent20$common_name, rep(NA, max_n - nrow(percent20)))
-percent5_biomass_025 = c(percent5_biomass_025$common_name, rep(NA, max_n - nrow(percent5_biomass_025)))
-percent5_biomass_1 = c(percent5_biomass_1$common_name, rep(NA, max_n - nrow(percent5_biomass_1)))
+percent5 = c(percent5$scientific_name, rep(NA, max_n - nrow(percent5)))
+percent20 = c(percent20$scientific_name, rep(NA, max_n - nrow(percent20)))
+percent5_biomass_025 = c(percent5_biomass_025$scientific_name, rep(NA, max_n - nrow(percent5_biomass_025)))
+percent5_biomass_1 = c(percent5_biomass_1$scientific_name, rep(NA, max_n - nrow(percent5_biomass_1)))
 
 goaai_spp_lists <- data.frame(percent5, percent20, percent5_biomass_025, percent5_biomass_1)
-saveRDS(goaai_spp_lists, "goaai_spp_lists.rds")
+saveRDS(goaai_spp_lists, "data-raw/goaai_spp_lists.rds")
 
 
 bering_haul <- filter(afsc_haul, survey_name %in% c("eastern Bering Sea", "northern Bering Sea", "Bering Sea Slope"))
 
 percent5 <-  left_join(afsc_catch, afsc_haul) |>
   filter(survey_name %in% c("eastern Bering Sea", "northern Bering Sea", "Bering Sea Slope")) |>
-  group_by(common_name) |>
+  group_by(scientific_name) |>
   summarise(freq = n() / nrow(goaai_haul), total_weight = sum(catch_weight), itis = itis[1]) |>
   filter(freq > 0.05) |>
-  distinct(common_name)
+  distinct(scientific_name)
 
 percent20 <- left_join(afsc_catch, afsc_haul) |>
   filter(survey_name %in% c("eastern Bering Sea", "northern Bering Sea", "Bering Sea Slope")) |>
-  group_by(common_name) |>
+  group_by(scientific_name) |>
   summarise(freq = n() / nrow(goaai_haul), total_weight = sum(catch_weight), itis = itis[1]) |>
   filter(freq > 0.2) |>
-  distinct(common_name)
+  distinct(scientific_name)
 
 total_yr <- left_join(afsc_catch, afsc_haul) |>
   filter(survey_name %in% c("eastern Bering Sea", "northern Bering Sea", "Bering Sea Slope")) |>
@@ -195,30 +195,30 @@ total_mean <- mean(total_yr$total)
 
 percent5_biomass_025 <- left_join(afsc_catch, afsc_haul) |>
   filter(survey_name %in% c("eastern Bering Sea", "northern Bering Sea", "Bering Sea Slope")) |>
-  filter(common_name %in% percent5$common_name) |>
-  group_by(common_name) |>
+  filter(scientific_name %in% percent5$scientific_name) |>
+  group_by(scientific_name) |>
   mutate(year = lubridate::year(date)) |>
   summarise(mean_catch = sum(catch_weight) / length(unique(year))) |>
-  filter(mean_catch > 0.025 * total_mean)
+  filter(mean_catch > 0.0025 * total_mean)
 
 percent5_biomass_1 <- left_join(afsc_catch, afsc_haul) |>
   filter(survey_name %in% c("eastern Bering Sea", "northern Bering Sea", "Bering Sea Slope")) |>
-  filter(common_name %in% percent5$common_name) |>
-  group_by(common_name) |>
+  filter(scientific_name %in% percent5$scientific_name) |>
+  group_by(scientific_name) |>
   mutate(year = lubridate::year(date)) |>
   summarise(mean_catch = sum(catch_weight) / length(unique(year))) |>
-  filter(mean_catch > 0.1 * total_mean)
+  filter(mean_catch > 0.001 * total_mean)
 
 max_n = max(nrow(percent5), nrow(percent20),
             nrow(percent5_biomass_025), nrow(percent5_biomass_1))
 
-percent5 = c(percent5$common_name, rep(NA, max_n - nrow(percent5)))
-percent20 = c(percent20$common_name, rep(NA, max_n - nrow(percent20)))
-percent5_biomass_025 = c(percent5_biomass_025$common_name, rep(NA, max_n - nrow(percent5_biomass_025)))
-percent5_biomass_1 = c(percent5_biomass_1$common_name, rep(NA, max_n - nrow(percent5_biomass_1)))
+percent5 = c(percent5$scientific_name, rep(NA, max_n - nrow(percent5)))
+percent20 = c(percent20$scientific_name, rep(NA, max_n - nrow(percent20)))
+percent5_biomass_025 = c(percent5_biomass_025$scientific_name, rep(NA, max_n - nrow(percent5_biomass_025)))
+percent5_biomass_1 = c(percent5_biomass_1$scientific_name, rep(NA, max_n - nrow(percent5_biomass_1)))
 
 bering_spp_lists <- data.frame(percent5, percent20, percent5_biomass_025, percent5_biomass_1)
-saveRDS(bering_spp_lists, "bering_spp_lists.rds")
+saveRDS(bering_spp_lists, "data-raw/bering_spp_lists.rds")
 
 # # filter this to most prevalent species, by category ----
 # afsc_catch_fish <- afsc_catch %>%
