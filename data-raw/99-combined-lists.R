@@ -25,6 +25,16 @@ x
 x <- unlist(dl)
 xt <- table(x) |> sort()
 
-x[xt >= 2]
+xt[xt >= 2]
 
-x[xt < 2]
+
+df <- data.frame(scientific_name = sort(names(xt[xt>=2])))
+get_itis <- function(spp) {
+  out <- taxize::get_ids(spp, db = "itis", verbose = FALSE)
+  as.integer(unlist(out))
+}
+df$itis <- get_itis(df$scientific_name)
+
+
+saveRDS(df, "data-raw/joined_list.rds")
+
