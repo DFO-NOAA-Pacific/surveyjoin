@@ -67,4 +67,4 @@ nwfsc_haul <- dplyr::select(haul,
 #nwfsc_haul$vessel = as.character(nwfsc_haul$vessel)
 
 # usethis::use_data(nwfsc_haul, overwrite = TRUE)
-save_raw_data(nwfsc_haul, "nwfsc-haul")
+surveyjoin:::save_raw_data(nwfsc_haul, name = "nwfsc-haul")
