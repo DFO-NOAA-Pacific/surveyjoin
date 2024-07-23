@@ -28,7 +28,7 @@ return more than one survey.}
 of "Aleutian Islands Bottom Trawl Survey", "Eastern Bering Sea Crab/Groundfish Bottom Trawl Survey",
 "Eastern Bering Sea Slope Bottom Trawl Survey", "Gulf of Alaska Bottom Trawl Survey",
 "Northern Bering Sea Crab/Groundfish Survey - Eastern Bering Sea Shelf Survey Extension",
-"NWFSC.Combo", "NWFSC.Shelf", "NWFSC.Hypoxia", "NWFSC.Hypoxia", "Triennial", "SYN QCS",
+"NWFSC.Combo", "NWFSC.Shelf", "NWFSC.Hypoxia", "Triennial", "SYN QCS",
 "SYN HS", "SYN WCVI", "SYN WCHG". If NULL, all are returned}
 
 \item{years}{a vector of years, e.g. \code{year = 2013:2018}. If NULL, all are returned}
@@ -65,6 +65,6 @@ Main function to query the survey database
 }
 \examples{
 \dontrun{
-d <- get_data(common = "arrowtooth flounder", years = 2013:2018, region="pbs")
+d <- get_data()
 }
 }

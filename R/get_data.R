@@ -44,7 +44,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' d <- get_data(common = "arrowtooth flounder", years = 2013:2018, region="pbs")
+#' d <- get_data()
 #' }
 get_data <- function(common = NULL, scientific = NULL, itis_id = NULL, regions = NULL, surveys = NULL, years = NULL) {
 

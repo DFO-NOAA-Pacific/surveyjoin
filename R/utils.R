@@ -110,31 +110,38 @@ load_sql_data <- function() {
   haul <- map_dfr(f_haul, function(x) {
     out <- readRDS(file.path(get_cache_folder(), x))
     out$region <- gsub("([a-z]+)-[a-z]+.rds", "\\1", x)
+    out$event_id <- as.character(out$event_id)
     out$performance <- as.character(out$performance)
     out$year <- as.integer(lubridate::year(out$date))
     out$date <- as.character(lubridate::as_date(out$date))
     # FIXME: do this long before! Alaska
     out$lon_start <- ifelse(out$lon_start > 0, out$lon_start * -1, out$lon_start)
     out$lon_end <- ifelse(out$lon_end > 0, out$lon_end * -1, out$lon_end)
+    if(out$region[1] == "pbs") {
+      # Fix me earlier!
+      out <- dplyr::rename(out, bottom_temp_c = temperature_C) %>%
+        dplyr::select(-do_mlpL, -salinity_PSU)
+    }
     out
+
   })
   catch <- map_dfr(f_catch, function(x) {
     out <- readRDS(file.path(get_cache_folder(), x))
     out$region <- gsub("([a-z]+)-[a-z]+.rds", "\\1", x)
     out
   })
-  cli_alert_success("Raw data read into memory")
+  cli::cli_alert_success("Raw data read into memory")
 
   catch <- left_join(catch, surveyjoin::spp_dictionary)
   stopifnot(sum(is.na(catch$scientific_name)) == 0L)
-  cli_alert_success("Taxonomic data joined to catch data")
+  cli::cli_alert_success("Taxonomic data joined to catch data")
 
   db <- dbConnect(RSQLite::SQLite(), dbname = sql_folder())
   on.exit(suppressWarnings(suppressMessages(DBI::dbDisconnect(db))))
   dbWriteTable(db, "haul", haul, overwrite = TRUE, append = FALSE)
   dbWriteTable(db, "catch", catch, overwrite = TRUE, append = FALSE)
 
-  cli_alert_success("SQLite database created")
+  cli::cli_alert_success("SQLite database created")
 }
 
 
@@ -192,8 +199,8 @@ get_metadata <- function() {
 #' m <- get_survey_names()
 #' }
 get_survey_names <- function() {
-  df <- data.frame(survey = c("Aleutian Islands", "Gulf of Alaska", "eastern Bering Sea", 
-  "northern Bering Sea", "Bering Sea Slope", "NWFSC.Combo", "NWFSC.Shelf", "NWFSC.Hypoxia", 
+  df <- data.frame(survey = c("Aleutian Islands", "Gulf of Alaska", "eastern Bering Sea",
+  "northern Bering Sea", "Bering Sea Slope", "NWFSC.Combo", "NWFSC.Shelf", "NWFSC.Hypoxia",
   "NWFSC.Hypoxia", "Triennial", "SYN QCS", "SYN HS", "SYN WCVI", "SYN WCHG"),
   region = c(rep("afsc",5), rep("nwfsc",5), rep("pbs",4)))
   return(df)
