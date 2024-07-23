@@ -2,3 +2,5 @@
 ^\.Rproj\.user$
 ^data-raw$
 ^local-data$
+README.Rmd
+^docs$
