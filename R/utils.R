@@ -238,15 +238,6 @@ get_rawdata <- function() {
   return(df)
 }
 
-# make_itis_spp_table()
-
-# results <- bird_tracking %>%
-#   filter(device_info_serial == 860) %>%
-#   select(date_time, latitude, longitude, altitude) %>%
-#   filter(date_time < "2014-07-01") %>%
-#   filter(date_time > "2014-03-01")
-# head(results)
-
 #' Get the table of common and scientific names in the joined dataset
 #' @return a dataframe with the common and scientific name
 #' @import dplyr
