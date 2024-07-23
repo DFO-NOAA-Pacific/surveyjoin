@@ -246,3 +246,19 @@ get_rawdata <- function() {
 #   filter(date_time > "2014-03-01")
 # head(results)
 
+#' Get the table of common and scientific names in the joined dataset
+#' @return a dataframe with the common and scientific name
+#' @import dplyr
+#' @importFrom DBI dbDisconnect
+#' @export
+#' @examples
+#' \dontrun{
+#' get_species()
+#' }
+get_species <- function() {
+  db <- surv_db()
+  catch <- as.data.frame(tbl(db, "catch"))
+  catch_tbl <- dplyr::group_by(catch, common_name) %>%
+    dplyr::summarise(scientific_name = scientific_name[1], itis = itis[1])
+  return(catch_tbl)
+}
