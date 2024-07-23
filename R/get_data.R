@@ -78,9 +78,15 @@ get_data <- function(common = NULL, scientific = NULL, itis_id = NULL, regions =
   }
 
   # Join data and filter years if specified
-  d <- catch |>
-    left_join(haul, by = c("event_id", "region")) |>
+  #d <- catch |>
+  #  left_join(haul, by = c("event_id", "region")) |>
+  #  collect(n = Inf)
+  d <- haul |>
+    left_join(catch, by = c("event_id", "region")) |>
     collect(n = Inf)
+  # Replace NAs with 0s
+  d$catch_weight[which(is.na(d$catch_weight))] <- 0
+  d$catch_numbers[which(is.na(d$catch_numbers))] <- 0
   if(!is.null(years)) {
     d <- d |>
       filter(year %in% years)
