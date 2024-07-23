@@ -110,7 +110,8 @@ load_sql_data <- function() {
   haul <- map_dfr(f_haul, function(x) {
     out <- readRDS(file.path(get_cache_folder(), x))
     out$region <- gsub("([a-z]+)-[a-z]+.rds", "\\1", x)
-    out$event_id <- as.character(out$event_id)
+    if(is.character(out$event_id)) out$event_id <- as.numeric(out$event_id)
+    #out$event_id <- as.character(out$event_id)
     out$performance <- as.character(out$performance)
     out$year <- as.integer(lubridate::year(out$date))
     out$date <- as.character(lubridate::as_date(out$date))
@@ -133,7 +134,7 @@ load_sql_data <- function() {
   cli::cli_alert_success("Raw data read into memory")
 
   catch <- left_join(catch, surveyjoin::spp_dictionary)
-  stopifnot(sum(is.na(catch$scientific_name)) == 0L)
+  #stopifnot(sum(is.na(catch$scientific_name)) == 0L)
   cli::cli_alert_success("Taxonomic data joined to catch data")
 
   db <- dbConnect(RSQLite::SQLite(), dbname = sql_folder())
@@ -258,7 +259,8 @@ get_rawdata <- function() {
 get_species <- function() {
   db <- surv_db()
   catch <- as.data.frame(tbl(db, "catch"))
-  catch_tbl <- dplyr::group_by(catch, common_name) %>%
-    dplyr::summarise(scientific_name = scientific_name[1], itis = itis[1])
+  catch_tbl <- dplyr::group_by(catch, common_name) |>
+    dplyr::summarise(scientific_name = scientific_name[1], itis = itis[1]) |>
+    dplyr::filter(!is.na(scientific_name), !is.na(common_name))
   return(catch_tbl)
 }

@@ -37,6 +37,13 @@ get_shapefiles()
 get_rawdata()
 ```
 
+Additionally, we can look at the table of species names (common, scientific, itis) that are included. 
+
+```{r eval=FALSE}
+get_species()
+```
+
+
 The core function of the package is `get_data`. This allows for querying by species (using common names - "common", scientific names - "scientific", or ITIS identifiers - "itis_id"), regions, surveys, or years -- each of these may be a single value or vector of values. We could get data for sablefish from all Alaska surveys in the the last decade with
 
 ```{r eval=FALSE}

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>surveyjoin • surveyjoin</title>
-<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
+<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">surveyjoin</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.2</span>
       </span>
     </div>
 
@@ -84,7 +84,8 @@ plotting.</p>
 <span><span class="co">#&gt; The following objects are masked from 'package:base':</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;     intersect, setdiff, setequal, union</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span></code></pre></div>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: package 'ggplot2' was built under R version 4.3.2</span></span></code></pre></div>
 <p>The <code>surveyjoin</code> package contains several processing
 functions that will download the survey data files locally, and create a
 connection to the SQLite database. The <code><a href="../reference/cache_data.html">cache_data()</a></code>
@@ -102,19 +103,23 @@ our three regions (“afsc”, “pbs”, “nwfsc”).</p>
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_metadata.html">get_metadata</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/get_shapefiles.html">get_shapefiles</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/get_rawdata.html">get_rawdata</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p>Additionally, we can look at the table of species names (common,
+scientific, itis) that are included.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/get_species.html">get_species</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>The core function of the package is <code>get_data</code>. This
 allows for querying by species (using common names - “common”,
 scientific names - “scientific”, or ITIS identifiers - “itis_id”),
 regions, surveys, or years – each of these may be a single value or
 vector of values. We could get data for sablefish from all Alaska
 surveys in the the last decade with</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_data.html">get_data</a></span><span class="op">(</span>common <span class="op">=</span> <span class="st">"sablefish"</span>, years <span class="op">=</span> <span class="fl">2013</span><span class="op">:</span><span class="fl">2023</span>, regions<span class="op">=</span><span class="st">"afsc"</span><span class="op">)</span></span></code></pre></div>
 <p>As a second example, we could get data coastwide for Arrowtooth
 flounder and plot it with the following code. We’ll constrain it to
 years 2003-2018 for plotting purposes (though the earliest year of data
 is 1980).</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_data.html">get_data</a></span><span class="op">(</span>common <span class="op">=</span> <span class="st">"arrowtooth flounder"</span>, years <span class="op">=</span> <span class="fl">2003</span><span class="op">:</span><span class="fl">2018</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">g</span> <span class="op">&lt;-</span> <span class="va">d</span> <span class="op">|&gt;</span> </span>
@@ -137,41 +142,26 @@ is 1980).</p>
 <p><img src="../reference/figures/map-example.png"></p>
 <p>Additional information on specific species can be found in our
 species dictionary</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"spp_dictionary"</span><span class="op">)</span></span></code></pre></div>
 <p>And the full list of survey names can be found with</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_survey_names.html">get_survey_names</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt;                                                                                    survey</span></span>
-<span><span class="co">#&gt; 1                                                    Aleutian Islands Bottom Trawl Survey</span></span>
-<span><span class="co">#&gt; 2                                  Eastern Bering Sea Crab/Groundfish Bottom Trawl Survey</span></span>
-<span><span class="co">#&gt; 3                                            Eastern Bering Sea Slope Bottom Trawl Survey</span></span>
-<span><span class="co">#&gt; 4                                                      Gulf of Alaska Bottom Trawl Survey</span></span>
-<span><span class="co">#&gt; 5  Northern Bering Sea Crab/Groundfish Survey - Eastern Bering Sea Shelf Survey Extension</span></span>
-<span><span class="co">#&gt; 6                                                                             NWFSC.Combo</span></span>
-<span><span class="co">#&gt; 7                                                                             NWFSC.Shelf</span></span>
-<span><span class="co">#&gt; 8                                                                           NWFSC.Hypoxia</span></span>
-<span><span class="co">#&gt; 9                                                                           NWFSC.Hypoxia</span></span>
-<span><span class="co">#&gt; 10                                                                              Triennial</span></span>
-<span><span class="co">#&gt; 11                                                                                SYN QCS</span></span>
-<span><span class="co">#&gt; 12                                                                                 SYN HS</span></span>
-<span><span class="co">#&gt; 13                                                                               SYN WCVI</span></span>
-<span><span class="co">#&gt; 14                                                                               SYN WCHG</span></span>
-<span><span class="co">#&gt;    region</span></span>
-<span><span class="co">#&gt; 1    afsc</span></span>
-<span><span class="co">#&gt; 2    afsc</span></span>
-<span><span class="co">#&gt; 3    afsc</span></span>
-<span><span class="co">#&gt; 4    afsc</span></span>
-<span><span class="co">#&gt; 5    afsc</span></span>
-<span><span class="co">#&gt; 6   nwfsc</span></span>
-<span><span class="co">#&gt; 7   nwfsc</span></span>
-<span><span class="co">#&gt; 8   nwfsc</span></span>
-<span><span class="co">#&gt; 9   nwfsc</span></span>
-<span><span class="co">#&gt; 10  nwfsc</span></span>
-<span><span class="co">#&gt; 11    pbs</span></span>
-<span><span class="co">#&gt; 12    pbs</span></span>
-<span><span class="co">#&gt; 13    pbs</span></span>
-<span><span class="co">#&gt; 14    pbs</span></span></code></pre></div>
+<span><span class="co">#&gt;                 survey region</span></span>
+<span><span class="co">#&gt; 1     Aleutian Islands   afsc</span></span>
+<span><span class="co">#&gt; 2       Gulf of Alaska   afsc</span></span>
+<span><span class="co">#&gt; 3   eastern Bering Sea   afsc</span></span>
+<span><span class="co">#&gt; 4  northern Bering Sea   afsc</span></span>
+<span><span class="co">#&gt; 5     Bering Sea Slope   afsc</span></span>
+<span><span class="co">#&gt; 6          NWFSC.Combo  nwfsc</span></span>
+<span><span class="co">#&gt; 7          NWFSC.Shelf  nwfsc</span></span>
+<span><span class="co">#&gt; 8        NWFSC.Hypoxia  nwfsc</span></span>
+<span><span class="co">#&gt; 9        NWFSC.Hypoxia  nwfsc</span></span>
+<span><span class="co">#&gt; 10           Triennial  nwfsc</span></span>
+<span><span class="co">#&gt; 11             SYN QCS    pbs</span></span>
+<span><span class="co">#&gt; 12              SYN HS    pbs</span></span>
+<span><span class="co">#&gt; 13            SYN WCVI    pbs</span></span>
+<span><span class="co">#&gt; 14            SYN WCHG    pbs</span></span></code></pre></div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -189,7 +179,7 @@ species dictionary</p>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
 </div>
 
       </footer>

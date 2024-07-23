@@ -33,8 +33,8 @@ haul <- rbind(haul_nwfsc_combo,
 haul$sampling_start <- paste0(substr(haul$sampling_start_hhmmss,1,2),":",
                               substr(haul$sampling_start_hhmmss,3,4),":",
                               substr(haul$sampling_start_hhmmss,5,6))
-haul$date = ymd_hms(paste(ymd(haul$date_yyyymmdd), haul$sampling_start),
-                        tz = "US/Pacific")
+haul$date = haul$date_formatted
+haul$year <- year(haul$date)
 
 haul <- dplyr::rename(haul,
                       "effort" = "area_swept_ha_der",
@@ -61,8 +61,11 @@ nwfsc_haul <- dplyr::select(haul,
                       effort,
                       effort_units,
                       performance,
-                      bottom_temp_c)
+                      bottom_temp_c,
+                      year)
 
+# enforce types for dates, consistent with afsc / pbs
+nwfsc_haul$date <- as.POSIXct.Date(nwfsc_haul$date)
 # enforce types
 #nwfsc_haul$vessel = as.character(nwfsc_haul$vessel)
 

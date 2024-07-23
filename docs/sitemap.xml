@@ -16,7 +16,13 @@
     <loc>/index.html</loc>
   </url>
   <url>
+    <loc>/reference/afsc_grid.html</loc>
+  </url>
+  <url>
     <loc>/reference/cache_data.html</loc>
+  </url>
+  <url>
+    <loc>/reference/dfo_synoptic_grid.html</loc>
   </url>
   <url>
     <loc>/reference/get_cache_folder.html</loc>
@@ -37,6 +43,9 @@
     <loc>/reference/get_shapefiles.html</loc>
   </url>
   <url>
+    <loc>/reference/get_species.html</loc>
+  </url>
+  <url>
     <loc>/reference/get_survey_names.html</loc>
   </url>
   <url>
@@ -44,6 +53,9 @@
   </url>
   <url>
     <loc>/reference/load_sql_data.html</loc>
+  </url>
+  <url>
+    <loc>/reference/nwfsc_grid.html</loc>
   </url>
   <url>
     <loc>/reference/spp_dictionary.html</loc>

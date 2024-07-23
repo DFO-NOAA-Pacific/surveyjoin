@@ -13,6 +13,8 @@ The pkdown site can be found [here](https://dfo-noaa-pacific.github.io/surveyjoi
 
 This data includes surveys conducted by the Northwest Fisheries Science Center (NWFSC) off the west coast of the United States, surveys collected by Fisheries and Oceans Canada (DFO) in the waters of British Columbia, and surveys conducted by the Alaska Fisheries Science Center (AFSC) in Alaska.
 
+There are 55 species included in the initial version of the package, focusing on species that are occurring in multiple regions. The list of species can be viewed with the `get_species()` function.
+
 ### Citations
 
 Citing the `surveyjoin` package can be done with the DOI linked above, though more detailed citations may be needed for specific surveys or methodology. For citations pertaining to surveys run by the Alaska Fisheries Science Center (AFSC), see
