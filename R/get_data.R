@@ -81,9 +81,22 @@ get_data <- function(common = NULL, scientific = NULL, itis_id = NULL, regions =
   #d <- catch |>
   #  left_join(haul, by = c("event_id", "region")) |>
   #  collect(n = Inf)
-  d <- haul |>
-    left_join(catch, by = c("event_id", "region")) |>
-    collect(n = Inf)
+  catch <- catch |> collect()
+  catch_spp <- unique(catch$common_name)
+  for(i in 1:length(catch_spp)) {
+    dsub <- left_join(haul |> collect(), dplyr::filter(catch, common_name==catch_spp[i]), by = c("event_id","region"))
+    ids <- dplyr::filter(dsub, !is.na(itis)) |>
+      summarize(itis = itis[1], common_name = common_name[1], scientific_name = scientific_name[1])
+    dsub$itis <- ids$itis[1]
+    dsub$common_name <- ids$common_name[1]
+    dsub$scientific_name <- ids$scientific_name[1]
+    if(i==1) {
+      d <- dsub
+    } else {
+      d <- rbind(d, dsub)
+    }
+  }
+
   # Replace NAs with 0s
   d$catch_weight[which(is.na(d$catch_weight))] <- 0
   d$catch_numbers[which(is.na(d$catch_numbers))] <- 0
