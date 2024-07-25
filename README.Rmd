@@ -22,3 +22,14 @@ Citing the `surveyjoin` package can be done with the DOI linked above, though mo
 <https://github.com/afsc-gap-products/citations>
 
 Background and additional citations on surveys run by the Northwest Fisheries Science Center (NWFSC) can be found in [Keller et al. 2017](https://repository.library.noaa.gov/view/noaa/14179/noaa_14179_DS1.pdf).
+
+### What species are included?
+
+We first divided the joined datasets into 4 major areas: Eastern Bering Sea, Gulf of Alaska, British Columbia, and west coast of California / Oregon / Washington states.
+
+Within each region, we identified the species that occurred in at least 5% of all tows (resulting in 4 lists, 1 for each region). Because our interests are in cross-regional work, we identified species meeting our occurrence threshold that also occurred in 2 or more regions. This resulted in the following list of 55 species:
+
+```{r echo=FALSE}
+d <- readRDS("data-raw/joined_species_list.rds")
+knitr::kable(d)
+```

@@ -59,15 +59,309 @@
       </header><div class="row">
   <div class="contents col-md-9">
 <div class="section level1">
-<div class="page-header"><h1 id="surveyjoin">surveyjoin<a class="anchor" aria-label="anchor" href="#surveyjoin"></a>
+<div class="page-header"><h1 id="surveyjoin-package">surveyjoin package<a class="anchor" aria-label="anchor" href="#surveyjoin-package"></a>
 </h1></div>
-<p>Our objective is to facilitate robust marine research by providing a reliable repository of quality-controlled trawl survey data from NOAA and Fisheries and Oceans Canada (DFO) in the Northeast Pacific Ocean. Data includes surveys conducted by the Northwest Fisheries Science Center (NWFSC) off the west coast of the United States, surveys collected by Fisheries and Oceans Canada (DFO) in the waters of British Columbia, and surveys conducted by the Alaska Fisheries Science Center (AFSC) in Alaska. We are delivering these datasets in a standardized format to support a variety of analyses, including species distribution models, biomass trend evaluation, and species richness modelling. This repository serves as a resource for researchers and as an intermediate data product for other warehouses, such as the DisMap portal.</p>
+<p>This is a repository for combining trawl survey datasets from NOAA and Fisheries and Oceans Canada in the Northeast Pacific Ocean.</p>
 <p>The pkdown site can be found <a href="https://dfo-noaa-pacific.github.io/surveyjoin/" class="external-link">here</a></p>
-<p>Citation via Zenodo: <a href="https://zenodo.org/doi/10.5281/zenodo.10031852" class="external-link"><img src="https://zenodo.org/badge/484561620.svg" alt="DOI"></a></p>
-<div class="section level2">
-<h2 id="disclaimer">Disclaimer<a class="anchor" aria-label="anchor" href="#disclaimer"></a>
-</h2>
-<p>The United States Department of Commerce (DOC) GitHub project code is provided on an ‘as is’ basis and the user assumes responsibility for its use. DOC has relinquished control of the information and no longer has responsibility to protect the integrity, confidentiality, or availability of the information. Any claims against the Department of Commerce stemming from the use of its GitHub project will be governed by all applicable Federal law. Any reference to specific commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise, does not constitute or imply their endorsement, recommendation or favoring by the Department of Commerce. The Department of Commerce seal and logo, or the seal and logo of a DOC bureau, shall not be used in any manner to imply endorsement of any commercial product or activity by DOC or the United States Government.</p>
+<p><a href="https://zenodo.org/doi/10.5281/zenodo.10031852" class="external-link"><img src="https://zenodo.org/badge/484561620.svg" alt="DOI"></a></p>
+<p>This data includes surveys conducted by the Northwest Fisheries Science Center (NWFSC) off the west coast of the United States, surveys collected by Fisheries and Oceans Canada (DFO) in the waters of British Columbia, and surveys conducted by the Alaska Fisheries Science Center (AFSC) in Alaska.</p>
+<p>There are 55 species included in the initial version of the package, focusing on species that are occurring in multiple regions. The list of species can be viewed with the <code><a href="reference/get_species.html">get_species()</a></code> function.</p>
+<div class="section level3">
+<h3 id="citations">Citations<a class="anchor" aria-label="anchor" href="#citations"></a>
+</h3>
+<p>Citing the <code>surveyjoin</code> package can be done with the DOI linked above, though more detailed citations may be needed for specific surveys or methodology. For citations pertaining to surveys run by the Alaska Fisheries Science Center (AFSC), see</p>
+<p><a href="https://github.com/afsc-gap-products/citations" class="external-link uri">https://github.com/afsc-gap-products/citations</a></p>
+<p>Background and additional citations on surveys run by the Northwest Fisheries Science Center (NWFSC) can be found in <a href="https://repository.library.noaa.gov/view/noaa/14179/noaa_14179_DS1.pdf" class="external-link">Keller et al. 2017</a>.</p>
+</div>
+<div class="section level3">
+<h3 id="what-species-are-included">What species are included?<a class="anchor" aria-label="anchor" href="#what-species-are-included"></a>
+</h3>
+<p>We first divided the joined datasets into 4 major areas: Eastern Bering Sea, Gulf of Alaska, British Columbia, and west coast of California / Oregon / Washington states.</p>
+<p>Within each region, we identified the species that occurred in at least 5% of all tows (resulting in 4 lists, 1 for each region). Because our interests are in cross-regional work, we identified species meeting our occurrence threshold that also occurred in 2 or more regions. This resulted in the following list of 55 species:</p>
+<table class="table">
+<thead><tr class="header">
+<th align="left">common_name</th>
+<th align="left">scientific_name</th>
+<th align="right">itis</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">aleutian skate</td>
+<td align="left">bathyraja aleutica</td>
+<td align="right">160935</td>
+</tr>
+<tr class="even">
+<td align="left">arrowtooth flounder</td>
+<td align="left">atheresthes stomias</td>
+<td align="right">172862</td>
+</tr>
+<tr class="odd">
+<td align="left">big skate</td>
+<td align="left">raja binoculata</td>
+<td align="right">160848</td>
+</tr>
+<tr class="even">
+<td align="left">bigfin eelpout</td>
+<td align="left">lycodes cortezianus</td>
+<td align="right">550588</td>
+</tr>
+<tr class="odd">
+<td align="left">bigmouth sculpin</td>
+<td align="left">hemitripterus bolini</td>
+<td align="right">167287</td>
+</tr>
+<tr class="even">
+<td align="left">black eelpout</td>
+<td align="left">lycodes diapterus</td>
+<td align="right">165261</td>
+</tr>
+<tr class="odd">
+<td align="left">blackbelly eelpout</td>
+<td align="left">lycodes pacificus</td>
+<td align="right">630999</td>
+</tr>
+<tr class="even">
+<td align="left">bocaccio</td>
+<td align="left">sebastes paucispinis</td>
+<td align="right">166733</td>
+</tr>
+<tr class="odd">
+<td align="left">canary rockfish</td>
+<td align="left">sebastes pinniger</td>
+<td align="right">166734</td>
+</tr>
+<tr class="even">
+<td align="left">capelin</td>
+<td align="left">mallotus villosus</td>
+<td align="right">162035</td>
+</tr>
+<tr class="odd">
+<td align="left">curlfin sole</td>
+<td align="left">pleuronichthys decurrens</td>
+<td align="right">172924</td>
+</tr>
+<tr class="even">
+<td align="left">darkblotched rockfish</td>
+<td align="left">sebastes crameri</td>
+<td align="right">166715</td>
+</tr>
+<tr class="odd">
+<td align="left">darkfin sculpin</td>
+<td align="left">malacocottus zonurus</td>
+<td align="right">167305</td>
+</tr>
+<tr class="even">
+<td align="left">dover sole</td>
+<td align="left">microstomus pacificus</td>
+<td align="right">172887</td>
+</tr>
+<tr class="odd">
+<td align="left">english sole</td>
+<td align="left">parophrys vetulus</td>
+<td align="right">172921</td>
+</tr>
+<tr class="even">
+<td align="left">eulachon</td>
+<td align="left">thaleichthys pacificus</td>
+<td align="right">162051</td>
+</tr>
+<tr class="odd">
+<td align="left">flathead sole</td>
+<td align="left">hippoglossoides elassodon</td>
+<td align="right">172875</td>
+</tr>
+<tr class="even">
+<td align="left">giant grenadier</td>
+<td align="left">albatrossia pectoralis</td>
+<td align="right">165427</td>
+</tr>
+<tr class="odd">
+<td align="left">great sculpin</td>
+<td align="left">myoxocephalus polyacanthocephalus</td>
+<td align="right">167315</td>
+</tr>
+<tr class="even">
+<td align="left">greenstriped rockfish</td>
+<td align="left">sebastes elongatus</td>
+<td align="right">166717</td>
+</tr>
+<tr class="odd">
+<td align="left">harlequin rockfish</td>
+<td align="left">sebastes variegatus</td>
+<td align="right">166742</td>
+</tr>
+<tr class="even">
+<td align="left">kamchatka flounder</td>
+<td align="left">atheresthes evermanni</td>
+<td align="right">172861</td>
+</tr>
+<tr class="odd">
+<td align="left">lingcod</td>
+<td align="left">ophiodon elongatus</td>
+<td align="right">167116</td>
+</tr>
+<tr class="even">
+<td align="left">longnose skate</td>
+<td align="left">raja rhina</td>
+<td align="right">160851</td>
+</tr>
+<tr class="odd">
+<td align="left">north pacific hake</td>
+<td align="left">merluccius productus</td>
+<td align="right">164792</td>
+</tr>
+<tr class="even">
+<td align="left">northern rock sole</td>
+<td align="left">lepidopsetta polyxystra</td>
+<td align="right">616392</td>
+</tr>
+<tr class="odd">
+<td align="left">pacific cod</td>
+<td align="left">gadus macrocephalus</td>
+<td align="right">164711</td>
+</tr>
+<tr class="even">
+<td align="left">pacific halibut</td>
+<td align="left">hippoglossus stenolepis</td>
+<td align="right">172932</td>
+</tr>
+<tr class="odd">
+<td align="left">pacific herring</td>
+<td align="left">clupea pallasii</td>
+<td align="right">551209</td>
+</tr>
+<tr class="even">
+<td align="left">pacific ocean perch</td>
+<td align="left">sebastes alutus</td>
+<td align="right">166707</td>
+</tr>
+<tr class="odd">
+<td align="left">pacific sanddab</td>
+<td align="left">citharichthys sordidus</td>
+<td align="right">172716</td>
+</tr>
+<tr class="even">
+<td align="left">petrale sole</td>
+<td align="left">eopsetta jordani</td>
+<td align="right">172868</td>
+</tr>
+<tr class="odd">
+<td align="left">puget sound dogfish</td>
+<td align="left">squalus suckleyi</td>
+<td align="right">160620</td>
+</tr>
+<tr class="even">
+<td align="left">redbanded rockfish</td>
+<td align="left">sebastes babcocki</td>
+<td align="right">166710</td>
+</tr>
+<tr class="odd">
+<td align="left">rex sole</td>
+<td align="left">glyptocephalus zachirus</td>
+<td align="right">172978</td>
+</tr>
+<tr class="even">
+<td align="left">rock sole</td>
+<td align="left">lepidopsetta bilineata</td>
+<td align="right">172917</td>
+</tr>
+<tr class="odd">
+<td align="left">rosethorn rockfish</td>
+<td align="left">sebastes helvomaculatus</td>
+<td align="right">166723</td>
+</tr>
+<tr class="even">
+<td align="left">sablefish</td>
+<td align="left">anoplopoma fimbria</td>
+<td align="right">167123</td>
+</tr>
+<tr class="odd">
+<td align="left">sandpaper skate</td>
+<td align="left">bathyraja interrupta</td>
+<td align="right">160937</td>
+</tr>
+<tr class="even">
+<td align="left">searcher</td>
+<td align="left">bathymaster signatus</td>
+<td align="right">170949</td>
+</tr>
+<tr class="odd">
+<td align="left">sharpchin rockfish</td>
+<td align="left">sebastes zacentrus</td>
+<td align="right">166744</td>
+</tr>
+<tr class="even">
+<td align="left">shortfin eelpout</td>
+<td align="left">lycodes brevipes</td>
+<td align="right">165258</td>
+</tr>
+<tr class="odd">
+<td align="left">shortspine thornyhead</td>
+<td align="left">sebastolobus alascanus</td>
+<td align="right">166783</td>
+</tr>
+<tr class="even">
+<td align="left">slender sole</td>
+<td align="left">lyopsetta exilis</td>
+<td align="right">172871</td>
+</tr>
+<tr class="odd">
+<td align="left">spiny dogfish</td>
+<td align="left">squalus acanthias</td>
+<td align="right">160617</td>
+</tr>
+<tr class="even">
+<td align="left">spinyhead sculpin</td>
+<td align="left">dasycottus setiger</td>
+<td align="right">167265</td>
+</tr>
+<tr class="odd">
+<td align="left">splitnose rockfish</td>
+<td align="left">sebastes diploproa</td>
+<td align="right">166716</td>
+</tr>
+<tr class="even">
+<td align="left">spotted ratfish</td>
+<td align="left">hydrolagus colliei</td>
+<td align="right">161015</td>
+</tr>
+<tr class="odd">
+<td align="left">sturgeon poacher</td>
+<td align="left">podothecus accipenserinus</td>
+<td align="right">644358</td>
+</tr>
+<tr class="even">
+<td align="left">threadfin sculpin</td>
+<td align="left">icelinus filamentosus</td>
+<td align="right">167293</td>
+</tr>
+<tr class="odd">
+<td align="left">walleye pollock</td>
+<td align="left">gadus chalcogrammus</td>
+<td align="right">934083</td>
+</tr>
+<tr class="even">
+<td align="left">wattled eelpout</td>
+<td align="left">lycodes palearis</td>
+<td align="right">165265</td>
+</tr>
+<tr class="odd">
+<td align="left">widow rockfish</td>
+<td align="left">sebastes entomelas</td>
+<td align="right">166719</td>
+</tr>
+<tr class="even">
+<td align="left">yellow irish lord</td>
+<td align="left">hemilepidotus jordani</td>
+<td align="right">167280</td>
+</tr>
+<tr class="odd">
+<td align="left">yellowtain rockfish</td>
+<td align="left">sebastes flavidus</td>
+<td align="right">166720</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
   </div>
