@@ -51,8 +51,9 @@ afsc_haul <- haul %>% select(
     effort_units,
     performance,
     bottom_temp_c
-  )
-save_raw_data(afsc_haul, "afsc-haul")
+  ) %>%
+  tidyr::drop_na(lat_end, lon_end)
+surveyjoin:::save_raw_data(afsc_haul, "afsc-haul")
 
 # get catch data for fishes only, then filter to combined species list
 catch <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.FOSS_CATCH
@@ -80,7 +81,7 @@ afsc_catch <- catchjoin %>%
       catch_weight = as.numeric(catch_weight)
   )
 
-save_raw_data(afsc_catch, "afsc-catch")
+surveyjoin:::save_raw_data(afsc_catch, "afsc-catch")
 
 # # custom filter to most prevalent species, by category ----
 # catch <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.FOSS_CATCH")
