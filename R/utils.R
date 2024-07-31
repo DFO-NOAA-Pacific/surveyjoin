@@ -13,25 +13,31 @@ get_cache_folder <- function(name = "surveyjoin") {
   user_cache_dir(name)
 }
 
-drive_folder <- function(path = "West Coast Survey Data Join/data") {
-  # googledrive::drive_get(
-  #   path = path
-  # )
-  path
-}
+# Commenting out, only used once in function below
+# drive_folder <- function(path = "West Coast Survey Data Join/data") {
+#   path
+# }
 
 download <- function(x) {
+  drive_folder <- "data"
   cli::cli_progress_step(
     "Downloading {x}",
     msg_done = "{x} data cached"
   )
+  ids <- google_ids() # this is a table of file names and corresponding ids
   googledrive::local_drive_quiet()
   googledrive::drive_download(
-    file = file.path(drive_folder(), x),
-    path = file.path(get_cache_folder(), x),
+    file <- googledrive::drive_get(googledrive::as_id(ids$id[match(x, ids$files)])),
+    path = file.path(drive_folder, x), # path for output file
     overwrite = TRUE
   )
 }
+
+# download_public_file <- function() {
+#   file <- googledrive::drive_get(as_id(ids$id[match(x, ids$files)]))
+#   drive_download(file, overwrite = TRUE)
+# }
+
 
 uncompress <- function(x) { # for reading speed:
   cli::cli_progress_step(
@@ -45,13 +51,28 @@ uncompress <- function(x) { # for reading speed:
 
 cache_files <- function() {
   c(
-    "pbs-catch.rds",
-    "pbs-haul.rds",
-    "afsc-catch.rds",
-    "afsc-haul.rds",
-    "nwfsc-catch.rds",
-    "nwfsc-haul.rds"
+    "pbs-catch.rds",#https://drive.google.com/file/d/1Mv_asocDdJfYoGYaLzrugRU-o5kw4_bh/view?usp=sharing
+    "pbs-haul.rds",#https://drive.google.com/file/d/11WSEoKk6JyPBOScnjXq8MbtQL66drsRc/view?usp=sharing
+    "afsc-catch.rds",#https://drive.google.com/file/d/1xIJM_5ekG8F-BCHoxOxhMOy7k1KIUWHv/view?usp=drive_link
+    "afsc-haul.rds",#https://drive.google.com/file/d/1pR-tKv8QPaKwk8cKbMxNRxohSrZqdjV4/view?usp=drive_link
+    "nwfsc-catch.rds",#https://drive.google.com/file/d/1Kevwqr-9zTjLAUZWBQ89F1-apY9rasMe/view?usp=drive_link
+    "nwfsc-haul.rds"#https://drive.google.com/file/d/1mpzRc-bczQx8JMKDh505mWYien5hB91n/view?usp=drive_link
   )
+}
+
+# return corresponding Google Drive file IDs to cache files
+google_ids <- function() {
+  df <- data.frame(
+  files = cache_files(),
+  id = c(
+    "1Mv_asocDdJfYoGYaLzrugRU-o5kw4_bh",
+    "11WSEoKk6JyPBOScnjXq8MbtQL66drsRc",
+    "1xIJM_5ekG8F-BCHoxOxhMOy7k1KIUWHv",
+    "1pR-tKv8QPaKwk8cKbMxNRxohSrZqdjV4",
+    "1Kevwqr-9zTjLAUZWBQ89F1-apY9rasMe",
+    "1mpzRc-bczQx8JMKDh505mWYien5hB91n"
+  ))
+  return(df)
 }
 
 #' Function to cache the data files locally
