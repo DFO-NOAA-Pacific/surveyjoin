@@ -26,6 +26,8 @@ make_itis_spp_table <- function() {
   lu$common_name <- tolower(unname(com))
 
   missing <- filter(lu, is.na(common_name))
+  missing$scientific_name[missing$scientific_name == "Lepidopsetta"] <- "Lepidopsetta bilineata"
+
   common2 <- taxize::sci2comm(missing$scientific_name, db = "itis")
   com2 <- purrr::map_chr(common2, ~ .[1])
   tolower(unname(com2))
@@ -38,10 +40,9 @@ make_itis_spp_table <- function() {
 
   lu$itis <- as.integer(lu$itis)
   lu$common_name <- tolower(lu$common_name)
-  lu$scientific_name <- tolower(lu$scientific_name)
-
   lu$common_name[lu$common_name == "puget sound dogfish"] <- "pacific spiny dogfish"
-  lu <- dplyr::filter(lu, scientific_name != "squalus acanthias")
+  lu$common_name <- stringr::str_to_title(lu$common_name)
+  # lu$scientific_name <- tolower(lu$scientific_name)
 
   spp_dictionary <- lu
 

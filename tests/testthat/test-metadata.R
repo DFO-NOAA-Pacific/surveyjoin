@@ -19,7 +19,7 @@ test_that("get itis", {
 
 test_that("get species", {
   g <- get_species()
-  expect_equal(nrow(g), 51L)
+  expect_equal(nrow(g), 56L)
   expect_equal(names(g), c("common_name", "scientific_name", "itis"))
 })
 
