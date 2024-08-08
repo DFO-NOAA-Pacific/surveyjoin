@@ -41,8 +41,8 @@ make_itis_spp_table <- function() {
   lu$itis <- as.integer(lu$itis)
   lu$common_name <- tolower(lu$common_name)
   lu$common_name[lu$common_name == "puget sound dogfish"] <- "pacific spiny dogfish"
-  lu$common_name <- stringr::str_to_title(lu$common_name)
-  # lu$scientific_name <- tolower(lu$scientific_name)
+  # lu$common_name <- stringr::str_to_title(lu$common_name)
+  lu$scientific_name <- tolower(lu$scientific_name)
 
   spp_dictionary <- lu
 
