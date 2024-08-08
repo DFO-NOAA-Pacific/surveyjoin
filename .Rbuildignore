@@ -4,3 +4,4 @@
 ^local-data$
 README.Rmd
 ^docs$
+^\.github$

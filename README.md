@@ -1,6 +1,11 @@
 
 # surveyjoin package
 
+<!-- badges: start -->
+
+[![R-CMD-check](https://github.com/DFO-NOAA-Pacific/surveyjoin/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/DFO-NOAA-Pacific/surveyjoin/actions/workflows/R-CMD-check.yaml)
+<!-- badges: end -->
+
 This is a repository for combining trawl survey datasets from NOAA and
 Fisheries and Oceans Canada in the Northeast Pacific Ocean.
 
