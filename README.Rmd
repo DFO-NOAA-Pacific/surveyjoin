@@ -7,17 +7,20 @@ output:
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/DFO-NOAA-Pacific/surveyjoin/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/DFO-NOAA-Pacific/surveyjoin/actions/workflows/R-CMD-check.yaml)
+[![DOI](https://zenodo.org/badge/484561620.svg)](https://zenodo.org/doi/10.5281/zenodo.10031852)
 <!-- badges: end -->
 
 This is a repository for combining trawl survey datasets from NOAA and Fisheries and Oceans Canada in the Northeast Pacific Ocean.
 
-The pkdown site can be found [here](https://dfo-noaa-pacific.github.io/surveyjoin/)
-
-[![DOI](https://zenodo.org/badge/484561620.svg)](https://zenodo.org/doi/10.5281/zenodo.10031852)
+A pkgdown site is available [here](https://dfo-noaa-pacific.github.io/surveyjoin/).
 
 This data includes surveys conducted by the Northwest Fisheries Science Center (NWFSC) off the west coast of the United States, surveys collected by Fisheries and Oceans Canada (DFO) in the waters of British Columbia, and surveys conducted by the Alaska Fisheries Science Center (AFSC) in Alaska.
 
-There are 55 species included in the initial version of the package, focusing on species that are occurring in multiple regions. The list of species can be viewed with the `get_species()` function.
+```{r, include=FALSE, echo=FALSE}
+sp <- surveyjoin::get_species()
+```
+
+There are `r nrow(sp)` species included in the initial version of the package, focusing on species that are occurring in multiple regions.
 
 ### Installing
 
@@ -66,11 +69,6 @@ Background and additional citations on surveys run by the Northwest Fisheries Sc
 ### What species are included?
 
 We first divided the joined datasets into 4 major areas: Eastern Bering Sea, Gulf of Alaska, British Columbia, and west coast of California / Oregon / Washington states.
-
-```{r, include=FALSE, echo=FALSE}
-sp <- surveyjoin::get_species()
-```
-
 
 Within each region, we identified the species that occurred in at least 5% of all tows (resulting in 4 lists, 1 for each region). Because our interests are in cross-regional work, we identified species meeting our occurrence threshold that also occurred in 2 or more regions. This resulted in the following list of `r nrow(sp)` species:
 

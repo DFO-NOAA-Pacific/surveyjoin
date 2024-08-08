@@ -4,15 +4,14 @@
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/DFO-NOAA-Pacific/surveyjoin/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/DFO-NOAA-Pacific/surveyjoin/actions/workflows/R-CMD-check.yaml)
+[![DOI](https://zenodo.org/badge/484561620.svg)](https://zenodo.org/doi/10.5281/zenodo.10031852)
 <!-- badges: end -->
 
 This is a repository for combining trawl survey datasets from NOAA and
 Fisheries and Oceans Canada in the Northeast Pacific Ocean.
 
-The pkdown site can be found
-[here](https://dfo-noaa-pacific.github.io/surveyjoin/)
-
-[![DOI](https://zenodo.org/badge/484561620.svg)](https://zenodo.org/doi/10.5281/zenodo.10031852)
+A pkgdown site is available
+[here](https://dfo-noaa-pacific.github.io/surveyjoin/).
 
 This data includes surveys conducted by the Northwest Fisheries Science
 Center (NWFSC) off the west coast of the United States, surveys
@@ -21,8 +20,7 @@ Columbia, and surveys conducted by the Alaska Fisheries Science Center
 (AFSC) in Alaska.
 
 There are 55 species included in the initial version of the package,
-focusing on species that are occurring in multiple regions. The list of
-species can be viewed with the `get_species()` function.
+focusing on species that are occurring in multiple regions.
 
 ### Installing
 
