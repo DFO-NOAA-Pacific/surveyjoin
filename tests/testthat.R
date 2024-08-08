@@ -9,4 +9,6 @@
 library(testthat)
 library(surveyjoin)
 
+cache_data()
+load_sql_data()
 test_check("surveyjoin")
