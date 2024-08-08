@@ -102,13 +102,14 @@ dplyr::glimpse(d, width = 72)
 Citing the `surveyjoin` package can be done with the DOI linked above,
 though more detailed citations may be needed for specific surveys or
 methodology. For citations pertaining to surveys run by the Alaska
-Fisheries Science Center (AFSC), see
-
-<https://github.com/afsc-gap-products/citations>
+Fisheries Science Center (AFSC), 
+see <https://github.com/afsc-gap-products/citations>. 
+Metadata for surveys conducted by the AFSC can be found at 
+<https://afsc-gap-products.github.io/gap_products>.
 
 Background and additional citations on surveys run by the Northwest
 Fisheries Science Center (NWFSC) can be found in [Keller et
-al. 2017](https://repository.library.noaa.gov/view/noaa/14179/noaa_14179_DS1.pdf).
+al. 2017](https://repository.library.noaa.gov/view/noaa/14179/noaa_14179_DS1.pdf). 
 
 ### What species are included?
 
