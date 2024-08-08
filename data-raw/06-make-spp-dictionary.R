@@ -45,7 +45,7 @@ make_itis_spp_table <- function() {
   lu$scientific_name <- tolower(lu$scientific_name)
 
   spp_dictionary <- lu
-
+  spp_dictionary <- dplyr::distinct(spp_dictionary) # rock sole twice!?
   usethis::use_data(spp_dictionary, overwrite = TRUE)
 }
 
