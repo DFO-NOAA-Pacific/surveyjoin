@@ -32,7 +32,6 @@ Imports:
     purrr,
     checkmate,
     cli,
-    googledrive,
     rappdirs,
     DBI,
     taxize,
