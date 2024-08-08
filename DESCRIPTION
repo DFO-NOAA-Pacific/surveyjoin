@@ -43,7 +43,8 @@ Suggests:
     rmarkdown,
     devtools,
     MASS,
-    ggplot2
+    ggplot2,
+    stringr
 RoxygenNote: 7.3.2
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)

@@ -47,7 +47,7 @@ Within each region, we identified the species that occurred in at least
 5% of all tows (resulting in 4 lists, 1 for each region). Because our
 interests are in cross-regional work, we identified species meeting our
 occurrence threshold that also occurred in 2 or more regions. This
-resulted in the following list of 56 species:
+resulted in the following list of 55 species:
 
 | Common name           | Scientific name                     |
 |:----------------------|:------------------------------------|
@@ -86,7 +86,6 @@ resulted in the following list of 56 species:
 | Petrale Sole          | *Eopsetta jordani*                  |
 | Redbanded Rockfish    | *Sebastes babcocki*                 |
 | Rex Sole              | *Glyptocephalus zachirus*           |
-| Rock Sole             | *Lepidopsetta bilineata*            |
 | Rock Sole             | *Lepidopsetta bilineata*            |
 | Rosethorn Rockfish    | *Sebastes helvomaculatus*           |
 | Sablefish             | *Anoplopoma fimbria*                |
