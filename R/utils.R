@@ -1,13 +1,16 @@
 save_raw_data <- function(x, name = "pbs-haul") {
   dir.create("data-raw/data", showWarnings = FALSE)
-  saveRDS(x, file = paste0("data-raw/data/", name, ".rds"),
-    compress = "bzip2", version = 3)
+  saveRDS(x,
+    file = paste0("data-raw/data/", name, ".rds"),
+    compress = "bzip2", version = 3
+  )
 }
 
 #' Identify the local folder used for caching
 #' @param name the directory name, default is the package name "surveyjoin"
 #' @return The directory location used for caching
 #' @importFrom rappdirs user_cache_dir
+#' @importFrom rlang .data
 #' @export
 get_cache_folder <- function(name = "surveyjoin") {
   user_cache_dir(name)
@@ -49,12 +52,13 @@ cache_data <- function(region = c("nwfsc", "pbs", "afsc")) {
   r <- map_chr(region, function(region) {
     assert_choice(
       region,
-      c("nwfsc", "pbs", "afsc"))}
-  )
+      c("nwfsc", "pbs", "afsc")
+    )
+  })
 
   # subset files?
   files <- cache_files()
-  f <- map(r, ~files[grepl(., files)])
+  f <- map(r, ~ files[grepl(., files)])
   f <- unlist(f)
 
   # download/uncompress for speed
@@ -85,21 +89,20 @@ load_sql_data <- function() {
   haul <- map_dfr(f_haul, function(x) {
     out <- readRDS(file.path(get_cache_folder(), x))
     out$region <- gsub("([a-z]+)-[a-z]+.rds", "\\1", x)
-    if(is.character(out$event_id)) out$event_id <- as.numeric(out$event_id)
-    #out$event_id <- as.character(out$event_id)
+    if (is.character(out$event_id)) out$event_id <- as.numeric(out$event_id)
+    # out$event_id <- as.character(out$event_id)
     out$performance <- as.character(out$performance)
     out$year <- as.integer(lubridate::year(out$date))
     out$date <- as.character(lubridate::as_date(out$date))
     # FIXME: do this long before! Alaska
     out$lon_start <- ifelse(out$lon_start > 0, out$lon_start * -1, out$lon_start)
     out$lon_end <- ifelse(out$lon_end > 0, out$lon_end * -1, out$lon_end)
-    if(out$region[1] == "pbs") {
+    if (out$region[1] == "pbs") {
       # Fix me earlier!
-      out <- dplyr::rename(out, bottom_temp_c = temperature_C) %>%
-        dplyr::select(-do_mlpL, -salinity_PSU)
+      out <- dplyr::rename(out, bottom_temp_c = .data$temperature_C) %>%
+        dplyr::select(-.data$do_mlpL, -.data$salinity_PSU)
     }
     out
-
   })
   catch <- map_dfr(f_catch, function(x) {
     out <- readRDS(file.path(get_cache_folder(), x))
@@ -108,8 +111,8 @@ load_sql_data <- function() {
   })
   cli::cli_alert_success("Raw data read into memory")
 
-  catch <- left_join(catch, surveyjoin::spp_dictionary, by = join_by(itis, scientific_name))
-  #stopifnot(sum(is.na(catch$scientific_name)) == 0L)
+  catch <- left_join(catch, surveyjoin::spp_dictionary, by = join_by(.data$itis, .data$scientific_name))
+  # stopifnot(sum(is.na(catch$scientific_name)) == 0L)
   cli::cli_alert_success("Taxonomic data joined to catch data")
 
   db <- dbConnect(RSQLite::SQLite(), dbname = sql_folder())
@@ -132,7 +135,6 @@ sql_folder <- function() {
 #' @examples
 #' \dontrun{
 #' db <- surv_db()
-#'
 #' }
 surv_db <- function() {
   dbConnect(SQLite(), dbname = sql_folder())
@@ -146,7 +148,6 @@ surv_db <- function() {
 #' @examples
 #' \dontrun{
 #' id <- get_itis_spp("darkblotched rockfish")
-#'
 #' }
 get_itis_spp <- function(spp) {
   out <- get_ids(spp, db = "itis", verbose = FALSE)
@@ -161,9 +162,13 @@ get_itis_spp <- function(spp) {
 #' m <- get_metadata()
 #' }
 get_metadata <- function() {
-  df <- data.frame(region = c("afsc","pbs","nwfsc"),
-                   url = c("https://afsc-gap-products.github.io/gap_products/content/foss-metadata.html",
-                           NA, "https://www.fisheries.noaa.gov/inport/item/18418"))
+  df <- data.frame(
+    region = c("afsc", "pbs", "nwfsc"),
+    url = c(
+      "https://afsc-gap-products.github.io/gap_products/content/foss-metadata.html",
+      NA, "https://www.fisheries.noaa.gov/inport/item/18418"
+    )
+  )
   return(df)
 }
 
@@ -175,10 +180,14 @@ get_metadata <- function() {
 #' m <- get_survey_names()
 #' }
 get_survey_names <- function() {
-  df <- data.frame(survey = c("Aleutian Islands", "Gulf of Alaska", "eastern Bering Sea",
-  "northern Bering Sea", "Bering Sea Slope", "NWFSC.Combo", "NWFSC.Shelf", "NWFSC.Hypoxia",
-  "NWFSC.Hypoxia", "Triennial", "SYN QCS", "SYN HS", "SYN WCVI", "SYN WCHG"),
-  region = c(rep("afsc",5), rep("nwfsc",5), rep("pbs",4)))
+  df <- data.frame(
+    survey = c(
+      "Aleutian Islands", "Gulf of Alaska", "eastern Bering Sea",
+      "northern Bering Sea", "Bering Sea Slope", "NWFSC.Combo", "NWFSC.Shelf", "NWFSC.Hypoxia",
+      "NWFSC.Hypoxia", "Triennial", "SYN QCS", "SYN HS", "SYN WCVI", "SYN WCHG"
+    ),
+    region = c(rep("afsc", 5), rep("nwfsc", 5), rep("pbs", 4))
+  )
   return(df)
 }
 
@@ -191,10 +200,14 @@ get_survey_names <- function() {
 #' m <- get_shapefiles()
 #' }
 get_shapefiles <- function() {
-  df <- data.frame(region = c("afsc","pbs","nwfsc"),
-                   url = c("https://github.com/afsc-gap-products/akgfmaps",
-                           "https://github.com/pbs-assess/gfplot/tree/master/data",
-                           "https://www.webapps.nwfsc.noaa.gov/portal7/home/item.html?id=32f29675457e44d3b2e88f454f130ac9"))
+  df <- data.frame(
+    region = c("afsc", "pbs", "nwfsc"),
+    url = c(
+      "https://github.com/afsc-gap-products/akgfmaps",
+      "https://github.com/pbs-assess/gfplot/tree/master/data",
+      "https://www.webapps.nwfsc.noaa.gov/portal7/home/item.html?id=32f29675457e44d3b2e88f454f130ac9"
+    )
+  )
   return(df)
 }
 
@@ -206,10 +219,14 @@ get_shapefiles <- function() {
 #' m <- get_rawdata()
 #' }
 get_rawdata <- function() {
-  df <- data.frame(region = c("afsc","pbs","nwfsc"),
-                   url = c("https://www.fisheries.noaa.gov/foss/f?p=215:28",
-                           NA,
-                           "https://www.webapps.nwfsc.noaa.gov/data"))
+  df <- data.frame(
+    region = c("afsc", "pbs", "nwfsc"),
+    url = c(
+      "https://www.fisheries.noaa.gov/foss/f?p=215:28",
+      NA,
+      "https://www.webapps.nwfsc.noaa.gov/data"
+    )
+  )
   return(df)
 }
 
@@ -225,8 +242,8 @@ get_rawdata <- function() {
 get_species <- function() {
   db <- surv_db()
   catch <- as.data.frame(tbl(db, "catch"))
-  catch_tbl <- dplyr::group_by(catch, common_name) |>
-    dplyr::summarise(scientific_name = scientific_name[1], itis = itis[1]) |>
-    dplyr::filter(!is.na(scientific_name), !is.na(common_name))
-  return(catch_tbl)
+  catch_tbl <- dplyr::group_by(catch, .data$common_name) |>
+    dplyr::summarise(scientific_name = .data$scientific_name[1], itis = .data$itis[1]) |>
+    dplyr::filter(!is.na(.data$scientific_name), !is.na(.data$common_name))
+  catch_tbl
 }

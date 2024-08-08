@@ -47,66 +47,64 @@
 #' d <- get_data()
 #' }
 get_data <- function(common = NULL, scientific = NULL, itis_id = NULL, regions = NULL, surveys = NULL, years = NULL) {
-
   db <- surv_db() # create connection to database; need error checking
   catch <- tbl(db, "catch")
   haul <- tbl(db, "haul")
 
-  if(!is.null(common)) common <- tolower(common)
-  if(!is.null(scientific)) scientific <- tolower(scientific)
-  if(!is.null(itis_id)) itis_id <- as.integer(itis_id)
-  if(!is.null(years)) years <- as.integer(years)
+  if (!is.null(common)) common <- tolower(common)
+  if (!is.null(scientific)) scientific <- tolower(scientific)
+  if (!is.null(itis_id)) itis_id <- as.integer(itis_id)
+  if (!is.null(years)) years <- as.integer(years)
 
   # Filter species as needed, default returns all
-  if(!is.null(common)) {
+  if (!is.null(common)) {
     catch <- catch |>
-      filter(common_name %in% common)
+      filter(.data$common_name %in% common)
   }
-  if(!is.null(scientific)) {
+  if (!is.null(scientific)) {
     catch <- catch |>
-      filter(scientific_name %in% scientific)
+      filter(.data$scientific_name %in% scientific)
   }
-  if(!is.null(itis_id)) {
+  if (!is.null(itis_id)) {
     catch <- catch |>
-      filter(itis %in% itis_id)
+      filter(.data$itis %in% itis_id)
   }
 
   # Filter hauls as needed, default returns all
-  if(!is.null(surveys)) {
+  if (!is.null(surveys)) {
     haul <- haul |>
-      filter(survey_name %in% surveys)
+      filter(.data$survey_name %in% surveys)
   }
 
   # Join data and filter years if specified
-  #d <- catch |>
+  # d <- catch |>
   #  left_join(haul, by = c("event_id", "region")) |>
   #  collect(n = Inf)
   catch <- catch |> collect()
   catch_spp <- unique(catch$common_name)
-  for(i in 1:length(catch_spp)) {
-    dsub <- left_join(haul |> collect(), dplyr::filter(catch, common_name==catch_spp[i]), by = c("event_id","region"))
-    ids <- dplyr::filter(dsub, !is.na(itis)) |>
-      summarize(itis = itis[1], common_name = common_name[1], scientific_name = scientific_name[1])
+
+  d <- list()
+  for (i in seq_len(length(catch_spp))) {
+    dsub <- left_join(haul |> collect(), dplyr::filter(catch, .data$common_name == catch_spp[i]), by = c("event_id", "region"))
+    ids <- dplyr::filter(dsub, !is.na(.data$itis)) |>
+      summarize(itis = .data$itis[1], common_name = .data$common_name[1], scientific_name = .data$scientific_name[1])
     dsub$itis <- ids$itis[1]
     dsub$common_name <- ids$common_name[1]
     dsub$scientific_name <- ids$scientific_name[1]
-    if(i==1) {
-      d <- dsub
-    } else {
-      d <- rbind(d, dsub)
-    }
+    d[[i]] <- dsub
   }
+  d <- dplyr::bind_rows(d)
 
   # Replace NAs with 0s
-  d$catch_weight[which(is.na(d$catch_weight))] <- 0
-  d$catch_numbers[which(is.na(d$catch_numbers))] <- 0
-  if(!is.null(years)) {
+  d$catch_weight[is.na(d$catch_weight)] <- 0
+  d$catch_numbers[is.na(d$catch_numbers)] <- 0
+  if (!is.null(years)) {
     d <- d |>
-      filter(year %in% years)
+      filter(.data$year %in% years)
   }
-  if(!is.null(regions)) {
+  if (!is.null(regions)) {
     d <- d |>
-      filter(region %in% regions)
+      filter(.data$region %in% regions)
   }
   dbDisconnect(conn = db)
 
