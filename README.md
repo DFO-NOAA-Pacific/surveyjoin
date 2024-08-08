@@ -48,10 +48,8 @@ resulted in the following list of 55 species:
 |:----------------------|:----------------------------------|-------:|
 | aleutian skate        | bathyraja aleutica                | 160935 |
 | arrowtooth flounder   | atheresthes stomias               | 172862 |
-| big skate             | raja binoculata                   | 160848 |
 | bigfin eelpout        | lycodes cortezianus               | 550588 |
 | bigmouth sculpin      | hemitripterus bolini              | 167287 |
-| black eelpout         | lycodes diapterus                 | 165261 |
 | blackbelly eelpout    | lycodes pacificus                 | 630999 |
 | bocaccio              | sebastes paucispinis              | 166733 |
 | canary rockfish       | sebastes pinniger                 | 166734 |
@@ -69,7 +67,6 @@ resulted in the following list of 55 species:
 | harlequin rockfish    | sebastes variegatus               | 166742 |
 | kamchatka flounder    | atheresthes evermanni             | 172861 |
 | lingcod               | ophiodon elongatus                | 167116 |
-| longnose skate        | raja rhina                        | 160851 |
 | north pacific hake    | merluccius productus              | 164792 |
 | northern rock sole    | lepidopsetta polyxystra           | 616392 |
 | pacific cod           | gadus macrocephalus               | 164711 |
@@ -90,7 +87,6 @@ resulted in the following list of 55 species:
 | shortfin eelpout      | lycodes brevipes                  | 165258 |
 | shortspine thornyhead | sebastolobus alascanus            | 166783 |
 | slender sole          | lyopsetta exilis                  | 172871 |
-| spiny dogfish         | squalus acanthias                 | 160617 |
 | spinyhead sculpin     | dasycottus setiger                | 167265 |
 | splitnose rockfish    | sebastes diploproa                | 166716 |
 | spotted ratfish       | hydrolagus colliei                | 161015 |

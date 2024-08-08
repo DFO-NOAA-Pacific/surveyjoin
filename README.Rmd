@@ -29,7 +29,6 @@ We first divided the joined datasets into 4 major areas: Eastern Bering Sea, Gul
 
 Within each region, we identified the species that occurred in at least 5% of all tows (resulting in 4 lists, 1 for each region). Because our interests are in cross-regional work, we identified species meeting our occurrence threshold that also occurred in 2 or more regions. This resulted in the following list of 55 species:
 
-```{r echo=FALSE}
-d <- readRDS("data-raw/joined_species_list.rds")
-knitr::kable(d)
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+knitr::kable(surveyjoin::get_species())
 ```
