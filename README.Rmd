@@ -3,7 +3,7 @@ output:
   github_document:
 ---
 
-# surveyjoin package
+# surveyjoin
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/DFO-NOAA-Pacific/surveyjoin/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/DFO-NOAA-Pacific/surveyjoin/actions/workflows/R-CMD-check.yaml)
@@ -31,8 +31,15 @@ Background and additional citations on surveys run by the Northwest Fisheries Sc
 
 We first divided the joined datasets into 4 major areas: Eastern Bering Sea, Gulf of Alaska, British Columbia, and west coast of California / Oregon / Washington states.
 
-Within each region, we identified the species that occurred in at least 5% of all tows (resulting in 4 lists, 1 for each region). Because our interests are in cross-regional work, we identified species meeting our occurrence threshold that also occurred in 2 or more regions. This resulted in the following list of 55 species:
+Within each region, we identified the species that occurred in at least 5% of all tows (resulting in 4 lists, 1 for each region). Because our interests are in cross-regional work, we identified species meeting our occurrence threshold that also occurred in 2 or more regions. This resulted in the following list of `r nrow(surveyjoin::spp_dictionary)` species:
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
-knitr::kable(surveyjoin::get_species())
+library(dplyr)
+surveyjoin::spp_dictionary |> 
+  select(-itis) |> 
+  arrange(common_name) |> 
+  rename(`Scientific name` = scientific_name, `Common name` = common_name) |> 
+  select(2, 1) |> 
+  mutate(`Scientific name` = paste0("*", `Scientific name`, "*")) |> 
+  knitr::kable()
 ```

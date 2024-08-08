@@ -1,5 +1,5 @@
 
-# surveyjoin package
+# surveyjoin
 
 <!-- badges: start -->
 
@@ -47,58 +47,63 @@ Within each region, we identified the species that occurred in at least
 5% of all tows (resulting in 4 lists, 1 for each region). Because our
 interests are in cross-regional work, we identified species meeting our
 occurrence threshold that also occurred in 2 or more regions. This
-resulted in the following list of 55 species:
+resulted in the following list of 56 species:
 
-| common_name           | scientific_name                   |   itis |
-|:----------------------|:----------------------------------|-------:|
-| aleutian skate        | bathyraja aleutica                | 160935 |
-| arrowtooth flounder   | atheresthes stomias               | 172862 |
-| bigfin eelpout        | lycodes cortezianus               | 550588 |
-| bigmouth sculpin      | hemitripterus bolini              | 167287 |
-| blackbelly eelpout    | lycodes pacificus                 | 630999 |
-| bocaccio              | sebastes paucispinis              | 166733 |
-| canary rockfish       | sebastes pinniger                 | 166734 |
-| capelin               | mallotus villosus                 | 162035 |
-| curlfin sole          | pleuronichthys decurrens          | 172924 |
-| darkblotched rockfish | sebastes crameri                  | 166715 |
-| darkfin sculpin       | malacocottus zonurus              | 167305 |
-| dover sole            | microstomus pacificus             | 172887 |
-| english sole          | parophrys vetulus                 | 172921 |
-| eulachon              | thaleichthys pacificus            | 162051 |
-| flathead sole         | hippoglossoides elassodon         | 172875 |
-| giant grenadier       | albatrossia pectoralis            | 165427 |
-| great sculpin         | myoxocephalus polyacanthocephalus | 167315 |
-| greenstriped rockfish | sebastes elongatus                | 166717 |
-| harlequin rockfish    | sebastes variegatus               | 166742 |
-| kamchatka flounder    | atheresthes evermanni             | 172861 |
-| lingcod               | ophiodon elongatus                | 167116 |
-| north pacific hake    | merluccius productus              | 164792 |
-| northern rock sole    | lepidopsetta polyxystra           | 616392 |
-| pacific cod           | gadus macrocephalus               | 164711 |
-| pacific halibut       | hippoglossus stenolepis           | 172932 |
-| pacific herring       | clupea pallasii                   | 551209 |
-| pacific ocean perch   | sebastes alutus                   | 166707 |
-| pacific sanddab       | citharichthys sordidus            | 172716 |
-| petrale sole          | eopsetta jordani                  | 172868 |
-| puget sound dogfish   | squalus suckleyi                  | 160620 |
-| redbanded rockfish    | sebastes babcocki                 | 166710 |
-| rex sole              | glyptocephalus zachirus           | 172978 |
-| rock sole             | lepidopsetta bilineata            | 172917 |
-| rosethorn rockfish    | sebastes helvomaculatus           | 166723 |
-| sablefish             | anoplopoma fimbria                | 167123 |
-| sandpaper skate       | bathyraja interrupta              | 160937 |
-| searcher              | bathymaster signatus              | 170949 |
-| sharpchin rockfish    | sebastes zacentrus                | 166744 |
-| shortfin eelpout      | lycodes brevipes                  | 165258 |
-| shortspine thornyhead | sebastolobus alascanus            | 166783 |
-| slender sole          | lyopsetta exilis                  | 172871 |
-| spinyhead sculpin     | dasycottus setiger                | 167265 |
-| splitnose rockfish    | sebastes diploproa                | 166716 |
-| spotted ratfish       | hydrolagus colliei                | 161015 |
-| sturgeon poacher      | podothecus accipenserinus         | 644358 |
-| threadfin sculpin     | icelinus filamentosus             | 167293 |
-| walleye pollock       | gadus chalcogrammus               | 934083 |
-| wattled eelpout       | lycodes palearis                  | 165265 |
-| widow rockfish        | sebastes entomelas                | 166719 |
-| yellow irish lord     | hemilepidotus jordani             | 167280 |
-| yellowtain rockfish   | sebastes flavidus                 | 166720 |
+| Common name           | Scientific name                     |
+|:----------------------|:------------------------------------|
+| Aleutian Skate        | *Bathyraja aleutica*                |
+| Arrowtooth Flounder   | *Atheresthes stomias*               |
+| Big Skate             | *Raja binoculata*                   |
+| Bigfin Eelpout        | *Lycodes cortezianus*               |
+| Bigmouth Sculpin      | *Hemitripterus bolini*              |
+| Black Eelpout         | *Lycodes diapterus*                 |
+| Blackbelly Eelpout    | *Lycodes pacificus*                 |
+| Bocaccio              | *Sebastes paucispinis*              |
+| Canary Rockfish       | *Sebastes pinniger*                 |
+| Capelin               | *Mallotus villosus*                 |
+| Curlfin Sole          | *Pleuronichthys decurrens*          |
+| Darkblotched Rockfish | *Sebastes crameri*                  |
+| Darkfin Sculpin       | *Malacocottus zonurus*              |
+| Dover Sole            | *Microstomus pacificus*             |
+| English Sole          | *Parophrys vetulus*                 |
+| Eulachon              | *Thaleichthys pacificus*            |
+| Flathead Sole         | *Hippoglossoides elassodon*         |
+| Giant Grenadier       | *Albatrossia pectoralis*            |
+| Great Sculpin         | *Myoxocephalus polyacanthocephalus* |
+| Greenstriped Rockfish | *Sebastes elongatus*                |
+| Harlequin Rockfish    | *Sebastes variegatus*               |
+| Kamchatka Flounder    | *Atheresthes evermanni*             |
+| Lingcod               | *Ophiodon elongatus*                |
+| Longnose Skate        | *Raja rhina*                        |
+| North Pacific Hake    | *Merluccius productus*              |
+| Northern Rock Sole    | *Lepidopsetta polyxystra*           |
+| Pacific Cod           | *Gadus macrocephalus*               |
+| Pacific Halibut       | *Hippoglossus stenolepis*           |
+| Pacific Herring       | *Clupea pallasii*                   |
+| Pacific Ocean Perch   | *Sebastes alutus*                   |
+| Pacific Sanddab       | *Citharichthys sordidus*            |
+| Pacific Spiny Dogfish | *Squalus suckleyi*                  |
+| Petrale Sole          | *Eopsetta jordani*                  |
+| Redbanded Rockfish    | *Sebastes babcocki*                 |
+| Rex Sole              | *Glyptocephalus zachirus*           |
+| Rock Sole             | *Lepidopsetta bilineata*            |
+| Rock Sole             | *Lepidopsetta bilineata*            |
+| Rosethorn Rockfish    | *Sebastes helvomaculatus*           |
+| Sablefish             | *Anoplopoma fimbria*                |
+| Sandpaper Skate       | *Bathyraja interrupta*              |
+| Sawback Poacher       | *Sarritor frenatus*                 |
+| Searcher              | *Bathymaster signatus*              |
+| Sharpchin Rockfish    | *Sebastes zacentrus*                |
+| Shortfin Eelpout      | *Lycodes brevipes*                  |
+| Shortspine Thornyhead | *Sebastolobus alascanus*            |
+| Slender Sole          | *Lyopsetta exilis*                  |
+| Spinyhead Sculpin     | *Dasycottus setiger*                |
+| Splitnose Rockfish    | *Sebastes diploproa*                |
+| Spotted Ratfish       | *Hydrolagus colliei*                |
+| Sturgeon Poacher      | *Podothecus accipenserinus*         |
+| Threadfin Sculpin     | *Icelinus filamentosus*             |
+| Walleye Pollock       | *Gadus chalcogrammus*               |
+| Wattled Eelpout       | *Lycodes palearis*                  |
+| Widow Rockfish        | *Sebastes entomelas*                |
+| Yellow Irish Lord     | *Hemilepidotus jordani*             |
+| Yellowtain Rockfish   | *Sebastes flavidus*                 |
