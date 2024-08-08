@@ -14,22 +14,27 @@ get_data(
 )
 }
 \arguments{
-\item{common}{A string, or vector of strings of common names for species. This is NULL by default, so that all species are returned.}
+\item{common}{A string, or vector of strings of common names for species.
+This is NULL by default, so that all species are returned.}
 
-\item{scientific}{A string, or vector of strings of scientific names for species. This is NULL by default, so that all species are returned.}
+\item{scientific}{A string, or vector of strings of scientific names for
+species. This is NULL by default, so that all species are returned.}
 
-\item{itis_id}{An integer or vector of integers corresponding to ITIS identifiers. This is NULL by default, so that all species are returned.}
+\item{itis_id}{An integer or vector of integers corresponding to ITIS
+identifiers. This is NULL by default, so that all species are returned.}
 
-\item{regions}{A string, or vector of strings of common names for regions. May be one or more
-of "afsc", "nwfsc", "pbs". Surveys are nested within region, so returning data from a region will
-return more than one survey. This is NULL by default, so that all surveys are returned.}
+\item{regions}{A string, or vector of strings of common names for regions.
+May be one or more of "afsc", "nwfsc", "pbs". Surveys are nested within
+region, so returning data from a region will return more than one survey.
+This is NULL by default, so that all surveys are returned.}
 
-\item{surveys}{A string, or vector of strings of common names for surveys. May be one or more
-of "Aleutian Islands Bottom Trawl Survey", "Eastern Bering Sea Crab/Groundfish Bottom Trawl Survey",
-"Eastern Bering Sea Slope Bottom Trawl Survey", "Gulf of Alaska Bottom Trawl Survey",
-"Northern Bering Sea Crab/Groundfish Survey - Eastern Bering Sea Shelf Survey Extension",
-"NWFSC.Combo", "NWFSC.Shelf", "NWFSC.Hypoxia", "Triennial", "SYN QCS",
-"SYN HS", "SYN WCVI", "SYN WCHG". If NULL, all are returned.}
+\item{surveys}{A string, or vector of strings of common names for surveys.
+May be one or more of "Aleutian Islands Bottom Trawl Survey", "Eastern
+Bering Sea Crab/Groundfish Bottom Trawl Survey", "Eastern Bering Sea Slope
+Bottom Trawl Survey", "Gulf of Alaska Bottom Trawl Survey", "Northern
+Bering Sea Crab/Groundfish Survey - Eastern Bering Sea Shelf Survey
+Extension", "NWFSC.Combo", "NWFSC.Shelf", "NWFSC.Hypoxia", "Triennial",
+"SYN QCS", "SYN HS", "SYN WCVI", "SYN WCHG". If NULL, all are returned.}
 
 \item{years}{a vector of years, e.g. \code{year = 2013:2018}. If NULL, all are returned.}
 }

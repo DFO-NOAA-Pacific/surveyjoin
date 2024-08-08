@@ -1,17 +1,22 @@
 #' Main function to query the survey database
 #'
-#' @param common A string, or vector of strings of common names for species. This is NULL by default, so that all species are returned.
-#' @param scientific A string, or vector of strings of scientific names for species. This is NULL by default, so that all species are returned.
-#' @param itis_id An integer or vector of integers corresponding to ITIS identifiers. This is NULL by default, so that all species are returned.
-#' @param regions A string, or vector of strings of common names for regions. May be one or more
-#' of "afsc", "nwfsc", "pbs". Surveys are nested within region, so returning data from a region will
-#' return more than one survey. This is NULL by default, so that all surveys are returned.
-#' @param surveys A string, or vector of strings of common names for surveys. May be one or more
-#' of "Aleutian Islands Bottom Trawl Survey", "Eastern Bering Sea Crab/Groundfish Bottom Trawl Survey",
-#' "Eastern Bering Sea Slope Bottom Trawl Survey", "Gulf of Alaska Bottom Trawl Survey",
-#' "Northern Bering Sea Crab/Groundfish Survey - Eastern Bering Sea Shelf Survey Extension",
-#' "NWFSC.Combo", "NWFSC.Shelf", "NWFSC.Hypoxia", "Triennial", "SYN QCS",
-#' "SYN HS", "SYN WCVI", "SYN WCHG". If NULL, all are returned.
+#' @param common A string, or vector of strings of common names for species.
+#'   This is NULL by default, so that all species are returned.
+#' @param scientific A string, or vector of strings of scientific names for
+#'   species. This is NULL by default, so that all species are returned.
+#' @param itis_id An integer or vector of integers corresponding to ITIS
+#'   identifiers. This is NULL by default, so that all species are returned.
+#' @param regions A string, or vector of strings of common names for regions.
+#'   May be one or more of "afsc", "nwfsc", "pbs". Surveys are nested within
+#'   region, so returning data from a region will return more than one survey.
+#'   This is NULL by default, so that all surveys are returned.
+#' @param surveys A string, or vector of strings of common names for surveys.
+#'   May be one or more of "Aleutian Islands Bottom Trawl Survey", "Eastern
+#'   Bering Sea Crab/Groundfish Bottom Trawl Survey", "Eastern Bering Sea Slope
+#'   Bottom Trawl Survey", "Gulf of Alaska Bottom Trawl Survey", "Northern
+#'   Bering Sea Crab/Groundfish Survey - Eastern Bering Sea Shelf Survey
+#'   Extension", "NWFSC.Combo", "NWFSC.Shelf", "NWFSC.Hypoxia", "Triennial",
+#'   "SYN QCS", "SYN HS", "SYN WCVI", "SYN WCHG". If NULL, all are returned.
 #' @param years a vector of years, e.g. `year = 2013:2018`. If NULL, all are returned.
 #' @return a dataframe of joined haul and catch data
 #' \itemize{
