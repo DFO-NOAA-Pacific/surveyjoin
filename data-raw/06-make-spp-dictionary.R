@@ -6,7 +6,7 @@ make_itis_spp_table <- function() {
   afsc_dir <- readRDS("data-raw/data/afsc-catch.rds")
   nwfsc_dir <- readRDS("data-raw/data/nwfsc-catch.rds")
   pbs_dir <- readRDS("data-raw/data/pbs-catch.rds")
-  catch <- readRDS(afsc_dir) |>
+  catch <- bind_rows(afsc_dir) |>
     bind_rows(nwfsc_dir) |>
     bind_rows(pbs_dir)
 
@@ -39,7 +39,12 @@ make_itis_spp_table <- function() {
   lu$itis <- as.integer(lu$itis)
   lu$common_name <- tolower(lu$common_name)
   lu$scientific_name <- tolower(lu$scientific_name)
+
+  lu$common_name[lu$common_name == "puget sound dogfish"] <- "pacific spiny dogfish"
+  lu <- dplyr::filter(lu, scientific_name != "squalus acanthias")
+
   spp_dictionary <- lu
+
   usethis::use_data(spp_dictionary, overwrite = TRUE)
 }
 
