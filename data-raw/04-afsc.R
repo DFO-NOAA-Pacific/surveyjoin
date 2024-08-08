@@ -8,23 +8,24 @@ channel <- gapindex::get_connected()
 
 haul <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.FOSS_HAUL")
 names(haul) <- tolower(names(haul))
-afsc_haul <- haul %>% select(
-  survey_name = survey, # or = survey_name for full description if beyond trawl
-  event_id = hauljoin,
-  date = date_time,
-  vessel = vessel_name,
-  lat_start = latitude_dd_start,
-  lon_start = longitude_dd_start,
-  lat_end = latitude_dd_end,
-  lon_end = longitude_dd_end,
-  depth_m,
-  performance,
-  area_swept_km2,
-  bottom_temp_c = bottom_temperature_c
+afsc_haul <- haul %>%
+  select(
+    survey_name = survey, # or = survey_name for full description if beyond trawl
+    event_id = hauljoin,
+    date = date_time,
+    vessel = vessel_name,
+    lat_start = latitude_dd_start,
+    lon_start = longitude_dd_start,
+    lat_end = latitude_dd_end,
+    lon_end = longitude_dd_end,
+    depth_m,
+    performance,
+    area_swept_km2,
+    bottom_temp_c = bottom_temperature_c
   ) %>%
   mutate(
     event_id = as.numeric(event_id),
-    date = as.POSIXct(date,format="%m/%d/%Y %H:%M:%S",tz=Sys.timezone()),
+    date = as.POSIXct(date, format = "%m/%d/%Y %H:%M:%S", tz = Sys.timezone()),
     pass = NA_integer_,
     lat_start = as.numeric(lat_start),
     lon_start = as.numeric(lon_start),
@@ -75,10 +76,10 @@ afsc_catch <- catchjoin %>%
     catch_numbers = count,
     catch_weight = weight_kg
   ) %>%
-    mutate(
-      event_id = as.numeric(event_id),
-      catch_numbers = as.numeric(catch_numbers),
-      catch_weight = as.numeric(catch_weight)
+  mutate(
+    event_id = as.numeric(event_id),
+    catch_numbers = as.numeric(catch_numbers),
+    catch_weight = as.numeric(catch_weight)
   )
 
 surveyjoin:::save_raw_data(afsc_catch, "afsc-catch")

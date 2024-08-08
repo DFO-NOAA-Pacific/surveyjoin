@@ -32,9 +32,11 @@ if (Sys.info()[["user"]] == "seananderson") {
     group_by(species_science_name) |>
     summarise(mean_catch_proportion = mean(prop_catch_weight))
 
-  spp3 <- temp |> filter(mean_catch_proportion > 0.25 * 0.01) |>
+  spp3 <- temp |>
+    filter(mean_catch_proportion > 0.25 * 0.01) |>
     pull(species_science_name)
-  spp4 <- temp |> filter(mean_catch_proportion > 0.1 * 0.01) |>
+  spp4 <- temp |>
+    filter(mean_catch_proportion > 0.1 * 0.01) |>
     pull(species_science_name)
 
   spp1

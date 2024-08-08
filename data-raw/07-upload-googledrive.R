@@ -25,12 +25,14 @@ purrr::walk(f[grepl("catch", f)], function(x) {
   d <- readRDS(paste0("data-raw/data/", x))
   d <- dplyr::semi_join(d, spp_dictionary, by = join_by(itis))
   saveRDS(d, paste0("data-raw/data-itis-filtered/", x),
-    compress = "bzip2", version = 3)
+    compress = "bzip2", version = 3
+  )
 })
 purrr::walk(f[grepl("haul", f)], function(x) {
   d <- readRDS(paste0("data-raw/data/", x))
   saveRDS(d, paste0("data-raw/data-itis-filtered/", x),
-    compress = "bzip2", version = 3)
+    compress = "bzip2", version = 3
+  )
 })
 
 upload <- function(x) {

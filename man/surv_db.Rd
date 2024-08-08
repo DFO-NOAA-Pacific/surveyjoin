@@ -15,6 +15,5 @@ Function to create a connection to the database
 \examples{
 \dontrun{
 db <- surv_db()
-
 }
 }

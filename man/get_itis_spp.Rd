@@ -18,6 +18,5 @@ Get the ITIS identifier of a species
 \examples{
 \dontrun{
 id <- get_itis_spp("darkblotched rockfish")
-
 }
 }

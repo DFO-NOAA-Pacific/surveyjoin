@@ -42,7 +42,8 @@ dat <- purrr::map(seq_len(nrow(spp)), function(i) {
         area_swept = dplyr::case_when(
           grepl("SYN", survey_abbrev) & !is.na(area_swept2) ~ area_swept2,
           grepl("SYN", survey_abbrev) & is.na(area_swept2) ~ area_swept1
-        ))
+        )
+      )
     }
     saveRDS(d, file = f)
     d
@@ -80,15 +81,21 @@ if (FALSE) {
   saveRDS(d, "data-raw/data/pbs-env-data-raw.rds")
 }
 d <- readRDS("data-raw/data/pbs-env-data-raw.rds")
-lu <- dat[[1]] |> filter(year > 2005) |>
-  select(survey_series_id, survey_abbrev) |> distinct() |>
+lu <- dat[[1]] |>
+  filter(year > 2005) |>
+  select(survey_series_id, survey_abbrev) |>
+  distinct() |>
   rename(ssid = survey_series_id, survey_name = survey_abbrev)
 d <- left_join(d, lu)
 d <- select(d, year, survey_name, event_id = fishing_event_id, attribute, value = avg)
-d <- d |> group_by(year, survey_name, event_id, attribute) |>
+d <- d |>
+  group_by(year, survey_name, event_id, attribute) |>
   summarise(value = mean(value), .groups = "drop")
-d <- tidyr::pivot_wider(d, id_cols = c(year, survey_name, event_id),
-  names_from = attribute, values_from = value) |> select(-depth_m) |>
+d <- tidyr::pivot_wider(d,
+  id_cols = c(year, survey_name, event_id),
+  names_from = attribute, values_from = value
+) |>
+  select(-depth_m) |>
   rename(temperature_C = `temperature_(¿C)`)
 pbs_haul <- left_join(pbs_haul, d, by = join_by(survey_name, event_id))
 ## end environmental data
@@ -157,7 +164,7 @@ dat_samp$event_id <- as.numeric(dat_samp$event_id)
 
 dat_samp <- dat_samp |> filter(maturity_convention_code != 9)
 dat_samp <- dat_samp |>
-    filter(maturity_code <= maturity_convention_maxvalue)
+  filter(maturity_code <= maturity_convention_maxvalue)
 usability_codes_keep <- c(0, 1, 2, 6)
 dat_samp <- filter(dat_samp, usability_code %in% usability_codes_keep)
 dat_samp <- dat_samp[dat_samp$sex %in% c(1, 2), , drop = FALSE]

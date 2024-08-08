@@ -10,7 +10,7 @@ library(nwfscSurvey)
 # species <- d
 # usethis::use_data(species)
 
-#data("spp_dictionary")
+# data("spp_dictionary")
 
 # pull in the haul data from various nwfsc surveys
 catch_nwfsc_combo <- nwfscSurvey::PullCatch.fn(SurveyName = "NWFSC.Combo")
@@ -29,20 +29,25 @@ catch_nwfsc_tri <- nwfscSurvey::PullCatch.fn(SurveyName = "Triennial")
 catch_nwfsc_tri$survey_name <- "Triennial"
 
 # bind together
-catch <- rbind(catch_nwfsc_combo,
-              catch_nwfsc_slope,
-              catch_nwfsc_shelf,
-              catch_nwfsc_hypox,
-              catch_nwfsc_tri)
+catch <- rbind(
+  catch_nwfsc_combo,
+  catch_nwfsc_slope,
+  catch_nwfsc_shelf,
+  catch_nwfsc_hypox,
+  catch_nwfsc_tri
+)
 
 catch <- dplyr::rename(catch,
-                       event_id = Trawl_id,
-                       common_name = Common_name,
-                       scientific_name = Scientific_name,
-                       catch_numbers = total_catch_numbers,
-                       catch_wt = total_catch_wt_kg) %>%
-  dplyr::select(event_id, common_name, scientific_name, catch_numbers,
-                catch_wt)
+  event_id = Trawl_id,
+  common_name = Common_name,
+  scientific_name = Scientific_name,
+  catch_numbers = total_catch_numbers,
+  catch_wt = total_catch_wt_kg
+) %>%
+  dplyr::select(
+    event_id, common_name, scientific_name, catch_numbers,
+    catch_wt
+  )
 
 catch$common_name <- tolower(catch$common_name)
 catch$scientific_name <- tolower(catch$scientific_name)
@@ -62,10 +67,10 @@ itis_codes <- get_itis(spp)
 spp_df <- tibble(scientific_name = spp, itis = itis_codes)
 catch <- dplyr::left_join(catch, spp_df)
 # bring in the common name
-#nwfsc_catch <- dplyr::left_join(catch, spp_dictionary) #%>%
- # dplyr::select(-common_name)
+# nwfsc_catch <- dplyr::left_join(catch, spp_dictionary) #%>%
+# dplyr::select(-common_name)
 # specify units -- kilograms
-#nwfsc_catch$catch_wt_units = "kg"
+# nwfsc_catch$catch_wt_units = "kg"
 
 # filter out only species that are included in our joined list across regions
 joined_list <- readRDS("data-raw/joined_list.rds")
@@ -74,7 +79,7 @@ nwfsc_catch_keep <- dplyr::filter(catch, itis %in% joined_list$itis)
 nwfsc_catch_keep <- rename(nwfsc_catch_keep, catch_weight = catch_wt)
 
 # save space:
-#nwfsc_catch_keep$catch_wt_units <- NULL
+# nwfsc_catch_keep$catch_wt_units <- NULL
 nwfsc_catch_keep$scientific_name <- NULL
 nwfsc_catch_keep$common_name <- NULL
 nwfsc_catch_keep$event_id <- as.numeric(nwfsc_catch_keep$event_id)

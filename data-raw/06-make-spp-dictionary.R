@@ -27,7 +27,7 @@ make_itis_spp_table <- function() {
 
   missing <- filter(lu, is.na(common_name))
   common2 <- taxize::sci2comm(missing$scientific_name, db = "itis")
-  com2 <- purrr::map_chr(common2, ~.[1])
+  com2 <- purrr::map_chr(common2, ~ .[1])
   tolower(unname(com2))
   lu2 <- data.frame(scientific_name = names(com2), common_name = tolower(unname(com2)))
   lu2 <- left_join(lu2, select(lu, scientific_name, itis))

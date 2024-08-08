@@ -47,7 +47,7 @@ get_species()
 The core function of the package is `get_data`. This allows for querying by species (using common names - "common", scientific names - "scientific", or ITIS identifiers - "itis_id"), regions, surveys, or years -- each of these may be a single value or vector of values. We could get data for sablefish from all Alaska surveys in the the last decade with
 
 ```{r eval=FALSE}
-d <- get_data(common = "sablefish", years = 2013:2023, regions="afsc")
+d <- get_data(common = "sablefish", years = 2013:2023, regions = "afsc")
 ```
 
 As a second example, we could get data coastwide for Arrowtooth flounder and plot it with the following code. We'll constrain it to years 2003-2018 for plotting purposes (though the earliest year of data is 1980).
@@ -55,24 +55,25 @@ As a second example, we could get data coastwide for Arrowtooth flounder and plo
 ```{r, eval=FALSE}
 d <- get_data(common = "arrowtooth flounder", years = 2003:2018)
 
-g <- d |> 
+g <- d |>
   ggplot(aes(
-    lon_start, 
-    lat_start, 
-    colour = catch_weight / effort, 
+    lon_start,
+    lat_start,
+    colour = catch_weight / effort,
     size = catch_weight / effort
   )) +
-  geom_point(pch = 21) + 
+  geom_point(pch = 21) +
   facet_wrap(~year) +
   scale_colour_viridis_c(trans = "log10") +
   theme_light() +
-  coord_fixed() + 
-  xlab("Start longitude") + 
+  coord_fixed() +
+  xlab("Start longitude") +
   ylab("Start latitude")
 
-ggsave(g, filename = "map-example.png", 
-       width = 6, height = 7, dpi = 150)
-
+ggsave(g,
+  filename = "map-example.png",
+  width = 6, height = 7, dpi = 150
+)
 ```
 
 ![](../man/figures/map-example.png)
