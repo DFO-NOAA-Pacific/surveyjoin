@@ -241,6 +241,7 @@ get_rawdata <- function() {
 #' }
 get_species <- function() {
   db <- surv_db()
+  on.exit(suppressWarnings(suppressMessages(DBI::dbDisconnect(db))))
   catch <- as.data.frame(tbl(db, "catch"))
   catch_tbl <- dplyr::group_by(catch, .data$common_name) |>
     dplyr::summarise(scientific_name = .data$scientific_name[1], itis = .data$itis[1]) |>
