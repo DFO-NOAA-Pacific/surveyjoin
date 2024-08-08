@@ -112,6 +112,8 @@ pbs_catch <- dat %>%
     catch_weight = catch_weight
   )
 pbs_catch$event_id <- as.numeric(pbs_catch$event_id)
+# pacific spiny dogfish:
+pbs_catch$itis[pbs_catch$itis == 160617] <- 160620
 
 glimpse(pbs_catch)
 
