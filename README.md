@@ -24,6 +24,81 @@ There are 55 species included in the initial version of the package,
 focusing on species that are occurring in multiple regions. The list of
 species can be viewed with the `get_species()` function.
 
+### Installing
+
+``` r
+# install.packages("pak")
+pak::pkg_install("DFO-NOAA-Pacific/surveyjoin")
+```
+
+### Basic use
+
+``` r
+library(surveyjoin)
+```
+
+On first use, download the data and load it into a local SQL database:
+
+``` r
+cache_data()
+load_sql_data()
+```
+
+Find available species:
+
+``` r
+get_species()
+```
+
+    ## # A tibble: 55 × 3
+    ##    common_name         scientific_name        itis
+    ##    <chr>               <chr>                 <dbl>
+    ##  1 aleutian skate      bathyraja aleutica   160935
+    ##  2 arrowtooth flounder atheresthes stomias  172862
+    ##  3 big skate           raja binoculata      160848
+    ##  4 bigfin eelpout      lycodes cortezianus  550588
+    ##  5 bigmouth sculpin    hemitripterus bolini 167287
+    ##  6 black eelpout       lycodes diapterus    165261
+    ##  7 blackbelly eelpout  lycodes pacificus    630999
+    ##  8 bocaccio            sebastes paucispinis 166733
+    ##  9 canary rockfish     sebastes pinniger    166734
+    ## 10 capelin             mallotus villosus    162035
+    ## # ℹ 45 more rows
+
+Load data for a species:
+
+``` r
+d <- get_data("pacific cod")
+```
+
+``` r
+dplyr::glimpse(d, width = 72)
+```
+
+    ## Rows: 58,889
+    ## Columns: 21
+    ## $ survey_name     <chr> "Aleutian Islands", "Aleutian Islands", "Aleut…
+    ## $ event_id        <dbl> -21893, -21764, -21455, -18280, -18259, -18094…
+    ## $ date            <chr> "2022-08-07", "2022-07-28", "2022-07-03", "201…
+    ## $ pass            <int> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…
+    ## $ vessel          <chr> "OCEAN EXPLORER", "OCEAN EXPLORER", "ALASKA PR…
+    ## $ lat_start       <dbl> 52.01721, 53.11242, 51.96523, 52.67577, 52.507…
+    ## $ lon_start       <dbl> -175.8889, -170.9027, -172.6282, -172.7522, -1…
+    ## $ lat_end         <dbl> 52.00690, 53.10904, 51.96874, 52.67061, 52.516…
+    ## $ lon_end         <dbl> -175.9017, -170.9244, -172.6096, -172.7648, -1…
+    ## $ depth_m         <dbl> 184, 98, 216, 184, 167, 133, 225, 80, 186, 111…
+    ## $ effort          <dbl> 2.3745, 2.5268, 2.6409, 1.7392, 1.8012, 1.8531…
+    ## $ effort_units    <chr> "ha", "ha", "ha", "ha", "ha", "ha", "ha", "ha"…
+    ## $ performance     <chr> "0", "0", "5", "4", "4", "0", "4", "0", "0", "…
+    ## $ bottom_temp_c   <dbl> 4.6, 4.9, 4.5, 4.5, 4.6, 4.6, 4.3, 5.5, 4.8, 4…
+    ## $ region          <chr> "afsc", "afsc", "afsc", "afsc", "afsc", "afsc"…
+    ## $ year            <int> 2022, 2022, 2022, 2018, 2018, 2018, 2018, 2018…
+    ## $ itis            <dbl> 164711, 164711, 164711, 164711, 164711, 164711…
+    ## $ catch_numbers   <dbl> 0, 0, 0, 7, 11, 4, 11, 30, 12, 56, 2, 0, 0, 3,…
+    ## $ catch_weight    <dbl> 0.00, 0.00, 0.00, 24.65, 31.22, 14.61, 34.22, …
+    ## $ scientific_name <chr> "gadus macrocephalus", "gadus macrocephalus", …
+    ## $ common_name     <chr> "pacific cod", "pacific cod", "pacific cod", "…
+
 ### Citations
 
 Citing the `surveyjoin` package can be done with the DOI linked above,

@@ -19,6 +19,42 @@ This data includes surveys conducted by the Northwest Fisheries Science Center (
 
 There are 55 species included in the initial version of the package, focusing on species that are occurring in multiple regions. The list of species can be viewed with the `get_species()` function.
 
+### Installing
+
+```{r, eval=FALSE}
+# install.packages("pak")
+pak::pkg_install("DFO-NOAA-Pacific/surveyjoin")
+```
+
+### Basic use
+
+```{r}
+library(surveyjoin)
+```
+
+On first use, download the data and load it into a local SQL database:
+
+```{r, eval=FALSE}
+cache_data()
+load_sql_data()
+```
+
+Find available species:
+
+```{r}
+get_species()
+```
+
+Load data for a species:
+
+```{r}
+d <- get_data("pacific cod")
+```
+
+```{r}
+dplyr::glimpse(d, width = 72)
+```
+
 ### Citations
 
 Citing the `surveyjoin` package can be done with the DOI linked above, though more detailed citations may be needed for specific surveys or methodology. For citations pertaining to surveys run by the Alaska Fisheries Science Center (AFSC), see
