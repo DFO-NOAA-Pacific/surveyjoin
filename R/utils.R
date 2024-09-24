@@ -6,6 +6,18 @@ save_raw_data <- function(x, name = "pbs-haul") {
   )
 }
 
+files_to_cache <- function() {
+  f <- c(
+    "pbs-catch.rds",
+    "pbs-haul.rds",
+    "afsc-catch.rds",
+    "afsc-haul.rds",
+    "nwfsc-catch.rds",
+    "nwfsc-haul.rds"
+  )
+  return(f)
+}
+
 #' Identify the local folder used for caching
 #' @param name the directory name, default is the package name "surveyjoin"
 #' @return The directory location used for caching
@@ -16,21 +28,150 @@ get_cache_folder <- function(name = "surveyjoin") {
   user_cache_dir(name)
 }
 
+#' Perform downloading
+#' @param x the directory name, default is the package name "surveyjoin"
+#' @param cache_folder the name of the folder used for caching
+#' @return NULL
+#' @importFrom utils download.file
 download <- function(x, cache_folder = get_cache_folder()) {
-  f <- "https://github.com/DFO-NOAA-Pacific/surveyjoin-data/raw/main/"
-  utils::download.file(paste0(f, x), destfile = file.path(cache_folder, x))
+  # get last modified date of the file on GitHub
+  last_modified <- file_last_modified(x)
+
+  local_file <- file.path(cache_folder, x)
+
+  # download if it's missing
+  if (!file.exists(local_file)) {
+    f <- "https://github.com/DFO-NOAA-Pacific/surveyjoin-data/raw/main/"
+    download.file(paste0(f, x), destfile = local_file)
+    return(last_modified)
+  }
+
+  # if it exists, check if local cache is outdated
+  metadata <- load_metadata()
+  cached_version <- metadata$files[[x]]$last_modified
+  if (is.null(cached_version) || cached_version != last_modified) {
+    f <- "https://github.com/DFO-NOAA-Pacific/surveyjoin-data/raw/main/"
+    download.file(paste0(f, x), destfile = local_file)
+    return(last_modified)
+  }
+
+  # If no change -- return nothing
+  return(NULL)
 }
 
-cache_files <- function() {
-  c(
-    "pbs-catch.rds",
-    "pbs-haul.rds",
-    "afsc-catch.rds",
-    "afsc-haul.rds",
-    "nwfsc-catch.rds",
-    "nwfsc-haul.rds"
-  )
+#' Function to get the metadata file path
+#' @return NULL
+get_metadata_file <- function() {
+  file.path(get_cache_folder(), "data_metadata.json")
 }
+
+#' Function to load metadata
+#' @importFrom jsonlite fromJSON
+#' @return NULL
+#' @export
+load_metadata <- function() {
+  metadata_file <- get_metadata_file()
+
+  # Load existing metadata if available, otherwise create a new list
+  if (file.exists(metadata_file)) {
+    fromJSON(metadata_file)
+  } else {
+    list(files = list(), version = "0.1", last_download = NULL)
+  }
+}
+
+#' Function to save metadata
+#' @param metadata the name of the metadata object
+#' @importFrom jsonlite write_json
+#' @return NULL
+save_metadata <- function(metadata) {
+  metadata_file <- get_metadata_file()
+  write_json(metadata, metadata_file, pretty = TRUE, auto_unbox = TRUE)
+}
+
+#' Wrapper function to cache files
+#' @return NULL
+cache_files <- function() {
+  files <- files_to_cache()
+
+  metadata <- load_metadata()
+  cache_folder <- get_cache_folder()
+
+  # Check each file to see if it needs to be downloaded
+  for (file in files) {
+    last_modified <- file_last_modified(file)
+
+    local_file <- file.path(cache_folder, file)
+
+    # If GitHub rate limit is exceeded or API fails, use local cached data if available
+    skip <- FALSE
+    if (is.null(last_modified)) {
+      if (!file.exists(local_file)) {
+        stop("Rate limit exceeded and no local data available for: ", file)
+      } else {
+        message(paste("Using locally cached version of", file))
+        skip <- TRUE
+      }
+    }
+
+    if(!skip) {
+      # if local file doesn't exist or has a different modified date, download it
+      cached_version <- metadata$files[[file]]$last_modified
+      if (is.null(cached_version) || cached_version != last_modified) {
+        f <- "https://github.com/DFO-NOAA-Pacific/surveyjoin-data/raw/main/"
+        utils::download.file(paste0(f, file), destfile = local_file)
+
+        # update metadata for the downloaded file
+        file_info <- file.info(local_file)
+        metadata$files[[file]] <- list(
+          version = last_modified,
+          size = file_info$size,
+          last_modified = last_modified
+        )
+      } else {
+        message(paste("Using cached version of", file))
+      }
+    }
+  }
+
+  # update metadata with the latest download date
+  metadata$last_download <- Sys.time()
+
+  save_metadata(metadata)
+}
+
+#' Function to get the last modified date of a file from GitHub
+#' @param file_name the file name, e.g. "nwfsc-catch.rds"
+#' @return The time stamp file was last changed
+#' @importFrom httr GET content user_agent status_code
+#' @export
+file_last_modified <- function(file_name) {
+  # Specify the repo and file path
+  repo <- "DFO-NOAA-Pacific/surveyjoin-data"
+  url <- paste0("https://api.github.com/repos/", repo, "/commits?path=", file_name)
+
+  # Make a GET request to GitHub API
+  response <- GET(url, user_agent("R (httr)"))
+
+  # Check for a successful response
+  if (status_code(response) == 200) {
+    # Parse the response and get the last commit date for the file
+    commit_data <- content(response, as = "parsed")
+    if (length(commit_data) > 0) {
+      # Extract the timestamp on last commit
+      last_modified <- commit_data[[1]]$commit$committer$date
+      return(last_modified)
+    } else {
+      stop("No commits found for file: ", file_name)
+    }
+  } else if (status_code(response) == 403) {  # Rate limit exceeded
+    message("GitHub API rate limit exceeded. Using local data if available.")
+    return(NULL)
+  } else {
+    stop("Failed to get GitHub file info for: ", file_name)
+  }
+}
+
 
 #' Function to cache the data files locally
 #'
@@ -48,26 +189,13 @@ cache_files <- function() {
 #' cache_data()
 #' }
 cache_data <- function(region = c("nwfsc", "pbs", "afsc")) {
-  # valid region(s)?
-  r <- map_chr(region, function(region) {
-    assert_choice(
-      region,
-      c("nwfsc", "pbs", "afsc")
-    )
-  })
+  # Ensure valid region(s)
+  valid_regions <- c("nwfsc", "pbs", "afsc")
+  purrr::walk(region, ~checkmate::assert_choice(.x, valid_regions))
 
-  # subset files?
   files <- cache_files()
-  f <- map(r, ~ files[grepl(., files)])
-  f <- unlist(f)
 
-  # download/uncompress for speed
-  dir.create(get_cache_folder(), showWarnings = FALSE)
-  walk(f, download, cache_folder = get_cache_folder())
-  # walk(f, uncompress)
-
-  msg <- "All data downloaded and uncompressed"
-  cli_alert_success(msg)
+  cli_alert_success("All data for region(s) {region} downloaded and cached")
 }
 
 #' Load SQLite database
@@ -82,7 +210,8 @@ cache_data <- function(region = c("nwfsc", "pbs", "afsc")) {
 #' load_sql_data()
 #' }
 load_sql_data <- function() {
-  f <- cache_files()
+  f <- files_to_cache()
+
   f_haul <- sort(f[grepl("haul", f)])
   f_catch <- sort(f[grepl("catch", f)])
   stopifnot(length(f_haul) == length(f_catch))

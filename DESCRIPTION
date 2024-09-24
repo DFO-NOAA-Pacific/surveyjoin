@@ -26,17 +26,18 @@ Encoding: UTF-8
 Depends:
     R (>= 4.0.0)
 Imports:
-    dplyr (>= 1.0.2),
-    dbplyr,
-    rlang (>= 0.4.1),
-    RSQLite,
-    purrr,
     checkmate,
     cli,
-    rappdirs,
     DBI,
-    taxize,
-    lubridate
+    dplyr (>= 1.0.2),
+    httr,
+    lubridate,
+    jsonlite, 
+    purrr,
+    rappdirs,
+    rlang (>= 0.4.1),
+    RSQLite,
+    taxize
 Suggests:
     testthat (>= 3.0.0),
     parallel,
