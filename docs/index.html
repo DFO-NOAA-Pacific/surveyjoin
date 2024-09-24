@@ -59,18 +59,80 @@
       </header><div class="row">
   <div class="contents col-md-9">
 <div class="section level1">
-<div class="page-header"><h1 id="surveyjoin-package">surveyjoin package<a class="anchor" aria-label="anchor" href="#surveyjoin-package"></a>
+<div class="page-header"><h1 id="surveyjoin">surveyjoin<a class="anchor" aria-label="anchor" href="#surveyjoin"></a>
 </h1></div>
+<!-- badges: start -->
+
 <p>This is a repository for combining trawl survey datasets from NOAA and Fisheries and Oceans Canada in the Northeast Pacific Ocean.</p>
-<p>The pkdown site can be found <a href="https://dfo-noaa-pacific.github.io/surveyjoin/" class="external-link">here</a></p>
-<p><a href="https://zenodo.org/doi/10.5281/zenodo.10031852" class="external-link"><img src="https://zenodo.org/badge/484561620.svg" alt="DOI"></a></p>
+<p>A pkgdown site is available <a href="https://dfo-noaa-pacific.github.io/surveyjoin/" class="external-link">here</a>.</p>
 <p>This data includes surveys conducted by the Northwest Fisheries Science Center (NWFSC) off the west coast of the United States, surveys collected by Fisheries and Oceans Canada (DFO) in the waters of British Columbia, and surveys conducted by the Alaska Fisheries Science Center (AFSC) in Alaska.</p>
-<p>There are 55 species included in the initial version of the package, focusing on species that are occurring in multiple regions. The list of species can be viewed with the <code><a href="reference/get_species.html">get_species()</a></code> function.</p>
+<p>There are 55 species included in the initial version of the package, focusing on species that are occurring in multiple regions.</p>
+<div class="section level3">
+<h3 id="installing">Installing<a class="anchor" aria-label="anchor" href="#installing"></a>
+</h3>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># install.packages("pak")</span></span>
+<span><span class="fu">pak</span><span class="fu">::</span><span class="fu">pkg_install</span><span class="op">(</span><span class="st">"DFO-NOAA-Pacific/surveyjoin"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="basic-use">Basic use<a class="anchor" aria-label="anchor" href="#basic-use"></a>
+</h3>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">surveyjoin</span><span class="op">)</span></span></code></pre></div>
+<p>On first use, download the data and load it into a local SQL database:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/cache_data.html">cache_data</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/load_sql_data.html">load_sql_data</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p>Find available species:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/get_species.html">get_species</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="do">## # A tibble: 55 × 3</span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="do">##    common_name         scientific_name        itis</span></span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="do">##    &lt;chr&gt;               &lt;chr&gt;                 &lt;dbl&gt;</span></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="do">##  1 aleutian skate      bathyraja aleutica   160935</span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="do">##  2 arrowtooth flounder atheresthes stomias  172862</span></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="do">##  3 big skate           raja binoculata      160848</span></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="do">##  4 bigfin eelpout      lycodes cortezianus  550588</span></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="do">##  5 bigmouth sculpin    hemitripterus bolini 167287</span></span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="do">##  6 black eelpout       lycodes diapterus    165261</span></span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="do">##  7 blackbelly eelpout  lycodes pacificus    630999</span></span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="do">##  8 bocaccio            sebastes paucispinis 166733</span></span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a><span class="do">##  9 canary rockfish     sebastes pinniger    166734</span></span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a><span class="do">## 10 capelin             mallotus villosus    162035</span></span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a><span class="do">## # ℹ 45 more rows</span></span></code></pre></div>
+<p>Load data for a species:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_data.html">get_data</a></span><span class="op">(</span><span class="st">"pacific cod"</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="va">d</span>, width <span class="op">=</span> <span class="fl">72</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="do">## Rows: 58,889</span></span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="do">## Columns: 21</span></span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a><span class="do">## $ survey_name     &lt;chr&gt; "Aleutian Islands", "Aleutian Islands", "Aleut…</span></span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a><span class="do">## $ event_id        &lt;dbl&gt; -21893, -21764, -21455, -18280, -18259, -18094…</span></span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a><span class="do">## $ date            &lt;chr&gt; "2022-08-07", "2022-07-28", "2022-07-03", "201…</span></span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a><span class="do">## $ pass            &lt;int&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…</span></span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a><span class="do">## $ vessel          &lt;chr&gt; "OCEAN EXPLORER", "OCEAN EXPLORER", "ALASKA PR…</span></span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a><span class="do">## $ lat_start       &lt;dbl&gt; 52.01721, 53.11242, 51.96523, 52.67577, 52.507…</span></span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a><span class="do">## $ lon_start       &lt;dbl&gt; -175.8889, -170.9027, -172.6282, -172.7522, -1…</span></span>
+<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a><span class="do">## $ lat_end         &lt;dbl&gt; 52.00690, 53.10904, 51.96874, 52.67061, 52.516…</span></span>
+<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a><span class="do">## $ lon_end         &lt;dbl&gt; -175.9017, -170.9244, -172.6096, -172.7648, -1…</span></span>
+<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a><span class="do">## $ depth_m         &lt;dbl&gt; 184, 98, 216, 184, 167, 133, 225, 80, 186, 111…</span></span>
+<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a><span class="do">## $ effort          &lt;dbl&gt; 2.3745, 2.5268, 2.6409, 1.7392, 1.8012, 1.8531…</span></span>
+<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a><span class="do">## $ effort_units    &lt;chr&gt; "ha", "ha", "ha", "ha", "ha", "ha", "ha", "ha"…</span></span>
+<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a><span class="do">## $ performance     &lt;chr&gt; "0", "0", "5", "4", "4", "0", "4", "0", "0", "…</span></span>
+<span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a><span class="do">## $ bottom_temp_c   &lt;dbl&gt; 4.6, 4.9, 4.5, 4.5, 4.6, 4.6, 4.3, 5.5, 4.8, 4…</span></span>
+<span id="cb8-17"><a href="#cb8-17" tabindex="-1"></a><span class="do">## $ region          &lt;chr&gt; "afsc", "afsc", "afsc", "afsc", "afsc", "afsc"…</span></span>
+<span id="cb8-18"><a href="#cb8-18" tabindex="-1"></a><span class="do">## $ year            &lt;int&gt; 2022, 2022, 2022, 2018, 2018, 2018, 2018, 2018…</span></span>
+<span id="cb8-19"><a href="#cb8-19" tabindex="-1"></a><span class="do">## $ itis            &lt;dbl&gt; 164711, 164711, 164711, 164711, 164711, 164711…</span></span>
+<span id="cb8-20"><a href="#cb8-20" tabindex="-1"></a><span class="do">## $ catch_numbers   &lt;dbl&gt; 0, 0, 0, 7, 11, 4, 11, 30, 12, 56, 2, 0, 0, 3,…</span></span>
+<span id="cb8-21"><a href="#cb8-21" tabindex="-1"></a><span class="do">## $ catch_weight    &lt;dbl&gt; 0.00, 0.00, 0.00, 24.65, 31.22, 14.61, 34.22, …</span></span>
+<span id="cb8-22"><a href="#cb8-22" tabindex="-1"></a><span class="do">## $ scientific_name &lt;chr&gt; "gadus macrocephalus", "gadus macrocephalus", …</span></span>
+<span id="cb8-23"><a href="#cb8-23" tabindex="-1"></a><span class="do">## $ common_name     &lt;chr&gt; "pacific cod", "pacific cod", "pacific cod", "…</span></span></code></pre></div>
+</div>
 <div class="section level3">
 <h3 id="citations">Citations<a class="anchor" aria-label="anchor" href="#citations"></a>
 </h3>
-<p>Citing the <code>surveyjoin</code> package can be done with the DOI linked above, though more detailed citations may be needed for specific surveys or methodology. For citations pertaining to surveys run by the Alaska Fisheries Science Center (AFSC), see</p>
-<p><a href="https://github.com/afsc-gap-products/citations" class="external-link uri">https://github.com/afsc-gap-products/citations</a></p>
+<p>Citing the <code>surveyjoin</code> package can be done with the DOI linked above, though more detailed citations may be needed for specific surveys or methodology. For citations pertaining to surveys run by the Alaska Fisheries Science Center (AFSC), see <a href="https://github.com/afsc-gap-products/citations" class="external-link uri">https://github.com/afsc-gap-products/citations</a>. Metadata for surveys conducted by the AFSC can be found at <a href="https://afsc-gap-products.github.io/gap_products" class="external-link uri">https://afsc-gap-products.github.io/gap_products</a>.</p>
 <p>Background and additional citations on surveys run by the Northwest Fisheries Science Center (NWFSC) can be found in <a href="https://repository.library.noaa.gov/view/noaa/14179/noaa_14179_DS1.pdf" class="external-link">Keller et al. 2017</a>.</p>
 </div>
 <div class="section level3">
@@ -80,285 +142,229 @@
 <p>Within each region, we identified the species that occurred in at least 5% of all tows (resulting in 4 lists, 1 for each region). Because our interests are in cross-regional work, we identified species meeting our occurrence threshold that also occurred in 2 or more regions. This resulted in the following list of 55 species:</p>
 <table class="table">
 <thead><tr class="header">
-<th align="left">common_name</th>
-<th align="left">scientific_name</th>
-<th align="right">itis</th>
+<th align="left">Common name</th>
+<th align="left">Scientific name</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left">aleutian skate</td>
-<td align="left">bathyraja aleutica</td>
-<td align="right">160935</td>
+<td align="left">Aleutian Skate</td>
+<td align="left"><em>Bathyraja aleutica</em></td>
 </tr>
 <tr class="even">
-<td align="left">arrowtooth flounder</td>
-<td align="left">atheresthes stomias</td>
-<td align="right">172862</td>
+<td align="left">Arrowtooth Flounder</td>
+<td align="left"><em>Atheresthes stomias</em></td>
 </tr>
 <tr class="odd">
-<td align="left">big skate</td>
-<td align="left">raja binoculata</td>
-<td align="right">160848</td>
+<td align="left">Big Skate</td>
+<td align="left"><em>Raja binoculata</em></td>
 </tr>
 <tr class="even">
-<td align="left">bigfin eelpout</td>
-<td align="left">lycodes cortezianus</td>
-<td align="right">550588</td>
+<td align="left">Bigfin Eelpout</td>
+<td align="left"><em>Lycodes cortezianus</em></td>
 </tr>
 <tr class="odd">
-<td align="left">bigmouth sculpin</td>
-<td align="left">hemitripterus bolini</td>
-<td align="right">167287</td>
+<td align="left">Bigmouth Sculpin</td>
+<td align="left"><em>Hemitripterus bolini</em></td>
 </tr>
 <tr class="even">
-<td align="left">black eelpout</td>
-<td align="left">lycodes diapterus</td>
-<td align="right">165261</td>
+<td align="left">Black Eelpout</td>
+<td align="left"><em>Lycodes diapterus</em></td>
 </tr>
 <tr class="odd">
-<td align="left">blackbelly eelpout</td>
-<td align="left">lycodes pacificus</td>
-<td align="right">630999</td>
+<td align="left">Blackbelly Eelpout</td>
+<td align="left"><em>Lycodes pacificus</em></td>
 </tr>
 <tr class="even">
-<td align="left">bocaccio</td>
-<td align="left">sebastes paucispinis</td>
-<td align="right">166733</td>
+<td align="left">Bocaccio</td>
+<td align="left"><em>Sebastes paucispinis</em></td>
 </tr>
 <tr class="odd">
-<td align="left">canary rockfish</td>
-<td align="left">sebastes pinniger</td>
-<td align="right">166734</td>
+<td align="left">Canary Rockfish</td>
+<td align="left"><em>Sebastes pinniger</em></td>
 </tr>
 <tr class="even">
-<td align="left">capelin</td>
-<td align="left">mallotus villosus</td>
-<td align="right">162035</td>
+<td align="left">Capelin</td>
+<td align="left"><em>Mallotus villosus</em></td>
 </tr>
 <tr class="odd">
-<td align="left">curlfin sole</td>
-<td align="left">pleuronichthys decurrens</td>
-<td align="right">172924</td>
+<td align="left">Curlfin Sole</td>
+<td align="left"><em>Pleuronichthys decurrens</em></td>
 </tr>
 <tr class="even">
-<td align="left">darkblotched rockfish</td>
-<td align="left">sebastes crameri</td>
-<td align="right">166715</td>
+<td align="left">Darkblotched Rockfish</td>
+<td align="left"><em>Sebastes crameri</em></td>
 </tr>
 <tr class="odd">
-<td align="left">darkfin sculpin</td>
-<td align="left">malacocottus zonurus</td>
-<td align="right">167305</td>
+<td align="left">Darkfin Sculpin</td>
+<td align="left"><em>Malacocottus zonurus</em></td>
 </tr>
 <tr class="even">
-<td align="left">dover sole</td>
-<td align="left">microstomus pacificus</td>
-<td align="right">172887</td>
+<td align="left">Dover Sole</td>
+<td align="left"><em>Microstomus pacificus</em></td>
 </tr>
 <tr class="odd">
-<td align="left">english sole</td>
-<td align="left">parophrys vetulus</td>
-<td align="right">172921</td>
+<td align="left">English Sole</td>
+<td align="left"><em>Parophrys vetulus</em></td>
 </tr>
 <tr class="even">
-<td align="left">eulachon</td>
-<td align="left">thaleichthys pacificus</td>
-<td align="right">162051</td>
+<td align="left">Eulachon</td>
+<td align="left"><em>Thaleichthys pacificus</em></td>
 </tr>
 <tr class="odd">
-<td align="left">flathead sole</td>
-<td align="left">hippoglossoides elassodon</td>
-<td align="right">172875</td>
+<td align="left">Flathead Sole</td>
+<td align="left"><em>Hippoglossoides elassodon</em></td>
 </tr>
 <tr class="even">
-<td align="left">giant grenadier</td>
-<td align="left">albatrossia pectoralis</td>
-<td align="right">165427</td>
+<td align="left">Giant Grenadier</td>
+<td align="left"><em>Albatrossia pectoralis</em></td>
 </tr>
 <tr class="odd">
-<td align="left">great sculpin</td>
-<td align="left">myoxocephalus polyacanthocephalus</td>
-<td align="right">167315</td>
+<td align="left">Great Sculpin</td>
+<td align="left"><em>Myoxocephalus polyacanthocephalus</em></td>
 </tr>
 <tr class="even">
-<td align="left">greenstriped rockfish</td>
-<td align="left">sebastes elongatus</td>
-<td align="right">166717</td>
+<td align="left">Greenstriped Rockfish</td>
+<td align="left"><em>Sebastes elongatus</em></td>
 </tr>
 <tr class="odd">
-<td align="left">harlequin rockfish</td>
-<td align="left">sebastes variegatus</td>
-<td align="right">166742</td>
+<td align="left">Harlequin Rockfish</td>
+<td align="left"><em>Sebastes variegatus</em></td>
 </tr>
 <tr class="even">
-<td align="left">kamchatka flounder</td>
-<td align="left">atheresthes evermanni</td>
-<td align="right">172861</td>
+<td align="left">Kamchatka Flounder</td>
+<td align="left"><em>Atheresthes evermanni</em></td>
 </tr>
 <tr class="odd">
-<td align="left">lingcod</td>
-<td align="left">ophiodon elongatus</td>
-<td align="right">167116</td>
+<td align="left">Lingcod</td>
+<td align="left"><em>Ophiodon elongatus</em></td>
 </tr>
 <tr class="even">
-<td align="left">longnose skate</td>
-<td align="left">raja rhina</td>
-<td align="right">160851</td>
+<td align="left">Longnose Skate</td>
+<td align="left"><em>Raja rhina</em></td>
 </tr>
 <tr class="odd">
-<td align="left">north pacific hake</td>
-<td align="left">merluccius productus</td>
-<td align="right">164792</td>
+<td align="left">North Pacific Hake</td>
+<td align="left"><em>Merluccius productus</em></td>
 </tr>
 <tr class="even">
-<td align="left">northern rock sole</td>
-<td align="left">lepidopsetta polyxystra</td>
-<td align="right">616392</td>
+<td align="left">Northern Rock Sole</td>
+<td align="left"><em>Lepidopsetta polyxystra</em></td>
 </tr>
 <tr class="odd">
-<td align="left">pacific cod</td>
-<td align="left">gadus macrocephalus</td>
-<td align="right">164711</td>
+<td align="left">Pacific Cod</td>
+<td align="left"><em>Gadus macrocephalus</em></td>
 </tr>
 <tr class="even">
-<td align="left">pacific halibut</td>
-<td align="left">hippoglossus stenolepis</td>
-<td align="right">172932</td>
+<td align="left">Pacific Halibut</td>
+<td align="left"><em>Hippoglossus stenolepis</em></td>
 </tr>
 <tr class="odd">
-<td align="left">pacific herring</td>
-<td align="left">clupea pallasii</td>
-<td align="right">551209</td>
+<td align="left">Pacific Herring</td>
+<td align="left"><em>Clupea pallasii</em></td>
 </tr>
 <tr class="even">
-<td align="left">pacific ocean perch</td>
-<td align="left">sebastes alutus</td>
-<td align="right">166707</td>
+<td align="left">Pacific Ocean Perch</td>
+<td align="left"><em>Sebastes alutus</em></td>
 </tr>
 <tr class="odd">
-<td align="left">pacific sanddab</td>
-<td align="left">citharichthys sordidus</td>
-<td align="right">172716</td>
+<td align="left">Pacific Sanddab</td>
+<td align="left"><em>Citharichthys sordidus</em></td>
 </tr>
 <tr class="even">
-<td align="left">petrale sole</td>
-<td align="left">eopsetta jordani</td>
-<td align="right">172868</td>
+<td align="left">Pacific Spiny Dogfish</td>
+<td align="left"><em>Squalus suckleyi</em></td>
 </tr>
 <tr class="odd">
-<td align="left">puget sound dogfish</td>
-<td align="left">squalus suckleyi</td>
-<td align="right">160620</td>
+<td align="left">Petrale Sole</td>
+<td align="left"><em>Eopsetta jordani</em></td>
 </tr>
 <tr class="even">
-<td align="left">redbanded rockfish</td>
-<td align="left">sebastes babcocki</td>
-<td align="right">166710</td>
+<td align="left">Redbanded Rockfish</td>
+<td align="left"><em>Sebastes babcocki</em></td>
 </tr>
 <tr class="odd">
-<td align="left">rex sole</td>
-<td align="left">glyptocephalus zachirus</td>
-<td align="right">172978</td>
+<td align="left">Rex Sole</td>
+<td align="left"><em>Glyptocephalus zachirus</em></td>
 </tr>
 <tr class="even">
-<td align="left">rock sole</td>
-<td align="left">lepidopsetta bilineata</td>
-<td align="right">172917</td>
+<td align="left">Rock Sole</td>
+<td align="left"><em>Lepidopsetta bilineata</em></td>
 </tr>
 <tr class="odd">
-<td align="left">rosethorn rockfish</td>
-<td align="left">sebastes helvomaculatus</td>
-<td align="right">166723</td>
+<td align="left">Rosethorn Rockfish</td>
+<td align="left"><em>Sebastes helvomaculatus</em></td>
 </tr>
 <tr class="even">
-<td align="left">sablefish</td>
-<td align="left">anoplopoma fimbria</td>
-<td align="right">167123</td>
+<td align="left">Sablefish</td>
+<td align="left"><em>Anoplopoma fimbria</em></td>
 </tr>
 <tr class="odd">
-<td align="left">sandpaper skate</td>
-<td align="left">bathyraja interrupta</td>
-<td align="right">160937</td>
+<td align="left">Sandpaper Skate</td>
+<td align="left"><em>Bathyraja interrupta</em></td>
 </tr>
 <tr class="even">
-<td align="left">searcher</td>
-<td align="left">bathymaster signatus</td>
-<td align="right">170949</td>
+<td align="left">Sawback Poacher</td>
+<td align="left"><em>Sarritor frenatus</em></td>
 </tr>
 <tr class="odd">
-<td align="left">sharpchin rockfish</td>
-<td align="left">sebastes zacentrus</td>
-<td align="right">166744</td>
+<td align="left">Searcher</td>
+<td align="left"><em>Bathymaster signatus</em></td>
 </tr>
 <tr class="even">
-<td align="left">shortfin eelpout</td>
-<td align="left">lycodes brevipes</td>
-<td align="right">165258</td>
+<td align="left">Sharpchin Rockfish</td>
+<td align="left"><em>Sebastes zacentrus</em></td>
 </tr>
 <tr class="odd">
-<td align="left">shortspine thornyhead</td>
-<td align="left">sebastolobus alascanus</td>
-<td align="right">166783</td>
+<td align="left">Shortfin Eelpout</td>
+<td align="left"><em>Lycodes brevipes</em></td>
 </tr>
 <tr class="even">
-<td align="left">slender sole</td>
-<td align="left">lyopsetta exilis</td>
-<td align="right">172871</td>
+<td align="left">Shortspine Thornyhead</td>
+<td align="left"><em>Sebastolobus alascanus</em></td>
 </tr>
 <tr class="odd">
-<td align="left">spiny dogfish</td>
-<td align="left">squalus acanthias</td>
-<td align="right">160617</td>
+<td align="left">Slender Sole</td>
+<td align="left"><em>Lyopsetta exilis</em></td>
 </tr>
 <tr class="even">
-<td align="left">spinyhead sculpin</td>
-<td align="left">dasycottus setiger</td>
-<td align="right">167265</td>
+<td align="left">Spinyhead Sculpin</td>
+<td align="left"><em>Dasycottus setiger</em></td>
 </tr>
 <tr class="odd">
-<td align="left">splitnose rockfish</td>
-<td align="left">sebastes diploproa</td>
-<td align="right">166716</td>
+<td align="left">Splitnose Rockfish</td>
+<td align="left"><em>Sebastes diploproa</em></td>
 </tr>
 <tr class="even">
-<td align="left">spotted ratfish</td>
-<td align="left">hydrolagus colliei</td>
-<td align="right">161015</td>
+<td align="left">Spotted Ratfish</td>
+<td align="left"><em>Hydrolagus colliei</em></td>
 </tr>
 <tr class="odd">
-<td align="left">sturgeon poacher</td>
-<td align="left">podothecus accipenserinus</td>
-<td align="right">644358</td>
+<td align="left">Sturgeon Poacher</td>
+<td align="left"><em>Podothecus accipenserinus</em></td>
 </tr>
 <tr class="even">
-<td align="left">threadfin sculpin</td>
-<td align="left">icelinus filamentosus</td>
-<td align="right">167293</td>
+<td align="left">Threadfin Sculpin</td>
+<td align="left"><em>Icelinus filamentosus</em></td>
 </tr>
 <tr class="odd">
-<td align="left">walleye pollock</td>
-<td align="left">gadus chalcogrammus</td>
-<td align="right">934083</td>
+<td align="left">Walleye Pollock</td>
+<td align="left"><em>Gadus chalcogrammus</em></td>
 </tr>
 <tr class="even">
-<td align="left">wattled eelpout</td>
-<td align="left">lycodes palearis</td>
-<td align="right">165265</td>
+<td align="left">Wattled Eelpout</td>
+<td align="left"><em>Lycodes palearis</em></td>
 </tr>
 <tr class="odd">
-<td align="left">widow rockfish</td>
-<td align="left">sebastes entomelas</td>
-<td align="right">166719</td>
+<td align="left">Widow Rockfish</td>
+<td align="left"><em>Sebastes entomelas</em></td>
 </tr>
 <tr class="even">
-<td align="left">yellow irish lord</td>
-<td align="left">hemilepidotus jordani</td>
-<td align="right">167280</td>
+<td align="left">Yellow Irish Lord</td>
+<td align="left"><em>Hemilepidotus jordani</em></td>
 </tr>
 <tr class="odd">
-<td align="left">yellowtain rockfish</td>
-<td align="left">sebastes flavidus</td>
-<td align="right">166720</td>
+<td align="left">Yellowtain Rockfish</td>
+<td align="left"><em>Sebastes flavidus</em></td>
 </tr>
 </tbody>
 </table>
@@ -398,7 +404,13 @@
 </ul>
 </div>
 
-
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://github.com/DFO-NOAA-Pacific/surveyjoin/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/DFO-NOAA-Pacific/surveyjoin/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
+<li><a href="https://zenodo.org/doi/10.5281/zenodo.10031852" class="external-link"><img src="https://zenodo.org/badge/484561620.svg" alt="DOI"></a></li>
+</ul>
+</div>
 
   </div>
 </div>

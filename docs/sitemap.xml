@@ -22,7 +22,16 @@
     <loc>/reference/cache_data.html</loc>
   </url>
   <url>
+    <loc>/reference/cache_files.html</loc>
+  </url>
+  <url>
     <loc>/reference/dfo_synoptic_grid.html</loc>
+  </url>
+  <url>
+    <loc>/reference/download.html</loc>
+  </url>
+  <url>
+    <loc>/reference/file_last_modified.html</loc>
   </url>
   <url>
     <loc>/reference/get_cache_folder.html</loc>
@@ -35,6 +44,9 @@
   </url>
   <url>
     <loc>/reference/get_metadata.html</loc>
+  </url>
+  <url>
+    <loc>/reference/get_metadata_file.html</loc>
   </url>
   <url>
     <loc>/reference/get_rawdata.html</loc>
@@ -52,10 +64,16 @@
     <loc>/reference/index.html</loc>
   </url>
   <url>
+    <loc>/reference/load_metadata.html</loc>
+  </url>
+  <url>
     <loc>/reference/load_sql_data.html</loc>
   </url>
   <url>
     <loc>/reference/nwfsc_grid.html</loc>
+  </url>
+  <url>
+    <loc>/reference/save_metadata.html</loc>
   </url>
   <url>
     <loc>/reference/spp_dictionary.html</loc>
