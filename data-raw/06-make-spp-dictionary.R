@@ -1,3 +1,17 @@
+#' Get the ITIS identifier of a species
+#' @param spp (character) Taxonomic name to query
+#' @return an integer representing the ITIS identifier
+#' @export
+#' @importFrom taxize get_ids
+#' @examples
+#' \dontrun{
+#' id <- get_itis_spp("darkblotched rockfish")
+#' }
+get_itis_spp <- function(spp) {
+  out <- get_ids(spp, db = "itis", verbose = FALSE)
+  as.integer(unlist(out))
+}
+
 make_itis_spp_table <- function() {
   # db <- surv_db()
   # haul <- dplyr::tbl(db, "haul")
