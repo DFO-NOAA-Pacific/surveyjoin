@@ -273,9 +273,8 @@ load_sql_data <- function() {
       out
     }
   })
-  print(nrow(catch))
-  print(catch)
-  if(!is.null(nrow(catch))) {
+
+  if(nrow(catch) == 0) {
     cli::cli_alert_success("Raw data read into memory")
     catch$scientific_name <- NULL
     catch <- dplyr::left_join(catch, surveyjoin::spp_dictionary, by = dplyr::join_by("itis"))
