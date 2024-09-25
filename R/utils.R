@@ -30,37 +30,6 @@ get_cache_folder <- function(name = "surveyjoin") {
   user_cache_dir(appname = name, appauthor = NULL)
 }
 
-#' Perform downloading
-#' @param x the directory name, default is the package name "surveyjoin"
-#' @param cache_folder the name of the folder used for caching
-#' @return NULL
-#' @importFrom utils download.file
-download <- function(x, cache_folder = get_cache_folder()) {
-  # get last modified date of the file on GitHub
-  last_modified <- file_last_modified(x)
-
-  local_file <- file.path(cache_folder, x)
-
-  # download if it's missing
-  if (!file.exists(local_file)) {
-    f <- "https://github.com/DFO-NOAA-Pacific/surveyjoin-data/raw/main/"
-    download.file(paste0(f, x), destfile = local_file)
-    return(last_modified)
-  }
-
-  # if it exists, check if local cache is outdated
-  metadata <- load_metadata()
-  cached_version <- metadata$files[[x]]$last_modified
-  if (is.null(cached_version) || cached_version != last_modified) {
-    f <- "https://github.com/DFO-NOAA-Pacific/surveyjoin-data/raw/main/"
-    download.file(paste0(f, x), destfile = local_file)
-    return(last_modified)
-  }
-
-  # If no change -- return nothing
-  return(NULL)
-}
-
 #' Function to get the metadata file path
 #' @return NULL
 get_metadata_file <- function() {
@@ -141,7 +110,10 @@ cache_files <- function() {
       if (is.null(cached_version) || cached_version != last_modified) {
         f <- "https://github.com/DFO-NOAA-Pacific/surveyjoin-data/raw/main/"
         download.file(paste0(f, file), destfile = local_file)
-
+        # append version info to attributes of object in file
+        temp <- readRDS(local_file)
+        attr(temp, "version") <- last_modified
+        saveRDS(temp, local_file)
         # update metadata for the downloaded file
         file_info <- file.info(local_file)
         metadata$files[[file]] <- list(
@@ -214,7 +186,7 @@ file_last_modified <- function(file_name) {
 cache_data <- function(region = c("nwfsc", "pbs", "afsc")) {
   # Ensure valid region(s)
   valid_regions <- c("nwfsc", "pbs", "afsc")
-  purrr::walk(region, ~checkmate::assert_choice(.x, valid_regions))
+  purrr::walk(region, ~assert_choice(.x, valid_regions))
 
   files <- cache_files()
 
