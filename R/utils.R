@@ -25,10 +25,9 @@ files_to_cache <- function() {
 #' @importFrom rlang .data
 #' @export
 get_cache_folder <- function(name = "surveyjoin") {
-  f <- user_cache_dir(name)
-  # see if this fixes Windows issue
-  f <- gsub("(surveyjoin[/\\\\]){2,}", "surveyjoin/", f)
-  return(f)
+  # platform specific directories -- Windows has unique handling
+  # https://www.rdocumentation.org/packages/rappdirs/versions/0.3.3/topics/user_cache_dir
+  user_cache_dir(appname = name, appauthor = NULL)
 }
 
 #' Perform downloading
