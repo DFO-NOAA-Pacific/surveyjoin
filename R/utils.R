@@ -235,6 +235,12 @@ load_sql_data <- function() {
   f_catch <- sort(f[grepl("catch", f)])
   stopifnot(length(f_haul) == length(f_catch))
   haul <- map_dfr(f_haul, function(x) {
+    # error handling if file doesn't exist -- largely for CI on Github
+    this_file <- file.path(get_cache_folder(), x)
+    if (!file.exists(this_file)) {
+      cli_abort(paste("File does not exist: ", this_file))
+    }
+
     out <- readRDS(file.path(get_cache_folder(), x))
     out$region <- gsub("([a-z]+)-[a-z]+.rds", "\\1", x)
     if (is.character(out$event_id)) out$event_id <- as.numeric(out$event_id)
@@ -253,6 +259,11 @@ load_sql_data <- function() {
     out
   })
   catch <- map_dfr(f_catch, function(x) {
+    # error handling if file doesn't exist -- largely for CI on Github
+    this_file <- file.path(get_cache_folder(), x)
+    if (!file.exists(this_file)) {
+      cli_abort(paste("File does not exist: ", this_file))
+    }
     out <- readRDS(file.path(get_cache_folder(), x))
     out$region <- gsub("([a-z]+)-[a-z]+.rds", "\\1", x)
     out
