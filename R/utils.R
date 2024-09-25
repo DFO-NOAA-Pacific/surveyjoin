@@ -84,6 +84,9 @@ cache_files <- function() {
   files <- files_to_cache()
   metadata <- load_metadata()
   cache_folder <- get_cache_folder()
+  if (!dir.exists(cache_folder)) { # Make sure cache folder exists
+    dir.create(cache_folder, recursive = TRUE, showWarnings = FALSE)
+  }
 
   # Check each file to see if it needs to be downloaded
   cache_success <- TRUE
@@ -95,7 +98,7 @@ cache_files <- function() {
     skip <- FALSE
     if (is.null(last_modified)) {
       if (!file.exists(local_file)) {
-        cli_inform(paste("Rate limit exceeded and no local data available for:", file))
+        cli_alert_warning(paste("Rate limit exceeded and no local data available for:", file))
         skip <- TRUE
         cache_success <- FALSE
       } else {
@@ -104,25 +107,32 @@ cache_files <- function() {
       }
     }
 
-    if(!skip) {
-      # if local file doesn't exist or has a different modified date, download it
-      cached_version <- metadata$files[[file]]$last_modified
-      if (is.null(cached_version) || cached_version != last_modified) {
-        f <- "https://github.com/DFO-NOAA-Pacific/surveyjoin-data/raw/main/"
-        download.file(paste0(f, file), destfile = local_file)
-        # append version info to attributes of object in file
+    if (!skip) {
+      # double check dir exists
+      if (!dir.exists(dirname(local_file))) {
+        dir.create(dirname(local_file), recursive = TRUE, showWarnings = FALSE)
+      }
+      # try to download
+      f <- "https://github.com/DFO-NOAA-Pacific/surveyjoin-data/raw/main/"
+      try({
+        download.file(paste0(f, file), destfile = local_file, mode = "wb")
+
+        # add version info to attributes of the object, re-save
         temp <- readRDS(local_file)
         attr(temp, "version") <- last_modified
         saveRDS(temp, local_file)
-        # update metadata for the downloaded file
+
+        # update metadata
         file_info <- file.info(local_file)
         metadata$files[[file]] <- list(
           version = last_modified,
           size = file_info$size,
           last_modified = last_modified
         )
-      } else {
-        cli_inform(paste("Using cached version of", file))
+      }, silent = TRUE)
+
+      if (!file.exists(local_file)) {
+        cache_success <- FALSE
       }
     }
   }
