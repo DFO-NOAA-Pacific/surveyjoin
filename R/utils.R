@@ -240,49 +240,56 @@ load_sql_data <- function() {
     # error handling if file doesn't exist -- largely for CI on Github
     this_file <- file.path(get_cache_folder(), x)
     if (!file.exists(this_file)) {
-      cli_abort(paste("File does not exist: ", this_file))
+      cli_inform(paste("File does not exist: ", this_file))
+      out <- NULL
+    } else {
+      out <- readRDS(file.path(get_cache_folder(), x))
+      out$region <- gsub("([a-z]+)-[a-z]+.rds", "\\1", x)
+      if (is.character(out$event_id)) out$event_id <- as.numeric(out$event_id)
+      # out$event_id <- as.character(out$event_id)
+      out$performance <- as.character(out$performance)
+      out$year <- as.integer(lubridate::year(out$date))
+      out$date <- as.character(lubridate::as_date(out$date))
+      # FIXME: do this long before! Alaska
+      out$lon_start <- ifelse(out$lon_start > 0, out$lon_start * -1, out$lon_start)
+      out$lon_end <- ifelse(out$lon_end > 0, out$lon_end * -1, out$lon_end)
+      if (out$region[1] == "pbs") {
+        # Fix me earlier!
+        out <- dplyr::rename(out, bottom_temp_c = .data$temperature_C) %>%
+          dplyr::select(-.data$do_mlpL, -.data$salinity_PSU)
+      }
+      out
     }
-
-    out <- readRDS(file.path(get_cache_folder(), x))
-    out$region <- gsub("([a-z]+)-[a-z]+.rds", "\\1", x)
-    if (is.character(out$event_id)) out$event_id <- as.numeric(out$event_id)
-    # out$event_id <- as.character(out$event_id)
-    out$performance <- as.character(out$performance)
-    out$year <- as.integer(lubridate::year(out$date))
-    out$date <- as.character(lubridate::as_date(out$date))
-    # FIXME: do this long before! Alaska
-    out$lon_start <- ifelse(out$lon_start > 0, out$lon_start * -1, out$lon_start)
-    out$lon_end <- ifelse(out$lon_end > 0, out$lon_end * -1, out$lon_end)
-    if (out$region[1] == "pbs") {
-      # Fix me earlier!
-      out <- dplyr::rename(out, bottom_temp_c = .data$temperature_C) %>%
-        dplyr::select(-.data$do_mlpL, -.data$salinity_PSU)
-    }
-    out
   })
   catch <- map_dfr(f_catch, function(x) {
     # error handling if file doesn't exist -- largely for CI on Github
     this_file <- file.path(get_cache_folder(), x)
     if (!file.exists(this_file)) {
-      cli_abort(paste("File does not exist: ", this_file))
+      cli_inform(paste("File does not exist: ", this_file))
+      out <- NULL
+    } else {
+      out <- readRDS(file.path(get_cache_folder(), x))
+      out$region <- gsub("([a-z]+)-[a-z]+.rds", "\\1", x)
+      out
     }
-    out <- readRDS(file.path(get_cache_folder(), x))
-    out$region <- gsub("([a-z]+)-[a-z]+.rds", "\\1", x)
-    out
   })
-  cli::cli_alert_success("Raw data read into memory")
 
-  catch$scientific_name <- NULL
-  catch <- dplyr::left_join(catch, surveyjoin::spp_dictionary, by = dplyr::join_by("itis"))
-  # stopifnot(sum(is.na(catch$scientific_name)) == 0L)
-  cli::cli_alert_success("Taxonomic data joined to catch data")
+  if(!is.null(nrow(catch))) {
+    cli::cli_alert_success("Raw data read into memory")
+    catch$scientific_name <- NULL
+    catch <- dplyr::left_join(catch, surveyjoin::spp_dictionary, by = dplyr::join_by("itis"))
+    # stopifnot(sum(is.na(catch$scientific_name)) == 0L)
+    cli::cli_alert_success("Taxonomic data joined to catch data")
 
-  db <- dbConnect(RSQLite::SQLite(), dbname = sql_folder())
-  on.exit(suppressWarnings(suppressMessages(DBI::dbDisconnect(db))))
-  dbWriteTable(db, "haul", haul, overwrite = TRUE, append = FALSE)
-  dbWriteTable(db, "catch", catch, overwrite = TRUE, append = FALSE)
+    db <- dbConnect(RSQLite::SQLite(), dbname = sql_folder())
+    on.exit(suppressWarnings(suppressMessages(DBI::dbDisconnect(db))))
+    dbWriteTable(db, "haul", haul, overwrite = TRUE, append = FALSE)
+    dbWriteTable(db, "catch", catch, overwrite = TRUE, append = FALSE)
 
-  cli::cli_alert_success("SQLite database created")
+    cli::cli_alert_success("SQLite database created")
+  } else {
+    cli::cli_inform("There was a problem with loading cached files, SQLite database not created")
+  }
 }
 
 
