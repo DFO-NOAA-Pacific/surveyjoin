@@ -95,8 +95,15 @@ data_version <- function() {
 #' @return NULL
 save_metadata <- function(metadata) {
   metadata_file <- get_metadata_file()
+  # make sure directory exists before writing the file
+  cache_dir <- dirname(metadata_file)
+  if (!dir.exists(cache_dir)) {
+    dir.create(cache_dir, recursive = TRUE, showWarnings = FALSE)
+  }
   write_json(metadata, metadata_file, pretty = TRUE, auto_unbox = TRUE)
 }
+
+
 
 #' Wrapper function to cache files
 #' @return NULL
