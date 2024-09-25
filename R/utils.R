@@ -111,21 +111,22 @@ save_metadata <- function(metadata) {
 #' @importFrom utils download.file
 cache_files <- function() {
   files <- files_to_cache()
-
   metadata <- load_metadata()
   cache_folder <- get_cache_folder()
 
   # Check each file to see if it needs to be downloaded
+  cache_success <- TRUE
   for (file in files) {
     last_modified <- file_last_modified(file)
-
     local_file <- file.path(cache_folder, file)
 
     # If GitHub rate limit is exceeded or API fails, use local cached data if available
     skip <- FALSE
     if (is.null(last_modified)) {
       if (!file.exists(local_file)) {
-        cli_abort(paste("Rate limit exceeded and no local data available for:", file))
+        cli_inform(paste("Rate limit exceeded and no local data available for:", file))
+        skip <- TRUE
+        cache_success <- FALSE
       } else {
         cli_inform(paste("Using locally cached version of", file))
         skip <- TRUE
@@ -153,9 +154,10 @@ cache_files <- function() {
   }
 
   # update metadata with the latest download date
-  metadata$last_download <- Sys.time()
-
-  save_metadata(metadata)
+  if(cache_success) {
+    metadata$last_download <- Sys.time()
+    save_metadata(metadata)
+  }
 }
 
 #' Function to get the last modified date of a file from GitHub
