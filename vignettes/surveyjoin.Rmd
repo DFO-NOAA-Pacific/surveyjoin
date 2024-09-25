@@ -22,11 +22,17 @@ library(dplyr)
 library(ggplot2)
 ```
 
-The `surveyjoin` package contains several processing functions that will download the survey data files locally, and create a connection to the SQLite database. The `cache_data()` function takes 5-10 minutes to run, and needs to be only run every time the raw data is refreshed (a new year of survey data becomes available).
+The `surveyjoin` package contains several processing functions that will download the survey data files locally, and create a connection to the SQLite database. The `cache_data()` function pulls data from a public Github repository, and needs to be only run every time the raw data is refreshed (a new year of survey data becomes available).
 
 ```{r get-data, eval=FALSE}
 cache_data()
 load_sql_data()
+```
+
+If you try to run these functions too many times in an hour, the Github API will timeout, and the `load_sql_data()` function will work with the files that are already locally cached. You can check the versions (dates) on individual files with 
+
+```{r data-version, eval=FALSE}
+data_version()
 ```
 
 Several helper functions have been included to provide more information on the metadata, survey shapefiles, and links to the original data. Each of these returns a dataframe with a URL for each of our three regions ("afsc", "pbs", "nwfsc").

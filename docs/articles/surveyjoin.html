@@ -89,23 +89,29 @@ plotting.</p>
 <p>The <code>surveyjoin</code> package contains several processing
 functions that will download the survey data files locally, and create a
 connection to the SQLite database. The <code><a href="../reference/cache_data.html">cache_data()</a></code>
-function takes 5-10 minutes to run, and needs to be only run every time
-the raw data is refreshed (a new year of survey data becomes
-available).</p>
+function pulls data from a public Github repository, and needs to be
+only run every time the raw data is refreshed (a new year of survey data
+becomes available).</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cache_data.html">cache_data</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/load_sql_data.html">load_sql_data</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p>If you try to run these functions too many times in an hour, the
+Github API will timeout, and the <code><a href="../reference/load_sql_data.html">load_sql_data()</a></code> function
+will work with the files that are already locally cached. You can check
+the versions (dates) on individual files with</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/data_version.html">data_version</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>Several helper functions have been included to provide more
 information on the metadata, survey shapefiles, and links to the
 original data. Each of these returns a dataframe with a URL for each of
 our three regions (“afsc”, “pbs”, “nwfsc”).</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_metadata.html">get_metadata</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/get_shapefiles.html">get_shapefiles</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/get_rawdata.html">get_rawdata</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>Additionally, we can look at the table of species names (common,
 scientific, itis) that are included.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_species.html">get_species</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>The core function of the package is <code>get_data</code>. This
 allows for querying by species (using common names - “common”,
@@ -113,13 +119,13 @@ scientific names - “scientific”, or ITIS identifiers - “itis_id”),
 regions, surveys, or years – each of these may be a single value or
 vector of values. We could get data for sablefish from all Alaska
 surveys in the the last decade with</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_data.html">get_data</a></span><span class="op">(</span>common <span class="op">=</span> <span class="st">"sablefish"</span>, years <span class="op">=</span> <span class="fl">2013</span><span class="op">:</span><span class="fl">2023</span>, regions <span class="op">=</span> <span class="st">"afsc"</span><span class="op">)</span></span></code></pre></div>
 <p>As a second example, we could get data coastwide for Arrowtooth
 flounder and plot it with the following code. We’ll constrain it to
 years 2003-2018 for plotting purposes (though the earliest year of data
 is 1980).</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_data.html">get_data</a></span><span class="op">(</span>common <span class="op">=</span> <span class="st">"arrowtooth flounder"</span>, years <span class="op">=</span> <span class="fl">2003</span><span class="op">:</span><span class="fl">2018</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">g</span> <span class="op">&lt;-</span> <span class="va">d</span> <span class="op">|&gt;</span></span>
@@ -144,10 +150,10 @@ is 1980).</p>
 <p><img src="../reference/figures/map-example.png"></p>
 <p>Additional information on specific species can be found in our
 species dictionary</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"spp_dictionary"</span><span class="op">)</span></span></code></pre></div>
 <p>And the full list of survey names can be found with</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_survey_names.html">get_survey_names</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                 survey region</span></span>
 <span><span class="co">#&gt; 1     Aleutian Islands   afsc</span></span>

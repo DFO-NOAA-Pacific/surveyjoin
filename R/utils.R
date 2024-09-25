@@ -68,7 +68,6 @@ get_metadata_file <- function() {
 #' Function to load metadata
 #' @importFrom jsonlite fromJSON
 #' @return NULL
-#' @export
 load_metadata <- function() {
   metadata_file <- get_metadata_file()
 
@@ -78,6 +77,15 @@ load_metadata <- function() {
   } else {
     list(files = list(), version = "0.1", last_download = NULL)
   }
+}
+
+#' Public facing function to create table of metadata
+#' @return dataframe containing file names and dates of last update
+#' @export
+data_version <- function() {
+  df <- data.frame(file = files_to_cache(),
+                   last_updated = as.character(unlist(lapply(m[[2]], getElement, 3))))
+  return(df)
 }
 
 #' Function to save metadata
