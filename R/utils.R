@@ -83,8 +83,9 @@ load_metadata <- function() {
 #' @return dataframe containing file names and dates of last update
 #' @export
 data_version <- function() {
+  meta <- load_metadata()
   df <- data.frame(file = files_to_cache(),
-                   last_updated = as.character(unlist(lapply(m[[2]], getElement, 3))))
+                   last_updated = as.character(unlist(lapply(meta[[2]], getElement, 3))))
   return(df)
 }
 
@@ -99,6 +100,8 @@ save_metadata <- function(metadata) {
 
 #' Wrapper function to cache files
 #' @return NULL
+#' @importFrom cli cli_abort cli_inform
+#' @importFrom utils download.file
 cache_files <- function() {
   files <- files_to_cache()
 
@@ -115,9 +118,9 @@ cache_files <- function() {
     skip <- FALSE
     if (is.null(last_modified)) {
       if (!file.exists(local_file)) {
-        stop("Rate limit exceeded and no local data available for: ", file)
+        cli_abort(paste("Rate limit exceeded and no local data available for:", file))
       } else {
-        message(paste("Using locally cached version of", file))
+        cli_inform(paste("Using locally cached version of", file))
         skip <- TRUE
       }
     }
@@ -127,7 +130,7 @@ cache_files <- function() {
       cached_version <- metadata$files[[file]]$last_modified
       if (is.null(cached_version) || cached_version != last_modified) {
         f <- "https://github.com/DFO-NOAA-Pacific/surveyjoin-data/raw/main/"
-        utils::download.file(paste0(f, file), destfile = local_file)
+        download.file(paste0(f, file), destfile = local_file)
 
         # update metadata for the downloaded file
         file_info <- file.info(local_file)
@@ -137,7 +140,7 @@ cache_files <- function() {
           last_modified = last_modified
         )
       } else {
-        message(paste("Using cached version of", file))
+        cli_inform(paste("Using cached version of", file))
       }
     }
   }
@@ -152,6 +155,7 @@ cache_files <- function() {
 #' @param file_name the file name, e.g. "nwfsc-catch.rds"
 #' @return The time stamp file was last changed
 #' @importFrom httr GET content user_agent status_code
+#' @importFrom cli cli_abort cli_inform
 #' @export
 file_last_modified <- function(file_name) {
   # Specify the repo and file path
@@ -170,13 +174,13 @@ file_last_modified <- function(file_name) {
       last_modified <- commit_data[[1]]$commit$committer$date
       return(last_modified)
     } else {
-      stop("No commits found for file: ", file_name)
+      cli_abort(paste("No commits found for file:", file_name))
     }
   } else if (status_code(response) == 403) {  # Rate limit exceeded
-    message("GitHub API rate limit exceeded. Using local data if available.")
+    cli_inform("GitHub API rate limit exceeded. Using local data if available.")
     return(NULL)
   } else {
-    stop("Failed to get GitHub file info for: ", file_name)
+    cli_abort(paste("Failed to get GitHub file info for: ", file_name))
   }
 }
 
@@ -375,7 +379,7 @@ get_rawdata <- function() {
 #' @export
 #' @examples
 #' \dontrun{
-#' get_species()
+#' m <- get_species()
 #' }
 get_species <- function() {
   db <- surv_db()

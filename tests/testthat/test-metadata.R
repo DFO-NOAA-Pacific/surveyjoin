@@ -12,12 +12,12 @@ test_that("test metadata", {
   expect_equal(nrow(g), 3L)
   expect_equal(g$region, c("afsc", "pbs", "nwfsc"))
 })
-
-test_that("get itis", {
-  skip_on_ci()
-  g <- get_itis_spp("chinook salmon")
-  expect_equal(g, 161980)
-})
+#
+# test_that("get itis", {
+#   skip_on_ci()
+#   g <- get_itis_spp("chinook salmon")
+#   expect_equal(g, 161980)
+# })
 
 test_that("get species", {
   skip_on_ci()

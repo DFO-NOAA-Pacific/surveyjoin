@@ -14,6 +14,6 @@ Get the table of common and scientific names in the joined dataset
 }
 \examples{
 \dontrun{
-get_species()
+m <- get_species()
 }
 }
