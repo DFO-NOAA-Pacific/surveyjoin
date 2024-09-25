@@ -2,17 +2,26 @@
 % Please edit documentation in R/utils.R
 \name{get_metadata}
 \alias{get_metadata}
-\title{Get the metadata URLs for each dataset}
+\title{Get the ITIS identifier of a species}
 \usage{
 get_metadata()
 }
+\arguments{
+\item{spp}{(character) Taxonomic name to query}
+}
 \value{
+an integer representing the ITIS identifier
+
 a dataframe with the metadata URL for each region
 }
 \description{
-Get the metadata URLs for each dataset
+Get the ITIS identifier of a species
 }
 \examples{
+\dontrun{
+id <- get_itis_spp("darkblotched rockfish")
+}
+Get the metadata URLs for each dataset
 \dontrun{
 m <- get_metadata()
 }

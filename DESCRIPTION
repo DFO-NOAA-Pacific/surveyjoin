@@ -36,8 +36,7 @@ Imports:
     purrr,
     rappdirs,
     rlang (>= 0.4.1),
-    RSQLite,
-    taxize
+    RSQLite
 Suggests:
     testthat (>= 3.0.0),
     parallel,

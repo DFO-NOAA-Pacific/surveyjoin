@@ -320,10 +320,10 @@ surv_db <- function() {
 #' \dontrun{
 #' id <- get_itis_spp("darkblotched rockfish")
 #' }
-get_itis_spp <- function(spp) {
-  out <- get_ids(spp, db = "itis", verbose = FALSE)
-  as.integer(unlist(out))
-}
+# get_itis_spp <- function(spp) {
+#   out <- get_ids(spp, db = "itis", verbose = FALSE)
+#   as.integer(unlist(out))
+# }
 
 #' Get the metadata URLs for each dataset
 #' @return a dataframe with the metadata URL for each region
