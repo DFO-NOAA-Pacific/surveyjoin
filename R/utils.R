@@ -25,7 +25,10 @@ files_to_cache <- function() {
 #' @importFrom rlang .data
 #' @export
 get_cache_folder <- function(name = "surveyjoin") {
-  user_cache_dir(name)
+  f <- user_cache_dir(name)
+  # see if this fixes Windows issue
+  f <- gsub("(surveyjoin[/\\\\]){2,}", "surveyjoin/", f)
+  return(f)
 }
 
 #' Perform downloading
