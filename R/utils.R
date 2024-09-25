@@ -273,7 +273,7 @@ load_sql_data <- function() {
       out
     }
   })
-
+  print(class(catch))
   if(!is.null(nrow(catch))) {
     cli::cli_alert_success("Raw data read into memory")
     catch$scientific_name <- NULL
