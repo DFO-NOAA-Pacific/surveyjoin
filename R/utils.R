@@ -56,7 +56,7 @@ load_metadata <- function() {
 data_version <- function() {
   meta <- load_metadata()
   df <- data.frame(file = files_to_cache(),
-                   last_updated = as.character(unlist(lapply(meta[[2]], getElement, 3))))
+                   last_updated = as.character(unlist(lapply(meta[[1]], getElement, 3))))
   return(df)
 }
 

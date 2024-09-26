@@ -32,3 +32,10 @@ test_that("get surveys", {
   expect_equal(nrow(g), 14L)
   expect_equal(names(g), c("survey", "region"))
 })
+
+test_that("data versioning", {
+  skip_on_ci()
+  g <- data_version()
+  expect_equal(nrow(g), 6L)
+  expect_equal(names(g), c("file", "last_updated"))
+})
