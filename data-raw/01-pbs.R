@@ -57,11 +57,16 @@ haul$area_swept <- haul$area_swept * 0.0001 # from m^2 to ha
 haul$pass <- NA_integer_
 haul$vessel <- NA_character_
 
+haul |> filter(is.na(time_deployed))
+haul$date <- dplyr::if_else(is.na(haul$time_deployed), lubridate::ymd(paste(haul$year, haul$month, haul$day)), haul$time_deployed)
+class(haul$date)
+head(haul$date)
+
 pbs_haul <- dplyr::select(
   haul,
   survey_name = survey_abbrev,
   event_id = fishing_event_id,
-  date = time_deployed,
+  date = date,
   pass,
   vessel,
   lat_start = latitude,
