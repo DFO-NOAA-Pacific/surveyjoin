@@ -17,10 +17,18 @@ This data includes surveys conducted by the Northwest Fisheries Science
 Center (NWFSC) off the west coast of the United States, surveys
 collected by Fisheries and Oceans Canada (DFO) in the waters of British
 Columbia, and surveys conducted by the Alaska Fisheries Science Center
-(AFSC) in Alaska.
+(AFSC) in Alaska. 
 
 There are 55 species included in the initial version of the package,
 focusing on species that are occurring in multiple regions.
+
+When interpreting the data, be aware that--while 
+generally the gears and sampling protocols are similar among surveys--
+there are invariably differences in the gear and/or how it is fished, 
+which can influence catchability and selectivity. For example, 
+the eastern and northern Bering Sea surveys employ a much smaller 
+footrope and different net than the other Alaskan surveys. See the links 
+below for details on each survey's methods.
 
 ### Installing
 
