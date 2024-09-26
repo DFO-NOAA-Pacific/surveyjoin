@@ -184,3 +184,8 @@ dat_samp <- select(dat_samp, -sex, -maturity_convention_code, -usability_code, -
 dat_samp$length_type <- tolower(dat_samp$length_type)
 
 saveRDS(dat_samp, "data-raw/data/pbs-bio-samples.rds")
+
+if (FALSE) {
+  system("cp data-raw/data/pbs-catch.rds ~/src/surveyjoin-data/pbs-catch.rds")
+  system("cp data-raw/data/pbs-haul.rds ~/src/surveyjoin-data/pbs-haul.rds")
+}
