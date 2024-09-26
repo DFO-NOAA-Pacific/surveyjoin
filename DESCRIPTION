@@ -1,7 +1,7 @@
 Package: surveyjoin
 Type: Package
 Title: Combine Data from Northeast Pacific Ocean Fish Surveys
-Version: 0.0.3
+Version: 0.0.4
 Authors@R: c(
     person(c("Eric", "J."), "Ward", email = "eric.ward@noaa.gov",
       role = c("aut", "cre")),
@@ -38,6 +38,7 @@ Imports:
     rlang (>= 0.4.1),
     RSQLite
 Suggests:
+    dbplyr,
     testthat (>= 3.0.0),
     parallel,
     knitr,
