@@ -1,15 +1,112 @@
 #---- Via Oracle internal server (requires credentials)
+
 library(dplyr)
-library(RODBC)
-library(getPass)
-library(gapindex)
 
-channel <- gapindex::get_connected()
+if (TRUE) { # Load data from oracle via internal connection
+  library(RODBC)
+  library(getPass)
+  library(gapindex)
+  
+  channel <- gapindex::get_connected()
+  
+  haul <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.FOSS_HAUL")
+  names(haul) <- tolower(names(haul))
+  
+  # get catch data for fishes only, then filter to combined species list
+  catch <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.FOSS_CATCH
+                         WHERE SPECIES_CODE < 32000")
+  names(catch) <- tolower(names(catch))
+  
+  catch_spp <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.FOSS_SPECIES
+                         WHERE SPECIES_CODE < 32000")
+  names(catch_spp) <- tolower(names(catch_spp))
+  
+} else { # Load data from FOSS public data share 
+  # adatapted from https://afsc-gap-products.github.io/gap_products/content/foss-api-r.html#haul-data 
+  # September 26, 2024 by Emily Markowitz
+  
+  library(httr)
+  library(jsonlite)
+  options(scipen = 999)
+  
+  # Load Haul Data -------------------------------------------------------------
+  
+  dat <- data.frame()
+  for (i in seq(0, 500000, 10000)){
+    # print(i)
+    ## query the API link
+    res <- httr::GET(url = paste0('https://apps-st.fisheries.noaa.gov/ods/foss/afsc_groundfish_survey_haul/', 
+                                  "?offset=",i,"&limit=10000"))
+    ## convert from JSON format
+    data <- jsonlite::fromJSON(base::rawToChar(res$content)) 
+    
+    ## if there are no data, stop the loop
+    if (is.null(nrow(data$items))) {
+      break
+    }
+    
+    ## bind sub-pull to dat data.frame
+    dat <- dplyr::bind_rows(dat, 
+                            data$items %>%
+                              dplyr::select(-links)) # necessary for API accounting, but not part of the dataset)
+  }
+  haul <- dat
+  
+  # Load Species Data ------------------------------------------------------------
+  
+  res <- httr::GET(url = paste0('https://apps-st.fisheries.noaa.gov/ods/foss/afsc_groundfish_survey_species/', 
+                                "?offset=0&limit=10000", '&q={"species_code":{"$lt":32000}}'))
+  
+  ## convert from JSON format
+  data <- jsonlite::fromJSON(base::rawToChar(res$content))
+  catch_spp <- data$items  %>%
+    dplyr::select(-links) # necessary for API accounting, but not part of the dataset
+  
+  # Load Catch Data ------------------------------------------------------------
+  
+  dat <- data.frame()
+  for (i in seq(0, 1000000, 10000)){
+    # for (i in seq(0, 1000000, 10000)){
+    # for (i in seq(0, 1000000, 10000)){
+    ## find how many iterations it takes to cycle through the data
+    print(i)
+    ## query the API link
+    res <- httr::GET(url = paste0("https://apps-st.fisheries.noaa.gov/ods/foss/afsc_groundfish_survey_catch/", 
+                                  "?offset=",i,"&limit=10000", '&q={"species_code":{"$lt":32000}}'))
+    ## convert from JSON format
+    data <- jsonlite::fromJSON(base::rawToChar(res$content)) 
+    
+    ## if there are no data, stop the loop
+    if (is.null(nrow(data$items))) {
+      break
+    }
+    
+    ## bind sub-pull to dat data.frame
+    dat <- dplyr::bind_rows(dat, 
+                            data$items %>%
+                              dplyr::select(-links)) # necessary for API accounting, but not part of the dataset)
+  }
+  
+  catch <- dat
+  
+  # # Zero-Filled Data -----------------------------------------------------------
+  # 
+  # dat <- dplyr::full_join(
+  #   afsc_haul,
+  #   afsc_catch) %>% 
+  #   dplyr::full_join(
+  #     afsc_species)  %>% 
+  #   # modify zero-filled rows
+  #   dplyr::mutate(
+  #     cpue_kgkm2 = ifelse(is.na(cpue_kgkm2), 0, cpue_kgkm2),
+  #     cpue_nokm2 = ifelse(is.na(cpue_nokm2), 0, cpue_nokm2),
+  #     count = ifelse(is.na(count), 0, count),
+  #     weight_kg = ifelse(is.na(weight_kg), 0, weight_kg))
+  
+}
 
-haul <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.FOSS_HAUL")
-names(haul) <- tolower(names(haul))
 afsc_haul <- haul %>%
-  select(
+  dplyr::select(
     survey_name = survey, # or = survey_name for full description if beyond trawl
     event_id = hauljoin,
     date = date_time,
@@ -23,7 +120,7 @@ afsc_haul <- haul %>%
     area_swept_km2,
     bottom_temp_c = bottom_temperature_c
   ) %>%
-  mutate(
+  dplyr::mutate(
     event_id = as.numeric(event_id),
     date = as.POSIXct(date, format = "%m/%d/%Y %H:%M:%S", tz = Sys.timezone()),
     pass = NA_integer_,
@@ -37,7 +134,7 @@ afsc_haul <- haul %>%
     performance = as.integer(performance),
     bottom_temp_c = as.numeric(bottom_temp_c)
   ) %>%
-  select(
+  dplyr::select(
     survey_name,
     event_id,
     date,
@@ -54,29 +151,24 @@ afsc_haul <- haul %>%
     bottom_temp_c
   ) %>%
   tidyr::drop_na(lat_end, lon_end)
+
 surveyjoin:::save_raw_data(afsc_haul, "afsc-haul")
 
-# get catch data for fishes only, then filter to combined species list
-catch <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.FOSS_CATCH
-                         WHERE SPECIES_CODE < 32000")
-catch_spp <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.FOSS_SPECIES
-                         WHERE SPECIES_CODE < 32000")
 catchjoin <- left_join(catch, catch_spp)
-names(catchjoin) <- tolower(names(catchjoin))
 catchjoin$scientific_name <- tolower(catchjoin$scientific_name)
 
 spp <- readRDS("data-raw/joined_list.rds")
 
 afsc_catch <- catchjoin %>%
-  filter(scientific_name %in% spp$scientific_name) %>%
-  select(
+  dplyr::filter(scientific_name %in% spp$scientific_name) %>%
+  dplyr::select(
     event_id = hauljoin,
     itis,
     scientific_name,
     catch_numbers = count,
     catch_weight = weight_kg
   ) %>%
-  mutate(
+  dplyr::mutate(
     event_id = as.numeric(event_id),
     catch_numbers = as.numeric(catch_numbers),
     catch_weight = as.numeric(catch_weight)
