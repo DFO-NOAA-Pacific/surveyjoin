@@ -2,108 +2,117 @@
 
 library(dplyr)
 
-if (TRUE) { # Load data from oracle via internal connection
+data_source <- "foss" # foss
+
+if (data_source == "oracle") { # Load data from oracle via internal NOAA-NMFS-AFSC connection
   library(RODBC)
   library(getPass)
   library(gapindex)
-  
+
   channel <- gapindex::get_connected()
-  
+
   haul <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.FOSS_HAUL")
   names(haul) <- tolower(names(haul))
-  
+
   # get catch data for fishes only, then filter to combined species list
   catch <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.FOSS_CATCH
                          WHERE SPECIES_CODE < 32000")
   names(catch) <- tolower(names(catch))
-  
+
   catch_spp <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.FOSS_SPECIES
                          WHERE SPECIES_CODE < 32000")
   names(catch_spp) <- tolower(names(catch_spp))
-  
-} else { # Load data from FOSS public data share 
-  # adatapted from https://afsc-gap-products.github.io/gap_products/content/foss-api-r.html#haul-data 
+
+} else if (data_source == "foss") { # Load data from FOSS public data API
+  # adatapted from https://afsc-gap-products.github.io/gap_products/content/foss-api-r.html#haul-data
   # September 26, 2024 by Emily Markowitz
-  
+
   library(httr)
   library(jsonlite)
   options(scipen = 999)
-  
+
   # Load Haul Data -------------------------------------------------------------
-  
+
   dat <- data.frame()
   for (i in seq(0, 500000, 10000)){
     # print(i)
     ## query the API link
-    res <- httr::GET(url = paste0('https://apps-st.fisheries.noaa.gov/ods/foss/afsc_groundfish_survey_haul/', 
+    res <- httr::GET(url = paste0('https://apps-st.fisheries.noaa.gov/ods/foss/afsc_groundfish_survey_haul/',
                                   "?offset=",i,"&limit=10000"))
     ## convert from JSON format
-    data <- jsonlite::fromJSON(base::rawToChar(res$content)) 
-    
+    data <- jsonlite::fromJSON(base::rawToChar(res$content))
+
     ## if there are no data, stop the loop
     if (is.null(nrow(data$items))) {
       break
     }
-    
+
     ## bind sub-pull to dat data.frame
-    dat <- dplyr::bind_rows(dat, 
+    dat <- dplyr::bind_rows(dat,
                             data$items %>%
                               dplyr::select(-links)) # necessary for API accounting, but not part of the dataset)
   }
-  haul <- dat
-  
+  haul <- dat %>%
+    dplyr::mutate(date_time = as.POSIXct(date_time,
+                                        format = "%Y-%m-%dT%H:%M:%S",
+                                        tz = Sys.timezone()))
+
   # Load Species Data ------------------------------------------------------------
-  
-  res <- httr::GET(url = paste0('https://apps-st.fisheries.noaa.gov/ods/foss/afsc_groundfish_survey_species/', 
+
+  res <- httr::GET(url = paste0('https://apps-st.fisheries.noaa.gov/ods/foss/afsc_groundfish_survey_species/',
                                 "?offset=0&limit=10000", '&q={"species_code":{"$lt":32000}}'))
-  
+
   ## convert from JSON format
   data <- jsonlite::fromJSON(base::rawToChar(res$content))
   catch_spp <- data$items  %>%
     dplyr::select(-links) # necessary for API accounting, but not part of the dataset
-  
+
   # Load Catch Data ------------------------------------------------------------
-  
+
   dat <- data.frame()
   for (i in seq(0, 1000000, 10000)){
-    # for (i in seq(0, 1000000, 10000)){
-    # for (i in seq(0, 1000000, 10000)){
     ## find how many iterations it takes to cycle through the data
     print(i)
     ## query the API link
-    res <- httr::GET(url = paste0("https://apps-st.fisheries.noaa.gov/ods/foss/afsc_groundfish_survey_catch/", 
+    res <- httr::GET(url = paste0("https://apps-st.fisheries.noaa.gov/ods/foss/afsc_groundfish_survey_catch/",
                                   "?offset=",i,"&limit=10000", '&q={"species_code":{"$lt":32000}}'))
     ## convert from JSON format
-    data <- jsonlite::fromJSON(base::rawToChar(res$content)) 
-    
+    data <- jsonlite::fromJSON(base::rawToChar(res$content))
+
     ## if there are no data, stop the loop
     if (is.null(nrow(data$items))) {
       break
     }
-    
+
     ## bind sub-pull to dat data.frame
-    dat <- dplyr::bind_rows(dat, 
+    dat <- dplyr::bind_rows(dat,
                             data$items %>%
                               dplyr::select(-links)) # necessary for API accounting, but not part of the dataset)
   }
-  
+
   catch <- dat
-  
+
   # # Zero-Filled Data -----------------------------------------------------------
-  # 
+  #
   # dat <- dplyr::full_join(
   #   afsc_haul,
-  #   afsc_catch) %>% 
+  #   afsc_catch) %>%
   #   dplyr::full_join(
-  #     afsc_species)  %>% 
+  #     afsc_species)  %>%
   #   # modify zero-filled rows
   #   dplyr::mutate(
   #     cpue_kgkm2 = ifelse(is.na(cpue_kgkm2), 0, cpue_kgkm2),
   #     cpue_nokm2 = ifelse(is.na(cpue_nokm2), 0, cpue_nokm2),
   #     count = ifelse(is.na(count), 0, count),
   #     weight_kg = ifelse(is.na(weight_kg), 0, weight_kg))
-  
+
 }
+
+
+# mostly for testing, but also nice to have it organized
+catch <- catch[order(catch$species_code), ]
+catch <- catch[order(catch$hauljoin), ]
+haul <- haul[order(haul$hauljoin), ]
 
 afsc_haul <- haul %>%
   dplyr::select(
@@ -122,7 +131,15 @@ afsc_haul <- haul %>%
   ) %>%
   dplyr::mutate(
     event_id = as.numeric(event_id),
-    date = as.POSIXct(date, format = "%m/%d/%Y %H:%M:%S", tz = Sys.timezone()),
+    date = as.POSIXct(date,
+                      format = "%m/%d/%Y %H:%M:%S",
+                      tz = Sys.timezone()),
+    # date = as.POSIXct(date,
+    #                   format = ifelse(data_source == "oracle",
+    #                                   "%m/%d/%Y %H:%M:%S", # oracle
+    #                                   "%Y-%m-%dT%H:%M:%S"), # foss
+    #                   tz = Sys.timezone()),
+    # date = as.POSIXct(date, format = "%m/%d/%Y %H:%M:%S", tz = Sys.timezone()),
     pass = NA_integer_,
     lat_start = as.numeric(lat_start),
     lon_start = as.numeric(lon_start),
@@ -259,3 +276,60 @@ surveyjoin:::save_raw_data(afsc_catch, "afsc-catch")
 # save_raw_data(afsc_catch_sfi_l, "afsc-catch-sfi-l")
 # save_raw_data(afsc_catch_inv_h, "afsc-catch-inv-h")
 # save_raw_data(afsc_catch_inv_l, "afsc-catch-inv-l")
+
+
+# TEST similarities between foss and oracle tables -----------------------------
+if (FALSE) {
+  # catch_foss <- catch; haul_foss <- haul; afsc_catch_foss<-afsc_catch; afsc_haul_foss <- afsc_haul
+  # catch_oracle <- catch; haul_oracle <- haul; afsc_catch_oracle<-afsc_catch; afsc_haul_oracle <- afsc_haul
+
+  # Input catch and haul tables ------------------------------------------------
+
+  check_diff <- function(bb, bbb){
+    whoisaproblem <- c()
+    for (i in names(bb)) {
+      aa <- bb[,i]
+      aa[is.na(aa)] <- 0
+      aaa <- bbb[,i]
+      aaa[is.na(aaa)] <- 0
+      a <- (aa != aaa)
+      whoisaproblem <- dplyr::bind_rows(
+        whoisaproblem,
+        data.frame(column = i,
+                   issues = sum(a)) )
+      if (sum(a)>0) {
+        print(data.frame("col" = i, "foss" = aa[which(a)], "oracle" = aaa[which(a)], "diff" = aa[which(a)]-aaa[which(a)]))
+      }
+    }
+    print(whoisaproblem)
+  }
+
+  dim(catch_oracle)
+  dim(catch_foss)
+  dim(haul_oracle)
+  dim(haul_foss)
+
+  str(catch_oracle)
+  str(catch_foss)
+  str(haul_oracle)
+  str(haul_foss)
+
+  check_diff(bb = haul_foss, bbb = haul_oracle)
+  check_diff(bb = catch_foss, bbb = catch_oracle)
+
+  # Final catch and haul tables ------------------------------------------------
+
+  dim(afsc_catch_oracle)
+  dim(afsc_catch_foss)
+  dim(afsc_haul_oracle)
+  dim(afsc_haul_foss)
+
+  str(afsc_catch_oracle)
+  str(afsc_catch_foss)
+  str(afsc_haul_oracle)
+  str(afsc_haul_foss)
+
+  check_diff(bb = afsc_haul_foss, bbb = afsc_haul_oracle)
+  check_diff(bb = afsc_catch_foss, bbb = afsc_catch_oracle)
+}
+
