@@ -1,10 +1,9 @@
-#---- Via Oracle internal server (requires credentials)
-
 library(dplyr)
 
-data_source <- "foss" # foss
+data_source <- "foss" # set to "foss" or "oracle"
 
-if (data_source == "oracle") { # Load data from oracle via internal NOAA-NMFS-AFSC connection
+# Load data from oracle via internal NOAA-NMFS-AFSC connection
+if (data_source == "oracle") {
   library(RODBC)
   library(getPass)
   library(gapindex)
@@ -126,6 +125,7 @@ afsc_haul <- haul %>%
     lon_end = longitude_dd_end,
     depth_m,
     performance,
+    stratum,
     area_swept_km2,
     bottom_temp_c = bottom_temperature_c
   ) %>%
@@ -134,12 +134,6 @@ afsc_haul <- haul %>%
     date = as.POSIXct(date,
                       format = "%m/%d/%Y %H:%M:%S",
                       tz = Sys.timezone()),
-    # date = as.POSIXct(date,
-    #                   format = ifelse(data_source == "oracle",
-    #                                   "%m/%d/%Y %H:%M:%S", # oracle
-    #                                   "%Y-%m-%dT%H:%M:%S"), # foss
-    #                   tz = Sys.timezone()),
-    # date = as.POSIXct(date, format = "%m/%d/%Y %H:%M:%S", tz = Sys.timezone()),
     pass = NA_integer_,
     lat_start = as.numeric(lat_start),
     lon_start = as.numeric(lon_start),
@@ -149,6 +143,8 @@ afsc_haul <- haul %>%
     effort = as.numeric(area_swept_km2 * 100), # convert to ha
     effort_units = "ha",
     performance = as.integer(performance),
+    stratum = as.numeric(stratum),
+    year = as.integer(format(date, format="%Y")),
     bottom_temp_c = as.numeric(bottom_temp_c)
   ) %>%
   dplyr::select(
@@ -165,6 +161,8 @@ afsc_haul <- haul %>%
     effort,
     effort_units,
     performance,
+    stratum,
+    year,
     bottom_temp_c
   ) %>%
   tidyr::drop_na(lat_end, lon_end)
@@ -279,9 +277,10 @@ surveyjoin:::save_raw_data(afsc_catch, "afsc-catch")
 
 
 # TEST similarities between foss and oracle tables -----------------------------
-if (FALSE) {
-  # catch_foss <- catch; haul_foss <- haul; afsc_catch_foss<-afsc_catch; afsc_haul_foss <- afsc_haul
-  # catch_oracle <- catch; haul_oracle <- haul; afsc_catch_oracle<-afsc_catch; afsc_haul_oracle <- afsc_haul
+test <- FALSE
+if (test == TRUE) {
+  catch_foss <- catch; haul_foss <- haul; afsc_catch_foss<-afsc_catch; afsc_haul_foss <- afsc_haul
+  catch_oracle <- catch; haul_oracle <- haul; afsc_catch_oracle<-afsc_catch; afsc_haul_oracle <- afsc_haul
 
   # Input catch and haul tables ------------------------------------------------
 
