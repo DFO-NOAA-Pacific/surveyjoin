@@ -1,3 +1,5 @@
+devtools::load_all()
+
 library(dplyr)
 
 dir.create("data-raw/data", showWarnings = FALSE)
@@ -76,7 +78,8 @@ pbs_haul <- dplyr::select(
   depth_m = depth_m,
   effort = area_swept,
   effort_units,
-  performance
+  performance,
+  stratum = grouping_code
 )
 pbs_haul$event_id <- as.integer(pbs_haul$event_id)
 
@@ -105,6 +108,11 @@ d <- tidyr::pivot_wider(d,
 pbs_haul <- left_join(pbs_haul, d, by = join_by(survey_name, event_id))
 ## end environmental data
 
+sum(duplicated(pbs_haul))
+sum(duplicated(select(pbs_haul, event_id, date)))
+
+pbs_haul <- distinct(pbs_haul)
+
 save_raw_data(pbs_haul, "pbs-haul")
 
 pbs_catch <- dat %>%
@@ -121,6 +129,11 @@ pbs_catch$event_id <- as.numeric(pbs_catch$event_id)
 pbs_catch$itis[pbs_catch$itis == 160617] <- 160620
 
 glimpse(pbs_catch)
+
+sum(duplicated(pbs_catch))
+dd <- pbs_catch[duplicated(pbs_catch), ]
+filter(pbs_catch, event_id == 2787010, itis == 160620)
+pbs_catch <- dplyr::distinct(pbs_catch)
 
 save_raw_data(pbs_catch, "pbs-catch")
 
