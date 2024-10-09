@@ -19,7 +19,8 @@ files_to_cache <- function() {
 }
 
 #' Identify the local folder used for caching
-#' @param name the directory name, default is the package name "surveyjoin"
+#'
+#' @param name The directory name, default is the package name `"surveyjoin"`.
 #' @return The directory location used for caching
 #' @importFrom rappdirs user_cache_dir
 #' @importFrom rlang .data
