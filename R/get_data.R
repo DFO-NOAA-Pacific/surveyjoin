@@ -44,8 +44,8 @@
 #'   \item \strong{bottom_temp_c}: Bottom temperature recorded at the gear, in degrees Celsius.
 #'   \item \strong{year}: Calendar year corresponding to the haul.
 #' }
-#' @import dplyr
 #' @importFrom DBI dbDisconnect
+#' @importFrom dplyr tbl filter collect left_join summarize
 #' @export
 #'
 #' @examples
