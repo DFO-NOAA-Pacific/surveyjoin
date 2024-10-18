@@ -19,7 +19,8 @@ files_to_cache <- function() {
 }
 
 #' Identify the local folder used for caching
-#' @param name the directory name, default is the package name "surveyjoin"
+#'
+#' @param name The directory name, default is the package name `"surveyjoin"`.
 #' @return The directory location used for caching
 #' @importFrom rappdirs user_cache_dir
 #' @importFrom rlang .data
@@ -208,7 +209,10 @@ cache_data <- function(region = c("nwfsc", "pbs", "afsc")) {
 #' @return Nothing; data is inserted into a local SQLite database.
 #' @export
 #' @importFrom rlang .data
-#' @import cli dplyr purrr RSQLite
+#' @importFrom dplyr %>%
+#' @importFrom purrr map_dfr
+#' @importFrom cli cli_alert_warning
+#' @importFrom RSQLite dbWriteTable
 #'
 #' @examples
 #' \dontrun{
@@ -371,7 +375,6 @@ get_rawdata <- function() {
 
 #' Get the table of common and scientific names in the joined dataset
 #' @return a dataframe with the common and scientific name
-#' @import dplyr
 #' @importFrom DBI dbDisconnect
 #' @export
 #' @examples

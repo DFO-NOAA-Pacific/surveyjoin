@@ -7,7 +7,7 @@
 get_cache_folder(name = "surveyjoin")
 }
 \arguments{
-\item{name}{the directory name, default is the package name "surveyjoin"}
+\item{name}{The directory name, default is the package name \code{"surveyjoin"}.}
 }
 \value{
 The directory location used for caching
