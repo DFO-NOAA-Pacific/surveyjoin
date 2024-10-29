@@ -12,7 +12,7 @@ world_coordinates <- maps::map("world", plot = FALSE, fill = TRUE) %>%
   sf::st_as_sf() %>%
   # sf::st_union() %>%
   sf::st_transform(crs = crs_out) %>%
-  dplyr::filter(ID %in% c("USA", "Russia", "Canada")) %>%
+  dplyr::filter(ID %in% c("USA", "Russia", "Canada", "Mexico")) %>%
   dplyr::mutate(ID = ifelse(ID == "USA", "Alaska", ID))
 
 place_labels <- data.frame(
