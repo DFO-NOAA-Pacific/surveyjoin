@@ -16,16 +16,16 @@ world_coordinates <- maps::map("world", plot = FALSE, fill = TRUE) %>%
   dplyr::mutate(ID = ifelse(ID == "USA", "Alaska", ID))
 
 place_labels <- data.frame(
-  type = c("mainland", "mainland", "mainland", "peninsula",
-           "survey", "survey", "survey", "survey", "survey"),
-  lab = c("Alaska", "Russia", "Canada", "Alaska Peninsula",
-          "Aleutian Islands", "Gulf of Alaska",
+  type = c("mainland", "mainland", "mainland", "mainland", "survey",
+           "peninsula", "survey", "survey", "survey", "survey", "survey"),
+  lab = c("Alaska", "Russia", "Canada", "USA", "West Coast",
+          "Alaska Peninsula", "Aleutian Islands", "Gulf of Alaska",
           "Bering\nSea\nSlope", "Eastern\nBering Sea", "Northern\nBering Sea"),
-  angle = c(0, 0, 0, 45, 0, 0, 0, 0, 0),
-  lat = c(62.296686, 62.798276, 63.722890, 56.352495, 53.25, 54.720787,
-          57, 57.456912, 63.905936),
-  lon = c(-157.377210, 173.205231, -136.664024, -159.029430, -173, -154.794131,
-          -176, -162, -165)) %>%
+  angle = c(0, 0, 0, 0, -45, 45, 0, 30, 0, 0, 0),
+  lat = c(63, 62.798276, 58, 42, 40, 56.352495, 53.25, 54.720787,
+          57, 57.456912, 62.25),
+  lon = c(-154, 173.205231, -122, -120, -125.2,
+          -159.029430, -173, -154.794131, -176, -162, -170.5)) %>%
   dplyr::filter(type != "peninsula") %>%
   sf::st_as_sf(coords = c("lon", "lat"),
                crs = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0") %>%
@@ -148,9 +148,9 @@ p <- ggplot2::ggplot() +
                   end = 0.80))) +
   # Manage Axis extents (limits) and breaks
   ggplot2::scale_x_continuous(name = "Longitude °W",
-                              breaks = c(170, 175, seq(-180, -120, 5))) +
+                              breaks = c(170, seq(-180, -120, 10))) +
   ggplot2::scale_y_continuous(name = "Latitude °N",
-                              breaks = seq(50, 65, 5)) + # seq(52, 62, 2)
+                              breaks = seq(30, 70, 10)) +
   ggplot2::coord_sf(xlim = sf::st_bbox(shp_all)[c(1,3)],
                     ylim = sf::st_bbox(shp_all)[c(2,4)]) +
   ggplot2::geom_sf_text(
@@ -180,14 +180,15 @@ p <- ggplot2::ggplot() +
     strip.text = element_text(face = "bold"), # , family = font0
     panel.border = element_rect(colour = "grey20", linewidth = .25, fill = NA),
     panel.background = element_rect(fill = "white"),
-    panel.grid = element_line(colour="grey80", size=0.5),
+    panel.grid = element_line(colour="grey80", linewidth=0.5),
     plot.title = element_text(face = "bold"), # , size = 12, family = font0
     axis.text = element_text(face = "bold"), # , size = 12 , family = font0
   ) +
   ggplot2::ggtitle(label = paste0("Bottom Trawl Survey Coverage"))
 p
-# ggsave(filename = paste0("survey_plot_all.png"),
-#        plot = p,
-#        path = here::here("img"),
-#        width = 7,
-#        height = 3)
+
+ggsave(filename = paste0("survey_coverage_map.png"),
+       plot = p,
+       path = here::here("img"),
+       width = 7,
+       height = 3)
