@@ -164,7 +164,7 @@ p <- ggplot2::ggplot() +
     mapping = aes(label = lab, angle = angle),
     color = "black",
     fontface = "bold",
-    size = 2,
+    size = 1.5,
     show.legend = FALSE) +
   ggplot2::geom_sf_text(
     data = place_labels %>% dplyr::filter(!(type %in% c("mainland", "survey"))),
