@@ -25,10 +25,15 @@ focusing on species that are occurring in multiple regions.
 When interpreting the data, be aware that--while 
 generally the gears and sampling protocols are similar among surveys--
 there are invariably differences in the gear and/or how it is fished, 
-which can influence catchability and selectivity. For example, 
-the eastern and northern Bering Sea surveys employ a much smaller 
-footrope and different net than the other Alaskan surveys. See the links 
-below for details on each survey's methods.
+which can influence catchability and selectivity. Most notably, 
+the eastern and northern Bering Sea Shelf surveys employ a much smaller 
+footrope and different net than the other Alaskan surveys. However,
+there is ongoing research to calibrate catch at size between Bering
+shelf and slope surveys that provide a way of standardizing catches
+for some common species. Aside from empirical calibration, differences
+in catchability among surveys may be accounted for in a statistical 
+model (e.g., by including survey as a factor). See the links below for 
+details on each survey's methods.
 
 ### Installing
 
