@@ -4,19 +4,19 @@ remotes::install_github("nwfsc-assess/nwfscSurvey")
 library(nwfscSurvey)
 
 # pull in the haul data from various nwfsc surveys
-haul_nwfsc_combo <- nwfscSurvey::PullHaul.fn(SurveyName = "NWFSC.Combo")
+haul_nwfsc_combo <- nwfscSurvey::pull_haul(survey = "NWFSC.Combo")
 haul_nwfsc_combo$survey_name <- "NWFSC.Combo"
 
-haul_nwfsc_slope <- nwfscSurvey::PullHaul.fn(SurveyName = "NWFSC.Slope")
+haul_nwfsc_slope <- nwfscSurvey::pull_haul(survey = "NWFSC.Slope")
 haul_nwfsc_slope$survey_name <- "NWFSC.Slope"
 
-haul_nwfsc_shelf <- nwfscSurvey::PullHaul.fn(SurveyName = "NWFSC.Shelf")
+haul_nwfsc_shelf <- nwfscSurvey::pull_haul(survey = "NWFSC.Shelf")
 haul_nwfsc_shelf$survey_name <- "NWFSC.Shelf"
 
-haul_nwfsc_hypox <- nwfscSurvey::PullHaul.fn(SurveyName = "NWFSC.Hypoxia")
+haul_nwfsc_hypox <- nwfscSurvey::pull_haul(survey = "NWFSC.Hypoxia")
 haul_nwfsc_hypox$survey_name <- "NWFSC.Hypoxia"
 
-haul_nwfsc_tri <- nwfscSurvey::PullHaul.fn(SurveyName = "Triennial")
+haul_nwfsc_tri <- nwfscSurvey::pull_haul(survey = "Triennial")
 haul_nwfsc_tri$survey_name <- "Triennial"
 
 # bind together

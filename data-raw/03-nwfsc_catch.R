@@ -13,19 +13,26 @@ library(nwfscSurvey)
 # data("spp_dictionary")
 
 # pull in the haul data from various nwfsc surveys
-catch_nwfsc_combo <- nwfscSurvey::PullCatch.fn(SurveyName = "NWFSC.Combo")
+catch_nwfsc_combo <- nwfscSurvey::pull_catch(survey = "NWFSC.Combo")
+# remove hake, and re-query
+catch_nwfsc_combo <- dplyr::filter(catch_nwfsc_combo, Common_name != "Pacific hake")
+catch_nwfsc_combo_hake <- nwfscSurvey::pull_catch(survey = "NWFSC.Combo", common_name = "Pacific hake",
+                                             sample_types = c("NA", NA, "Life Stage", "Size"))
+catch_nwfsc_combo_hake <- nwfscSurvey::combine_tows(catch_nwfsc_combo_hake)
+# join hake back in
+catch_nwfsc_combo <- rbind(catch_nwfsc_combo, catch_nwfsc_combo_hake)
 catch_nwfsc_combo$survey_name <- "NWFSC.Combo"
 
-catch_nwfsc_slope <- nwfscSurvey::PullCatch.fn(SurveyName = "NWFSC.Slope")
+catch_nwfsc_slope <- nwfscSurvey::pull_catch(survey = "NWFSC.Slope")
 catch_nwfsc_slope$survey_name <- "NWFSC.Slope"
 
-catch_nwfsc_shelf <- nwfscSurvey::PullCatch.fn(SurveyName = "NWFSC.Shelf")
+catch_nwfsc_shelf <- nwfscSurvey::pull_catch(survey = "NWFSC.Shelf")
 catch_nwfsc_shelf$survey_name <- "NWFSC.Shelf"
 
-catch_nwfsc_hypox <- nwfscSurvey::PullCatch.fn(SurveyName = "NWFSC.Hypoxia")
+catch_nwfsc_hypox <- nwfscSurvey::pull_catch(survey = "NWFSC.Hypoxia")
 catch_nwfsc_hypox$survey_name <- "NWFSC.Hypoxia"
 
-catch_nwfsc_tri <- nwfscSurvey::PullCatch.fn(SurveyName = "Triennial")
+catch_nwfsc_tri <- nwfscSurvey::pull_catch(survey = "Triennial")
 catch_nwfsc_tri$survey_name <- "Triennial"
 
 # bind together
