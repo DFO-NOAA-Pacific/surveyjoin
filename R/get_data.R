@@ -52,7 +52,12 @@
 #' \dontrun{
 #' d <- get_data()
 #' }
+source("R/utils.R")
 get_data <- function(common = NULL, scientific = NULL, itis_id = NULL, regions = NULL, surveys = NULL, years = NULL) {
+  if (!file.exists(sql_folder())) {
+    cli::cli_alert_info("Database file not found. Loading SQL data...")
+    load_sql_data()
+  }
   db <- surv_db() # create connection to database; need error checking
   catch <- tbl(db, "catch")
   haul <- tbl(db, "haul")
