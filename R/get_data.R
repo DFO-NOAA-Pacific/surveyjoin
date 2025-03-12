@@ -109,6 +109,10 @@ get_data <- function(common = NULL, scientific = NULL, itis_id = NULL, regions =
   # Replace NAs with 0s
   d$catch_weight[is.na(d$catch_weight)] <- 0
   d$catch_numbers[is.na(d$catch_numbers)] <- 0
+  # Correct false 0s
+  d$catch_weight <- ifelse(d$catch_numbers > 0 & d$catch_weight == 0, NA, d$catch_weight)
+  d$catch_numbers <- ifelse(d$catch_weight > 0 & d$catch_numbers == 0, NA, d$catch_numbers)
+
   if (!is.null(years)) {
     d <- d |>
       filter(.data$year %in% years)
