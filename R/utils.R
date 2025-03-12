@@ -309,7 +309,7 @@ get_metadata <- function() {
     region = c("afsc", "pbs", "nwfsc"),
     url = c(
       "https://afsc-gap-products.github.io/gap_products/content/foss-metadata.html",
-      NA, "https://www.fisheries.noaa.gov/inport/item/18418"
+      "https://open.canada.ca/data/en/dataset/a278d1af-d567-4964-a109-ae1e84cbd24a", "https://www.fisheries.noaa.gov/inport/item/18418"
     )
   )
   return(df)
