@@ -4,11 +4,12 @@
 "spp_dictionary"
 
 
-#' Data frame containing the survey grid for the West Coast Bottom Trawl Survey (WCBTS)
-#' collected by NOAA's Northwest Fisheries Science Center. Columns include the latitude
-#' and longitude in decimal degrees, area of each survey cell (in hectares), the survey
-#' name (`survey`) year of update (`survey_domain_year`) and depth (currently NA
-#' for this dataset and must be joined in separately)
+#' Data frame containing two survey grids for the West Coast Bottom Trawl Survey
+#' (WCBTS, "NWFSC.Combo") and triennial survey ("Triennial") collected by NOAA's
+#' Northwest Fisheries Science Center. Columns include the latitude and
+#' longitude in decimal degrees, area of each survey cell (in hectares), the
+#' survey name (`survey`) year of update (`survey_domain_year`) and
+#' depth (currently in meters)
 #'
 #' @format A data frame.
 "nwfsc_grid"
