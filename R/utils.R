@@ -327,7 +327,7 @@ get_survey_names <- function() {
     survey = c(
       "Aleutian Islands", "Gulf of Alaska", "eastern Bering Sea",
       "northern Bering Sea", "Bering Sea Slope", "NWFSC.Combo", "NWFSC.Shelf", "NWFSC.Hypoxia",
-      "NWFSC.Hypoxia", "Triennial", "SYN QCS", "SYN HS", "SYN WCVI", "SYN WCHG"
+      "NWFSC.Slope", "Triennial", "SYN QCS", "SYN HS", "SYN WCVI", "SYN WCHG"
     ),
     region = c(rep("afsc", 5), rep("nwfsc", 5), rep("pbs", 4))
   )
