@@ -236,4 +236,4 @@ resulted in the following list of 55 species:
 | Wattled Eelpout       | *Lycodes palearis*                  |
 | Widow Rockfish        | *Sebastes entomelas*                |
 | Yellow Irish Lord     | *Hemilepidotus jordani*             |
-| Yellowtain Rockfish   | *Sebastes flavidus*                 |
+| Yellowtail Rockfish   | *Sebastes flavidus*                 |
