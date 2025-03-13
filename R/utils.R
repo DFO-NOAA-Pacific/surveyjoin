@@ -76,74 +76,60 @@ save_metadata <- function(metadata) {
 }
 
 
-
-#' Wrapper function to cache files
+#' Wrapper function to cache files only if a newer version exists
 #' @return NULL
-#' @importFrom cli cli_abort cli_inform
+#' @importFrom cli cli_inform
 #' @importFrom utils download.file
 cache_files <- function() {
   files <- files_to_cache()
   metadata <- load_metadata()
   cache_folder <- get_cache_folder()
-  if (!dir.exists(cache_folder)) { # Make sure cache folder exists
+
+  if (!dir.exists(cache_folder)) {
     dir.create(cache_folder, recursive = TRUE, showWarnings = FALSE)
   }
 
-  # Check each file to see if it needs to be downloaded
-  cache_success <- TRUE
   for (file in files) {
+    # Get timestamp from GitHub and local file path
     last_modified <- file_last_modified(file)
     local_file <- file.path(cache_folder, file)
 
-    # If GitHub rate limit is exceeded or API fails, use local cached data if available
-    skip <- FALSE
-    if (is.null(last_modified)) {
-      if (!file.exists(local_file)) {
-        cli_alert_warning(paste("Rate limit exceeded and no local data available for:", file))
-        skip <- TRUE
-        cache_success <- FALSE
-      } else {
-        cli_inform(paste("Using locally cached version of", file))
-        skip <- TRUE
+    # Compare versions between Github timestamp and local version
+    download_file <- TRUE
+    if (file.exists(local_file) && !is.null(last_modified)) {
+      cached_version <- metadata$files[[file]]$version
+      if (!is.null(cached_version) && last_modified <= cached_version) {
+        cli_inform(paste("Skipping:", file, "- Local version is up to date"))
+        download_file <- FALSE
       }
     }
 
-    if (!skip) {
-      # double check dir exists
-      if (!dir.exists(dirname(local_file))) {
-        dir.create(dirname(local_file), recursive = TRUE, showWarnings = FALSE)
-      }
-      # try to download
+    if(download_file) {
+      # new version of file needs downloading
       f <- "https://github.com/DFO-NOAA-Pacific/surveyjoin-data/raw/main/"
       try({
         download.file(paste0(f, file), destfile = local_file, mode = "wb")
 
-        # add version info to attributes of the object, re-save
+        # Add version info to attributes and re-save
         temp <- readRDS(local_file)
         attr(temp, "version") <- last_modified
         saveRDS(temp, local_file)
 
-        # update metadata
+        # Update metadata
         file_info <- file.info(local_file)
         metadata$files[[file]] <- list(
           version = last_modified,
           size = file_info$size,
           last_modified = last_modified
         )
-      }, silent = TRUE)
 
-      if (!file.exists(local_file)) {
-        cache_success <- FALSE
-      }
+        cli_inform(paste("Updated:", file))
+      }, silent = TRUE)
     }
   }
 
-  # update metadata with the latest download date
-  if(cache_success) {
-    metadata$last_download <- Sys.time()
-    save_metadata(metadata)
-  }
 }
+
 
 #' Function to get the last modified date of a file from GitHub
 #' @param file_name the file name, e.g. "nwfsc-catch.rds"

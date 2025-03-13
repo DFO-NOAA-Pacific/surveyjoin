@@ -2,10 +2,10 @@
 % Please edit documentation in R/utils.R
 \name{cache_files}
 \alias{cache_files}
-\title{Wrapper function to cache files}
+\title{Wrapper function to cache files only if a newer version exists}
 \usage{
 cache_files()
 }
 \description{
-Wrapper function to cache files
+Wrapper function to cache files only if a newer version exists
 }
