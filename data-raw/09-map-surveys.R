@@ -17,15 +17,15 @@ world_coordinates <- maps::map("world", plot = FALSE, fill = TRUE) %>%
 
 place_labels <- data.frame(
   type = c("mainland", "mainland", "mainland", "mainland", "survey",
-           "peninsula", "survey", "survey", "survey", "survey", "survey"),
+           "peninsula", "survey", "survey", "survey", "survey", "survey", "survey"),
   lab = c("Alaska", "Russia", "Canada", "USA", "West Coast",
           "Alaska Peninsula", "Aleutian Islands", "Gulf of Alaska",
-          "Bering\nSea\nSlope", "Eastern\nBering Sea", "Northern\nBering Sea"),
-  angle = c(0, 0, 0, 0, -45, 45, 0, 30, 0, 0, 0),
+          "Bering\nSea\nSlope", "Eastern\nBering Sea", "Northern\nBering Sea", "British Columbia"),
+  angle = c(0, 0, 0, 0, -45, 45, 0, 30, 0, 0, 0, -30),
   lat = c(63, 62.798276, 58, 42, 40, 56.352495, 53.25, 54.720787,
-          57, 57.456912, 62.25),
+          57, 57.456912, 62.25, 51),
   lon = c(-154, 173.205231, -122, -120, -125.2,
-          -159.029430, -173, -154.794131, -176, -162, -170.5)) %>%
+          -159.029430, -173, -154.794131, -176, -162, -170.5, -131)) %>%
   dplyr::filter(type != "peninsula") %>%
   sf::st_as_sf(coords = c("lon", "lat"),
                crs = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0") %>%
@@ -127,6 +127,13 @@ shp_all <- shp <- dplyr::bind_rows(list(
 #     dplyr::select(-STRATUM))) %>%
 #   dplyr::select(SRVY, survey_definition_id, area_id = stratum, geometry)
 
+# Bring in SYN data
+source("data-raw/01-pbs-grids.R")
+# convert to crs_out
+outer_polygon_sf <- do.call(c, outer_polygon) %>%  # Combine list elements
+  sf::st_sf() %>%
+  sf::st_transform(crs = crs_out)  # Transform to match the map's CRS
+
 ## Plot ------------------------------------------------------------------------
 p <- ggplot2::ggplot() +
   ggplot2::geom_sf(data = world_coordinates,
@@ -183,12 +190,19 @@ p <- ggplot2::ggplot() +
     panel.grid = element_line(colour="grey80", linewidth=0.5),
     plot.title = element_text(face = "bold"), # , size = 12, family = font0
     axis.text = element_text(face = "bold"), # , size = 12 , family = font0
-  ) +
-  ggplot2::ggtitle(label = paste0("Bottom Trawl Survey Coverage"))
-p
+  )
+p2 <- p +
+  ggplot2::geom_sf(data = outer_polygon_sf,
+                   fill = "orange",
+                   alpha = 0.3,
+                   color = "grey50") +
+  ggplot2::coord_sf(xlim = sf::st_bbox(shp_all)[c(1,3)],
+                    ylim = sf::st_bbox(shp_all)[c(2,4)])
+
+p2
 
 ggsave(filename = paste0("survey_coverage_map.png"),
-       plot = p,
+       plot = p2,
        path = here::here("img"),
        width = 7,
-       height = 3)
+       height = 4)
