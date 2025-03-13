@@ -5,6 +5,7 @@
 
 [![R-CMD-check](https://github.com/DFO-NOAA-Pacific/surveyjoin/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/DFO-NOAA-Pacific/surveyjoin/actions/workflows/R-CMD-check.yaml)
 [![DOI](https://zenodo.org/badge/484561620.svg)](https://zenodo.org/doi/10.5281/zenodo.10031852)
+
 <!-- badges: end -->
 
 This is a repository for combining trawl survey datasets from NOAA and
@@ -17,23 +18,10 @@ This data includes surveys conducted by the Northwest Fisheries Science
 Center (NWFSC) off the west coast of the United States, surveys
 collected by Fisheries and Oceans Canada (DFO) in the waters of British
 Columbia, and surveys conducted by the Alaska Fisheries Science Center
-(AFSC) in Alaska. 
+(AFSC) in Alaska.
 
 There are 55 species included in the initial version of the package,
 focusing on species that are occurring in multiple regions.
-
-When interpreting the data, be aware that--while 
-generally the gears and sampling protocols are similar among surveys--
-there are invariably differences in the gear and/or how it is fished, 
-which can influence catchability and selectivity. Most notably, 
-the eastern and northern Bering Sea Shelf surveys employ a much smaller 
-footrope and different net than the other Alaskan surveys. However,
-there is ongoing research to calibrate catch at size between Bering
-shelf and slope surveys that provide a way of standardizing catches
-for some common species. Aside from empirical calibration, differences
-in catchability among surveys may be accounted for in a statistical 
-model (e.g., by including survey as a factor). See the links below for 
-details on each survey's methods.
 
 ### Installing
 
@@ -86,27 +74,28 @@ d <- get_data("pacific cod")
 dplyr::glimpse(d, width = 72)
 ```
 
-    ## Rows: 58,889
-    ## Columns: 21
-    ## $ survey_name     <chr> "Aleutian Islands", "Aleutian Islands", "Aleut…
-    ## $ event_id        <dbl> -21893, -21764, -21455, -18280, -18259, -18094…
-    ## $ date            <chr> "2022-08-07", "2022-07-28", "2022-07-03", "201…
+    ## Rows: 60,521
+    ## Columns: 22
+    ## $ survey_name     <chr> "eastern Bering Sea", "eastern Bering Sea", "e…
+    ## $ event_id        <dbl> -23911, -23910, -23909, -23908, -23900, -23899…
+    ## $ date            <chr> "2024-08-05", "2024-08-05", "2024-08-05", "202…
     ## $ pass            <int> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…
-    ## $ vessel          <chr> "OCEAN EXPLORER", "OCEAN EXPLORER", "ALASKA PR…
-    ## $ lat_start       <dbl> 52.01721, 53.11242, 51.96523, 52.67577, 52.507…
-    ## $ lon_start       <dbl> -175.8889, -170.9027, -172.6282, -172.7522, -1…
-    ## $ lat_end         <dbl> 52.00690, 53.10904, 51.96874, 52.67061, 52.516…
-    ## $ lon_end         <dbl> -175.9017, -170.9244, -172.6096, -172.7648, -1…
-    ## $ depth_m         <dbl> 184, 98, 216, 184, 167, 133, 225, 80, 186, 111…
-    ## $ effort          <dbl> 2.3745, 2.5268, 2.6409, 1.7392, 1.8012, 1.8531…
+    ## $ vessel          <chr> "NORTHWEST EXPLORER", "NORTHWEST EXPLORER", "N…
+    ## $ lat_start       <dbl> 60.66179, 60.65791, 60.31444, 59.98789, 60.011…
+    ## $ lon_start       <dbl> -178.1456, -177.5000, -177.3701, -177.2008, -1…
+    ## $ lat_end         <dbl> 60.63815, 60.67198, 60.33932, 60.01284, 60.032…
+    ## $ lon_end         <dbl> -178.1443, -177.5468, -177.3784, -177.1980, -1…
+    ## $ depth_m         <dbl> 159, 147, 147, 137, 141, 176, 149, 119, 86, 15…
+    ## $ effort          <dbl> 4.4429, 4.9899, 4.5955, 4.5007, 4.4427, 4.6980…
     ## $ effort_units    <chr> "ha", "ha", "ha", "ha", "ha", "ha", "ha", "ha"…
-    ## $ performance     <chr> "0", "0", "5", "4", "4", "0", "4", "0", "0", "…
-    ## $ bottom_temp_c   <dbl> 4.6, 4.9, 4.5, 4.5, 4.6, 4.6, 4.3, 5.5, 4.8, 4…
+    ## $ performance     <chr> "0", "0", "0", "0", "0", "0", "0", "0", "0", "…
+    ## $ stratum         <dbl> 61, 61, 61, 61, 61, 61, 61, 622, 621, 50, 314,…
+    ## $ year            <int> 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024…
+    ## $ bottom_temp_c   <dbl> 2.5, 0.8, 1.5, 1.1, 1.8, 3.6, 2.4, 4.8, 5.4, 4…
     ## $ region          <chr> "afsc", "afsc", "afsc", "afsc", "afsc", "afsc"…
-    ## $ year            <int> 2022, 2022, 2022, 2018, 2018, 2018, 2018, 2018…
     ## $ itis            <dbl> 164711, 164711, 164711, 164711, 164711, 164711…
-    ## $ catch_numbers   <dbl> 0, 0, 0, 7, 11, 4, 11, 30, 12, 56, 2, 0, 0, 3,…
-    ## $ catch_weight    <dbl> 0.00, 0.00, 0.00, 24.65, 31.22, 14.61, 34.22, …
+    ## $ catch_numbers   <dbl> 4, 3, 1, 8, 7, 9, 5, 2, 2, 10, 0, 9, 6, 6, 21,…
+    ## $ catch_weight    <dbl> 22.600, 11.740, 2.370, 34.920, 23.960, 35.450,…
     ## $ scientific_name <chr> "gadus macrocephalus", "gadus macrocephalus", …
     ## $ common_name     <chr> "pacific cod", "pacific cod", "pacific cod", "…
 
@@ -114,15 +103,70 @@ dplyr::glimpse(d, width = 72)
 
 Citing the `surveyjoin` package can be done with the DOI linked above,
 though more detailed citations may be needed for specific surveys or
-methodology. For citations pertaining to surveys run by the Alaska
-Fisheries Science Center (AFSC), 
-see <https://github.com/afsc-gap-products/citations>. 
-Metadata for surveys conducted by the AFSC can be found at 
-<https://afsc-gap-products.github.io/gap_products>.
+methodology. Some recent citations are:
 
-Background and additional citations on surveys run by the Northwest
-Fisheries Science Center (NWFSC) can be found in [Keller et
-al. 2017](https://repository.library.noaa.gov/view/noaa/14179/noaa_14179_DS1.pdf). 
+<u>Aleutian Islands Bottom Trawl Survey</u>
+
+- Von Szalay PG, Raring NW, Siple MC, Dowlin AN, Riggle BC, and Laman
+  EA. 2023. Data Report: 2022 Aleutian Islands bottom trawl survey. U.S.
+  Dep. Commer. DOI: 10.25923/85cy-g225.
+
+<u>Gulf of Alaska Bottom Trawl Survey</u>
+
+- Siple MC, von Szalay PG, Raring NW, Dowlin AN, Riggle BC. 2024. Data
+  Report: 2023 Gulf of Alaska bottom trawl survey. DOI:
+  10.25923/GBB1-X748.
+
+<u>Eastern & Northern Bering Sea Crab/Groundfish Bottom Trawl
+Surveys</u>
+
+- Zacher LS, Richar JI, Fedewa EJ, Ryznar ER, Litzow MA. 2023. The 2023
+  Eastern Bering Sea Continental Shelf Trawl Survey: Results for
+  Commercial Crab Species. U.S. Dep. Commer, 213 p.
+
+- Markowitz EH, Dawson EJ, Wassermann S, Anderson AB, Rohan SK,
+  Charriere BK, Stevenson DE. 2024. Results of the 2023 eastern and
+  northern Bering Sea continental shelf bottom trawl survey of
+  groundfish and invertebrate fauna. U.S. Dep. Commer.
+
+<u>Eastern Bering Sea Slope Bottom Trawl Survey</u>
+
+- Hoff GR. 2016. Results of the 2016 eastern Bering Sea upper
+  continental slope survey of groundfishes and invertebrate resources.
+  U.S. Dep. Commer. DOI: 10.7289/V5/TM-AFSC-339.
+
+<u>Fisheries and Oceans Canada Synoptic Bottom Trawl Surveys</u>
+
+- Nottingham MK, Williams DC, Wyeth MR, Olsen N. 2017. *Summary of the
+  West Coast Vancouver Island synoptic bottom trawl survey, May 28 –
+  June 21, 2014*. DFO Can. Manuscr. Rep. Fish. Aquat. Sci. 2017/3140,
+  viii + 55 p, Nanaimo.
+
+- Sinclair A, Schnute J, Haigh R, Starr P, Stanley R, Fargo J,
+  Workman G. 2003. *Feasibility of Multispecies Groundfish Bottom Trawl
+  Surveys on the BC Coast. DFO Canadian Science Advisory Secretariat
+  (CSAS) Research Document, 2003/049.*
+
+- Williams DC, Nottingham MK, Olsen N, Wyeth MR. 2018a. *Summary of the
+  Queen Charlotte Sound synoptic bottom trawl survey, July 6 – August 8,
+  2015*. DFO Can. Manuscr. Rep. Fish. Aquat. Sci. 3136, viii + 64 p,
+  Nanaimo.
+
+- Williams DC, Nottingham MK, Olsen N, Wyeth MR. 2018b. *Summary of the
+  West Coast Haida Gwaii synoptic bottom trawl survey, August 25 –
+  October 2, 2014*. DFO Can. Manuscr. Rep. Fish. Aquat. Sci. 2018/3134,
+  viii + 42 p, Nanaimo.
+
+- Wyeth MR, Olsen N, Nottingham MK, Williams DC. 2018. *Summary of the
+  Hecate Strait synoptic bottom trawl survey, May 26 – June 22, 2015*.
+  DFO Can. Manuscr. Rep. Fish. Aquat. Sci. 2018/3126, viii + 55 p,
+  Nanaimo.
+
+<u>USA West Coast Bottom Trawl Surveys</u>
+
+- Keller AA, Wallace JR, Methot RD. 2017. The Northwest Fisheries
+  Science Center’s West Coast Groundfish Bottom Trawl Survey: history,
+  design, and description. DOI: 10.7289/V5/TM-NWFSC-136.
 
 ### What species are included?
 
@@ -192,4 +236,4 @@ resulted in the following list of 55 species:
 | Wattled Eelpout       | *Lycodes palearis*                  |
 | Widow Rockfish        | *Sebastes entomelas*                |
 | Yellow Irish Lord     | *Hemilepidotus jordani*             |
-| Yellowtail Rockfish   | *Sebastes flavidus*                 |
+| Yellowtain Rockfish   | *Sebastes flavidus*                 |

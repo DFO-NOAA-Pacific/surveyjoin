@@ -6,8 +6,9 @@ output:
 # surveyjoin
 
 <!-- badges: start -->
-[![R-CMD-check](https://github.com/DFO-NOAA-Pacific/surveyjoin/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/DFO-NOAA-Pacific/surveyjoin/actions/workflows/R-CMD-check.yaml)
-[![DOI](https://zenodo.org/badge/484561620.svg)](https://zenodo.org/doi/10.5281/zenodo.10031852)
+
+[![R-CMD-check](https://github.com/DFO-NOAA-Pacific/surveyjoin/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/DFO-NOAA-Pacific/surveyjoin/actions/workflows/R-CMD-check.yaml) [![DOI](https://zenodo.org/badge/484561620.svg)](https://zenodo.org/doi/10.5281/zenodo.10031852)
+
 <!-- badges: end -->
 
 This is a repository for combining trawl survey datasets from NOAA and Fisheries and Oceans Canada in the Northeast Pacific Ocean.
@@ -60,11 +61,41 @@ dplyr::glimpse(d, width = 72)
 
 ### Citations
 
-Citing the `surveyjoin` package can be done with the DOI linked above, though more detailed citations may be needed for specific surveys or methodology. For citations pertaining to surveys run by the Alaska Fisheries Science Center (AFSC), see
+Citing the `surveyjoin` package can be done with the DOI linked above, though more detailed citations may be needed for specific surveys or methodology. Some recent citations are:
 
-<https://github.com/afsc-gap-products/citations>
+[Aleutian Islands Bottom Trawl Survey]{.underline}
 
-Background and additional citations on surveys run by the Northwest Fisheries Science Center (NWFSC) can be found in [Keller et al. 2017](https://repository.library.noaa.gov/view/noaa/14179/noaa_14179_DS1.pdf).
+-   Von Szalay PG, Raring NW, Siple MC, Dowlin AN, Riggle BC, and Laman EA. 2023. Data Report: 2022 Aleutian Islands bottom trawl survey. U.S. Dep. Commer. DOI: 10.25923/85cy-g225.
+
+[Gulf of Alaska Bottom Trawl Survey]{.underline}
+
+-   Siple MC, von Szalay PG, Raring NW, Dowlin AN, Riggle BC. 2024. Data Report: 2023 Gulf of Alaska bottom trawl survey. DOI: 10.25923/GBB1-X748.
+
+[Eastern & Northern Bering Sea Crab/Groundfish Bottom Trawl Surveys]{.underline}
+
+-   Zacher LS, Richar JI, Fedewa EJ, Ryznar ER, Litzow MA. 2023. The 2023 Eastern Bering Sea Continental Shelf Trawl Survey: Results for Commercial Crab Species. U.S. Dep. Commer, 213 p.
+
+-   Markowitz EH, Dawson EJ, Wassermann S, Anderson AB, Rohan SK, Charriere BK, Stevenson DE. 2024. Results of the 2023 eastern and northern Bering Sea continental shelf bottom trawl survey of groundfish and invertebrate fauna. U.S. Dep. Commer.
+
+[Eastern Bering Sea Slope Bottom Trawl Survey]{.underline}
+
+-   Hoff GR. 2016. Results of the 2016 eastern Bering Sea upper continental slope survey of groundfishes and invertebrate resources. U.S. Dep. Commer. DOI: 10.7289/V5/TM-AFSC-339.
+
+[Fisheries and Oceans Canada Synoptic Bottom Trawl Surveys]{.underline}
+
+-   Nottingham MK, Williams DC, Wyeth MR, Olsen N. 2017. *Summary of the West Coast Vancouver Island synoptic bottom trawl survey, May 28 – June 21, 2014*. DFO Can. Manuscr. Rep. Fish. Aquat. Sci. 2017/3140, viii + 55 p, Nanaimo.
+
+-   Sinclair A, Schnute J, Haigh R, Starr P, Stanley R, Fargo J, Workman G. 2003. *Feasibility of Multispecies Groundfish Bottom Trawl Surveys on the BC Coast. DFO Canadian Science Advisory Secretariat (CSAS) Research Document, 2003/049.*
+
+-   Williams DC, Nottingham MK, Olsen N, Wyeth MR. 2018a. *Summary of the Queen Charlotte Sound synoptic bottom trawl survey, July 6 – August 8, 2015*. DFO Can. Manuscr. Rep. Fish. Aquat. Sci. 3136, viii + 64 p, Nanaimo.
+
+-   Williams DC, Nottingham MK, Olsen N, Wyeth MR. 2018b. *Summary of the West Coast Haida Gwaii synoptic bottom trawl survey, August 25 – October 2, 2014*. DFO Can. Manuscr. Rep. Fish. Aquat. Sci. 2018/3134, viii + 42 p, Nanaimo.
+
+-   Wyeth MR, Olsen N, Nottingham MK, Williams DC. 2018. *Summary of the Hecate Strait synoptic bottom trawl survey, May 26 – June 22, 2015*. DFO Can. Manuscr. Rep. Fish. Aquat. Sci. 2018/3126, viii + 55 p, Nanaimo.
+
+[USA West Coast Bottom Trawl Surveys]{.underline}
+
+-   Keller AA, Wallace JR, Methot RD. 2017. The Northwest Fisheries Science Center’s West Coast Groundfish Bottom Trawl Survey: history, design, and description. DOI: 10.7289/V5/TM-NWFSC-136.
 
 ### What species are included?
 

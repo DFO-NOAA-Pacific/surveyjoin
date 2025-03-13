@@ -19,7 +19,7 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-home">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">surveyjoin</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.4</span>
       </span>
     </div>
 
@@ -54,7 +54,7 @@
 </div>
 <!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="contents col-md-9">
@@ -63,6 +63,7 @@
 </h1></div>
 <!-- badges: start -->
 
+<!-- badges: end -->
 <p>This is a repository for combining trawl survey datasets from NOAA and Fisheries and Oceans Canada in the Northeast Pacific Ocean.</p>
 <p>A pkgdown site is available <a href="https://dfo-noaa-pacific.github.io/surveyjoin/" class="external-link">here</a>.</p>
 <p>This data includes surveys conducted by the Northwest Fisheries Science Center (NWFSC) off the west coast of the United States, surveys collected by Fisheries and Oceans Canada (DFO) in the waters of British Columbia, and surveys conducted by the Alaska Fisheries Science Center (AFSC) in Alaska.</p>
@@ -72,7 +73,7 @@
 </h3>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("pak")</span></span>
-<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pkg_install.html" class="external-link">pkg_install</a></span><span class="op">(</span><span class="st">"DFO-NOAA-Pacific/surveyjoin"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">pak</span><span class="fu">::</span><span class="fu">pkg_install</span><span class="op">(</span><span class="st">"DFO-NOAA-Pacific/surveyjoin"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="basic-use">Basic use<a class="anchor" aria-label="anchor" href="#basic-use"></a>
@@ -105,35 +106,64 @@
 <code class="sourceCode R"><span><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_data.html">get_data</a></span><span class="op">(</span><span class="st">"pacific cod"</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="va">d</span>, width <span class="op">=</span> <span class="fl">72</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb8"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="do">## Rows: 58,889</span></span>
-<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="do">## Columns: 21</span></span>
-<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a><span class="do">## $ survey_name     &lt;chr&gt; "Aleutian Islands", "Aleutian Islands", "Aleut…</span></span>
-<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a><span class="do">## $ event_id        &lt;dbl&gt; -21893, -21764, -21455, -18280, -18259, -18094…</span></span>
-<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a><span class="do">## $ date            &lt;chr&gt; "2022-08-07", "2022-07-28", "2022-07-03", "201…</span></span>
+<div class="sourceCode" id="cb8"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="do">## Rows: 60,521</span></span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="do">## Columns: 22</span></span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a><span class="do">## $ survey_name     &lt;chr&gt; "eastern Bering Sea", "eastern Bering Sea", "e…</span></span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a><span class="do">## $ event_id        &lt;dbl&gt; -23911, -23910, -23909, -23908, -23900, -23899…</span></span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a><span class="do">## $ date            &lt;chr&gt; "2024-08-05", "2024-08-05", "2024-08-05", "202…</span></span>
 <span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a><span class="do">## $ pass            &lt;int&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…</span></span>
-<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a><span class="do">## $ vessel          &lt;chr&gt; "OCEAN EXPLORER", "OCEAN EXPLORER", "ALASKA PR…</span></span>
-<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a><span class="do">## $ lat_start       &lt;dbl&gt; 52.01721, 53.11242, 51.96523, 52.67577, 52.507…</span></span>
-<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a><span class="do">## $ lon_start       &lt;dbl&gt; -175.8889, -170.9027, -172.6282, -172.7522, -1…</span></span>
-<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a><span class="do">## $ lat_end         &lt;dbl&gt; 52.00690, 53.10904, 51.96874, 52.67061, 52.516…</span></span>
-<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a><span class="do">## $ lon_end         &lt;dbl&gt; -175.9017, -170.9244, -172.6096, -172.7648, -1…</span></span>
-<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a><span class="do">## $ depth_m         &lt;dbl&gt; 184, 98, 216, 184, 167, 133, 225, 80, 186, 111…</span></span>
-<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a><span class="do">## $ effort          &lt;dbl&gt; 2.3745, 2.5268, 2.6409, 1.7392, 1.8012, 1.8531…</span></span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a><span class="do">## $ vessel          &lt;chr&gt; "NORTHWEST EXPLORER", "NORTHWEST EXPLORER", "N…</span></span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a><span class="do">## $ lat_start       &lt;dbl&gt; 60.66179, 60.65791, 60.31444, 59.98789, 60.011…</span></span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a><span class="do">## $ lon_start       &lt;dbl&gt; -178.1456, -177.5000, -177.3701, -177.2008, -1…</span></span>
+<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a><span class="do">## $ lat_end         &lt;dbl&gt; 60.63815, 60.67198, 60.33932, 60.01284, 60.032…</span></span>
+<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a><span class="do">## $ lon_end         &lt;dbl&gt; -178.1443, -177.5468, -177.3784, -177.1980, -1…</span></span>
+<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a><span class="do">## $ depth_m         &lt;dbl&gt; 159, 147, 147, 137, 141, 176, 149, 119, 86, 15…</span></span>
+<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a><span class="do">## $ effort          &lt;dbl&gt; 4.4429, 4.9899, 4.5955, 4.5007, 4.4427, 4.6980…</span></span>
 <span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a><span class="do">## $ effort_units    &lt;chr&gt; "ha", "ha", "ha", "ha", "ha", "ha", "ha", "ha"…</span></span>
-<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a><span class="do">## $ performance     &lt;chr&gt; "0", "0", "5", "4", "4", "0", "4", "0", "0", "…</span></span>
-<span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a><span class="do">## $ bottom_temp_c   &lt;dbl&gt; 4.6, 4.9, 4.5, 4.5, 4.6, 4.6, 4.3, 5.5, 4.8, 4…</span></span>
-<span id="cb8-17"><a href="#cb8-17" tabindex="-1"></a><span class="do">## $ region          &lt;chr&gt; "afsc", "afsc", "afsc", "afsc", "afsc", "afsc"…</span></span>
-<span id="cb8-18"><a href="#cb8-18" tabindex="-1"></a><span class="do">## $ year            &lt;int&gt; 2022, 2022, 2022, 2018, 2018, 2018, 2018, 2018…</span></span>
-<span id="cb8-19"><a href="#cb8-19" tabindex="-1"></a><span class="do">## $ itis            &lt;dbl&gt; 164711, 164711, 164711, 164711, 164711, 164711…</span></span>
-<span id="cb8-20"><a href="#cb8-20" tabindex="-1"></a><span class="do">## $ catch_numbers   &lt;dbl&gt; 0, 0, 0, 7, 11, 4, 11, 30, 12, 56, 2, 0, 0, 3,…</span></span>
-<span id="cb8-21"><a href="#cb8-21" tabindex="-1"></a><span class="do">## $ catch_weight    &lt;dbl&gt; 0.00, 0.00, 0.00, 24.65, 31.22, 14.61, 34.22, …</span></span>
-<span id="cb8-22"><a href="#cb8-22" tabindex="-1"></a><span class="do">## $ scientific_name &lt;chr&gt; "gadus macrocephalus", "gadus macrocephalus", …</span></span>
-<span id="cb8-23"><a href="#cb8-23" tabindex="-1"></a><span class="do">## $ common_name     &lt;chr&gt; "pacific cod", "pacific cod", "pacific cod", "…</span></span></code></pre></div>
+<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a><span class="do">## $ performance     &lt;chr&gt; "0", "0", "0", "0", "0", "0", "0", "0", "0", "…</span></span>
+<span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a><span class="do">## $ stratum         &lt;dbl&gt; 61, 61, 61, 61, 61, 61, 61, 622, 621, 50, 314,…</span></span>
+<span id="cb8-17"><a href="#cb8-17" tabindex="-1"></a><span class="do">## $ year            &lt;int&gt; 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024…</span></span>
+<span id="cb8-18"><a href="#cb8-18" tabindex="-1"></a><span class="do">## $ bottom_temp_c   &lt;dbl&gt; 2.5, 0.8, 1.5, 1.1, 1.8, 3.6, 2.4, 4.8, 5.4, 4…</span></span>
+<span id="cb8-19"><a href="#cb8-19" tabindex="-1"></a><span class="do">## $ region          &lt;chr&gt; "afsc", "afsc", "afsc", "afsc", "afsc", "afsc"…</span></span>
+<span id="cb8-20"><a href="#cb8-20" tabindex="-1"></a><span class="do">## $ itis            &lt;dbl&gt; 164711, 164711, 164711, 164711, 164711, 164711…</span></span>
+<span id="cb8-21"><a href="#cb8-21" tabindex="-1"></a><span class="do">## $ catch_numbers   &lt;dbl&gt; 4, 3, 1, 8, 7, 9, 5, 2, 2, 10, 0, 9, 6, 6, 21,…</span></span>
+<span id="cb8-22"><a href="#cb8-22" tabindex="-1"></a><span class="do">## $ catch_weight    &lt;dbl&gt; 22.600, 11.740, 2.370, 34.920, 23.960, 35.450,…</span></span>
+<span id="cb8-23"><a href="#cb8-23" tabindex="-1"></a><span class="do">## $ scientific_name &lt;chr&gt; "gadus macrocephalus", "gadus macrocephalus", …</span></span>
+<span id="cb8-24"><a href="#cb8-24" tabindex="-1"></a><span class="do">## $ common_name     &lt;chr&gt; "pacific cod", "pacific cod", "pacific cod", "…</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="citations">Citations<a class="anchor" aria-label="anchor" href="#citations"></a>
 </h3>
-<p>Citing the <code>surveyjoin</code> package can be done with the DOI linked above, though more detailed citations may be needed for specific surveys or methodology. For citations pertaining to surveys run by the Alaska Fisheries Science Center (AFSC), see <a href="https://github.com/afsc-gap-products/citations" class="external-link uri">https://github.com/afsc-gap-products/citations</a>. Metadata for surveys conducted by the AFSC can be found at <a href="https://afsc-gap-products.github.io/gap_products" class="external-link uri">https://afsc-gap-products.github.io/gap_products</a>.</p>
-<p>Background and additional citations on surveys run by the Northwest Fisheries Science Center (NWFSC) can be found in <a href="https://repository.library.noaa.gov/view/noaa/14179/noaa_14179_DS1.pdf" class="external-link">Keller et al. 2017</a>.</p>
+<p>Citing the <code>surveyjoin</code> package can be done with the DOI linked above, though more detailed citations may be needed for specific surveys or methodology. Some recent citations are:</p>
+<p><u>Aleutian Islands Bottom Trawl Survey</u></p>
+<ul>
+<li>Von Szalay PG, Raring NW, Siple MC, Dowlin AN, Riggle BC, and Laman EA. 2023. Data Report: 2022 Aleutian Islands bottom trawl survey. U.S. Dep. Commer. DOI: 10.25923/85cy-g225.</li>
+</ul>
+<p><u>Gulf of Alaska Bottom Trawl Survey</u></p>
+<ul>
+<li>Siple MC, von Szalay PG, Raring NW, Dowlin AN, Riggle BC. 2024. Data Report: 2023 Gulf of Alaska bottom trawl survey. DOI: 10.25923/GBB1-X748.</li>
+</ul>
+<p><u>Eastern &amp; Northern Bering Sea Crab/Groundfish Bottom Trawl Surveys</u></p>
+<ul>
+<li><p>Zacher LS, Richar JI, Fedewa EJ, Ryznar ER, Litzow MA. 2023. The 2023 Eastern Bering Sea Continental Shelf Trawl Survey: Results for Commercial Crab Species. U.S. Dep. Commer, 213 p.</p></li>
+<li><p>Markowitz EH, Dawson EJ, Wassermann S, Anderson AB, Rohan SK, Charriere BK, Stevenson DE. 2024. Results of the 2023 eastern and northern Bering Sea continental shelf bottom trawl survey of groundfish and invertebrate fauna. U.S. Dep. Commer.</p></li>
+</ul>
+<p><u>Eastern Bering Sea Slope Bottom Trawl Survey</u></p>
+<ul>
+<li>Hoff GR. 2016. Results of the 2016 eastern Bering Sea upper continental slope survey of groundfishes and invertebrate resources. U.S. Dep. Commer. DOI: 10.7289/V5/TM-AFSC-339.</li>
+</ul>
+<p><u>Fisheries and Oceans Canada Synoptic Bottom Trawl Surveys</u></p>
+<ul>
+<li><p>Nottingham MK, Williams DC, Wyeth MR, Olsen N. 2017. <em>Summary of the West Coast Vancouver Island synoptic bottom trawl survey, May 28 – June 21, 2014</em>. DFO Can. Manuscr. Rep. Fish. Aquat. Sci. 2017/3140, viii + 55 p, Nanaimo.</p></li>
+<li><p>Sinclair A, Schnute J, Haigh R, Starr P, Stanley R, Fargo J, Workman G. 2003. <em>Feasibility of Multispecies Groundfish Bottom Trawl Surveys on the BC Coast. DFO Canadian Science Advisory Secretariat (CSAS) Research Document, 2003/049.</em></p></li>
+<li><p>Williams DC, Nottingham MK, Olsen N, Wyeth MR. 2018a. <em>Summary of the Queen Charlotte Sound synoptic bottom trawl survey, July 6 – August 8, 2015</em>. DFO Can. Manuscr. Rep. Fish. Aquat. Sci. 3136, viii + 64 p, Nanaimo.</p></li>
+<li><p>Williams DC, Nottingham MK, Olsen N, Wyeth MR. 2018b. <em>Summary of the West Coast Haida Gwaii synoptic bottom trawl survey, August 25 – October 2, 2014</em>. DFO Can. Manuscr. Rep. Fish. Aquat. Sci. 2018/3134, viii + 42 p, Nanaimo.</p></li>
+<li><p>Wyeth MR, Olsen N, Nottingham MK, Williams DC. 2018. <em>Summary of the Hecate Strait synoptic bottom trawl survey, May 26 – June 22, 2015</em>. DFO Can. Manuscr. Rep. Fish. Aquat. Sci. 2018/3126, viii + 55 p, Nanaimo.</p></li>
+</ul>
+<p><u>USA West Coast Bottom Trawl Surveys</u></p>
+<ul>
+<li>Keller AA, Wallace JR, Methot RD. 2017. The Northwest Fisheries Science Center’s West Coast Groundfish Bottom Trawl Survey: history, design, and description. DOI: 10.7289/V5/TM-NWFSC-136.</li>
+</ul>
 </div>
 <div class="section level3">
 <h3 id="what-species-are-included">What species are included?<a class="anchor" aria-label="anchor" href="#what-species-are-included"></a>
@@ -423,16 +453,16 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
       </footer>
 </div>
 
-  
 
 
-  
+
+
 
   </body>
 </html>
