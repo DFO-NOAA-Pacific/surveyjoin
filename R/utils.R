@@ -197,7 +197,7 @@ cache_data <- function(region = c("nwfsc", "pbs", "afsc")) {
 #' @importFrom rlang .data
 #' @importFrom dplyr %>%
 #' @importFrom purrr map_dfr
-#' @importFrom cli cli_alert_warning
+#' @importFrom cli cli_alert_warning cli_abort cli_alert_info
 #' @importFrom RSQLite dbWriteTable
 #'
 #' @examples
@@ -207,53 +207,72 @@ cache_data <- function(region = c("nwfsc", "pbs", "afsc")) {
 load_sql_data <- function() {
   f <- files_to_cache()
 
+  # detect if running in GitHub Actions
+  in_ci <- Sys.getenv("GITHUB_ACTIONS") == "true"
+
   f_haul <- sort(f[grepl("haul", f)])
   f_catch <- sort(f[grepl("catch", f)])
-  stopifnot(length(f_haul) == length(f_catch))
+
   haul <- map_dfr(f_haul, function(x) {
-    # error handling if file doesn't exist -- largely for CI on Github
-    this_file <- file.path(get_cache_folder(), x)
-    if (!file.exists(this_file)) {
-      cli_inform(paste("File does not exist: ", this_file))
-      out <- NULL
+    if (in_ci) {
+      # Runnng in CI, read from GitHub
+      url <- paste0("https://github.com/DFO-NOAA-Pacific/surveyjoin-data/raw/main/", x)
+      cli::cli_alert_info("Downloading haul data from: {url}")
+      temp <- tryCatch(readRDS(url(url)), error = function(e) {
+        cli::cli_abort("Failed to download: {x}")
+      })
     } else {
-      out <- readRDS(file.path(get_cache_folder(), x))
-      out$region <- gsub("([a-z]+)-[a-z]+.rds", "\\1", x)
-      if (is.character(out$event_id)) out$event_id <- as.numeric(out$event_id)
-      # out$event_id <- as.character(out$event_id)
-      out$performance <- as.character(out$performance)
-      out$year <- as.integer(lubridate::year(out$date))
-      out$date <- as.character(lubridate::as_date(out$date))
-      # FIXME: do this long before! Alaska
-      out$lon_start <- ifelse(out$lon_start > 0, out$lon_start * -1, out$lon_start)
-      out$lon_end <- ifelse(out$lon_end > 0, out$lon_end * -1, out$lon_end)
-      if (out$region[1] == "pbs") {
-        # Fix me earlier!
-        out <- dplyr::rename(out, bottom_temp_c = .data$temperature_C) %>%
+      # Read from local cache
+      this_file <- file.path(get_cache_folder(), x)
+      if (!file.exists(this_file)) {
+        cli::cli_abort("File missing locally: {this_file}")
+      } else {
+        temp <- readRDS(this_file)
+      }
+    }
+
+    if (!is.null(temp)) {
+      temp$region <- gsub("([a-z]+)-[a-z]+.rds", "\\1", x)
+      if (is.character(temp$event_id)) temp$event_id <- as.numeric(temp$event_id)
+      temp$performance <- as.character(temp$performance)
+      temp$year <- as.integer(lubridate::year(temp$date))
+      temp$date <- as.character(lubridate::as_date(temp$date))
+      temp$lon_start <- ifelse(temp$lon_start > 0, temp$lon_start * -1, temp$lon_start)
+      temp$lon_end <- ifelse(temp$lon_end > 0, temp$lon_end * -1, temp$lon_end)
+      if (temp$region[1] == "pbs") {
+        temp <- dplyr::rename(temp, bottom_temp_c = .data$temperature_C) %>%
           dplyr::select(-.data$do_mlpL, -.data$salinity_PSU)
       }
-      out
     }
-  })
-  catch <- map_dfr(f_catch, function(x) {
-    # error handling if file doesn't exist -- largely for CI on Github
-    this_file <- file.path(get_cache_folder(), x)
-    if (!file.exists(this_file)) {
-      cli_inform(paste("File does not exist: ", this_file))
-      out <- NULL
-    } else {
-      out <- readRDS(file.path(get_cache_folder(), x))
-      out$region <- gsub("([a-z]+)-[a-z]+.rds", "\\1", x)
-      out
-    }
+    temp
   })
 
-  if(nrow(catch) != 0) {
+  catch <- map_dfr(f_catch, function(x) {
+    if (in_ci) {
+      url <- paste0("https://github.com/DFO-NOAA-Pacific/surveyjoin-data/raw/main/", x)
+      cli::cli_alert_info("Downloading catch data from: {url}")
+      temp <- tryCatch(readRDS(url(url)), error = function(e) {
+        cli::cli_abort("Failed to download: {x}")
+      })
+    } else {
+      this_file <- file.path(get_cache_folder(), x)
+      if (!file.exists(this_file)) {
+        cli::cli_abort("File missing locally: {this_file}")
+      } else {
+        temp <- readRDS(this_file)
+      }
+    }
+
+    if (!is.null(temp)) {
+      temp$region <- gsub("([a-z]+)-[a-z]+.rds", "\\1", x)
+    }
+    temp
+  })
+
+  if (nrow(catch) != 0) {
     cli::cli_alert_success("Raw data read into memory")
     catch$scientific_name <- NULL
     catch <- dplyr::left_join(catch, surveyjoin::spp_dictionary, by = dplyr::join_by("itis"))
-    # stopifnot(sum(is.na(catch$scientific_name)) == 0L)
-    cli::cli_alert_success("Taxonomic data joined to catch data")
 
     db <- dbConnect(RSQLite::SQLite(), dbname = sql_folder())
     on.exit(suppressWarnings(suppressMessages(DBI::dbDisconnect(db))))
@@ -262,7 +281,7 @@ load_sql_data <- function() {
 
     cli::cli_alert_success("SQLite database created")
   } else {
-    cli::cli_inform("There was a problem with loading cached files, SQLite database not created")
+    cli::cli_alert_warning("Data loading failed, SQLite database not created.")
   }
 }
 

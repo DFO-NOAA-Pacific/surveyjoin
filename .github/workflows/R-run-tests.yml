@@ -1,0 +1,36 @@
+name: Run surveyjoin tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test-r:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: "4.3.1"
+
+      - name: Install dependencies
+        run: |
+          install.packages(c("remotes", "testthat", "dplyr", "cli", "purrr", "lubridate", "DBI", "RSQLite", "httr", "jsonlite"))
+
+      - name: Run testthat tests
+        run: |
+          Rscript -e 'testthat::test_dir("tests")'
+
+      - name: Check SQLite database file
+        run: |
+          if [ ! -f "$(Rscript -e 'cat(sql_folder())')" ]; then
+            echo "SQLite database was not created!"
+            exit 1
+          fi
