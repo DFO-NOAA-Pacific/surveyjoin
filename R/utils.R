@@ -287,7 +287,10 @@ load_sql_data <- function() {
     catch <- dplyr::left_join(catch, surveyjoin::spp_dictionary, by = dplyr::join_by("itis"))
 
     db_path <- sql_folder()
-    cli::cli_alert_info("Database path: {db_path}")
+    cli::cli_alert_info("Checking database path: {db_path}")
+    if (!file.exists(db_path)) {
+      cli::cli_alert_danger("Database file does not exist: {db_path}")
+    }
 
     db <- dbConnect(RSQLite::SQLite(), dbname = sql_folder())
     on.exit(suppressWarnings(suppressMessages(DBI::dbDisconnect(db))))

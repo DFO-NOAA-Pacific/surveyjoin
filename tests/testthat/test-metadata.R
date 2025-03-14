@@ -40,6 +40,22 @@ test_that("cache_data runs successfully", {
   }
 })
 
+test_that("SQLite database is created successfully", {
+  db_path <- sql_folder()
+  expect_true(file.exists(db_path), info = paste("Database file should exist at:", db_path))
+})
+
+# test_that("SQLite database contains data", {
+#   db <- surv_db()
+#   haul_count <- DBI::dbGetQuery(db, "SELECT COUNT(*) FROM haul")[[1]]
+#   catch_count <- DBI::dbGetQuery(db, "SELECT COUNT(*) FROM catch")[[1]]
+#   DBI::dbDisconnect(db)
+#
+#   expect_gt(haul_count, 0, info = "Haul data should have > 1 row")
+#   expect_gt(catch_count, 0, info = "Catch data should have > 1 row")
+# })
+
+
 test_that("test metadata", {
   skip_on_ci()
   g <- get_metadata()
