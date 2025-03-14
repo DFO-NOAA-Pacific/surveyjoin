@@ -6,7 +6,11 @@ test_that("load_sql_data runs successfully", {
     skip_on_cran()
   }
   # Changed to expect_no_error becasue load_sql_data throws warnings about pkg versions
-  expect_no_error(load_sql_data())
+  db_path <- surveyjoin:::sql_folder()
+  cli::cli_alert_info("Database path: {db_path}")
+
+  load_sql_data()
+  #expect_no_error(load_sql_data())
 
   # Check if database was created
   db_path <- sql_folder()
