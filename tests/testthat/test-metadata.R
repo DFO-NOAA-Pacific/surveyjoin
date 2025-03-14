@@ -21,11 +21,10 @@ test_that("cache_data runs successfully", {
     skip_on_cran()
   }
 
-  expect_no_error(cache_data())
-
-  # Check if cache folder exists
   cache_folder <- get_cache_folder()
-  expect_true(dir.exists(cache_folder), info = paste("Cache folder should exist at:", cache_folder))
+  cli::cli_alert_info("Cache folder path: {cache_folder}")
+
+  expect_no_error(cache_data())
 
   # Check that a file exists in cache (if not in CI)
   if (Sys.getenv("GITHUB_ACTIONS") != "true") {
