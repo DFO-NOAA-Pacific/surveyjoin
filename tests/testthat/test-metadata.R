@@ -1,3 +1,42 @@
+test_that("load_sql_data runs successfully", {
+  # Don't skip on CI
+  if (Sys.getenv("GITHUB_ACTIONS") == "true") {
+    cli::cli_alert_info("Running load_sql_data() in CI...")
+  } else {
+    skip_on_cran()
+  }
+  # Changed to expect_no_error becasue load_sql_data throws warnings about pkg versions
+  expect_no_error(load_sql_data())
+
+  # Check if database was created
+  db_path <- sql_folder()
+  expect_true(file.exists(db_path), info = paste("Database file should exist at:", db_path))
+})
+
+test_that("cache_data runs successfully", {
+  # Don't skip on CI
+  if (Sys.getenv("GITHUB_ACTIONS") == "true") {
+    cli::cli_alert_info("Running cache_data() in CI...")
+  } else {
+    skip_on_cran()
+  }
+
+  expect_no_error(cache_data())
+
+  # Check if cache folder exists
+  cache_folder <- get_cache_folder()
+  expect_true(dir.exists(cache_folder), info = paste("Cache folder should exist at:", cache_folder))
+
+  # Check that a file exists in cache (if not in CI)
+  if (Sys.getenv("GITHUB_ACTIONS") != "true") {
+    cached_files <- files_to_cache()
+    existing_files <- list.files(cache_folder, full.names = TRUE)
+    expect_true(any(basename(existing_files) %in% cached_files),
+                info = "At least one expected data file should exist in the cache"
+    )
+  }
+})
+
 test_that("test metadata", {
   skip_on_ci()
   g <- get_metadata()
@@ -40,42 +79,4 @@ test_that("data versioning", {
   expect_equal(names(g), c("file", "last_updated"))
 })
 
-test_that("load_sql_data runs successfully", {
-  # Don't skip on CI
-  if (Sys.getenv("GITHUB_ACTIONS") == "true") {
-    cli::cli_alert_info("Running load_sql_data() in CI...")
-  } else {
-    skip_on_cran()
-  }
-  # Changed to expect_no_error becasue load_sql_data throws warnings about pkg versions
-  expect_no_error(load_sql_data())
 
-  # Check if database was created
-  db_path <- sql_folder()
-  expect_true(file.exists(db_path), info = paste("Database file should exist at:", db_path))
-})
-
-
-test_that("cache_data runs successfully", {
-  # Don't skip on CI
-  if (Sys.getenv("GITHUB_ACTIONS") == "true") {
-    cli::cli_alert_info("Running cache_data() in CI...")
-  } else {
-    skip_on_cran()
-  }
-
-  expect_no_error(cache_data())
-
-  # Check if cache folder exists
-  cache_folder <- get_cache_folder()
-  expect_true(dir.exists(cache_folder), info = paste("Cache folder should exist at:", cache_folder))
-
-  # Check that a file exists in cache (if not in CI)
-  if (Sys.getenv("GITHUB_ACTIONS") != "true") {
-    cached_files <- files_to_cache()
-    existing_files <- list.files(cache_folder, full.names = TRUE)
-    expect_true(any(basename(existing_files) %in% cached_files),
-                info = "At least one expected data file should exist in the cache"
-    )
-  }
-})
