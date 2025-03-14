@@ -22,7 +22,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          install.packages(c("remotes", "testthat", "dplyr", "cli", "purrr", "lubridate", "DBI", "RSQLite", "httr", "jsonlite"))
+          Rscript -e 'install.packages(c("remotes", "testthat", "dplyr", "cli", "purrr", "lubridate", "DBI", "RSQLite", "httr", "jsonlite"))'
 
       - name: Run testthat tests
         run: |
