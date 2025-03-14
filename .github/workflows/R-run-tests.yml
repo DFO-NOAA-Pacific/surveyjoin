@@ -22,7 +22,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          Rscript -e 'install.packages(c("remotes", "testthat", "dplyr", "cli", "purrr", "lubridate", "DBI", "RSQLite", "httr", "jsonlite"))'
+          Rscript -e 'install.packages(c("remotes"))'
 
       - name: Install surveyjoin
         run: |
