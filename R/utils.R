@@ -286,6 +286,9 @@ load_sql_data <- function() {
     catch$scientific_name <- NULL
     catch <- dplyr::left_join(catch, surveyjoin::spp_dictionary, by = dplyr::join_by("itis"))
 
+    db_path <- sql_folder()
+    cli::cli_alert_info("Database path: {db_path}")
+
     db <- dbConnect(RSQLite::SQLite(), dbname = sql_folder())
     on.exit(suppressWarnings(suppressMessages(DBI::dbDisconnect(db))))
     dbWriteTable(db, "haul", haul, overwrite = TRUE, append = FALSE)
