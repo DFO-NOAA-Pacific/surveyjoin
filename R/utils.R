@@ -81,6 +81,13 @@ save_metadata <- function(metadata) {
 #' @importFrom cli cli_inform
 #' @importFrom utils download.file
 cache_files <- function() {
+
+  running_ci <- Sys.getenv("GITHUB_ACTIONS") == "true"
+  if (running_ci) {
+    cli_inform("Running in CI: Skipping cache_files() file downloads.")
+    return(NULL)  # skip this step, ignore rest of function
+  }
+
   files <- files_to_cache()
   metadata <- load_metadata()
   cache_folder <- get_cache_folder()
