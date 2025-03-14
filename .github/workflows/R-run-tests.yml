@@ -35,4 +35,4 @@ jobs:
 
       - name: Run testthat tests
         run: |
-          Rscript -e 'testthat::test_package("surveyjoin")'
+          Rscript -e 'library(testthat); library(surveyjoin); test_check("surveyjoin")'
