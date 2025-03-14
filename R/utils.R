@@ -214,36 +214,54 @@ cache_data <- function(region = c("nwfsc", "pbs", "afsc")) {
 load_sql_data <- function() {
   f <- files_to_cache()
 
-  # detect if running in GitHub Actions
+  # Detect if running in CI
   in_ci <- Sys.getenv("GITHUB_ACTIONS") == "true"
 
   f_haul <- sort(f[grepl("haul", f)])
   f_catch <- sort(f[grepl("catch", f)])
 
-  haul <- map_dfr(f_haul, function(x) {
+  # read and clean data
+  read_rds_file <- function(x) {
     if (in_ci) {
-      # Runnng in CI, read from GitHub
-      url <- paste0("https://github.com/DFO-NOAA-Pacific/surveyjoin-data/raw/main/", x)
-      cli::cli_alert_info("Downloading haul data from: {url}")
-      temp <- tryCatch(readRDS(url(url)), error = function(e) {
-        cli::cli_abort("Failed to download: {x}")
+      # run in CI: download from GitHub w/o saving
+      url <- paste0("https://raw.githubusercontent.com/DFO-NOAA-Pacific/surveyjoin-data/main/", x)
+      cli::cli_alert_info("Reading remote file from GitHub: {url}")
+      # create tempfile
+      temp_file <- tempfile(fileext = ".rds")
+
+      result <- tryCatch({
+        # Download to temp file and read in file
+        download.file(url, destfile = temp_file, mode = "wb", quiet = TRUE)
+        data <- readRDS(temp_file)
+        return(data)
+      }, error = function(e) {
+        cli::cli_alert_warning("Failed to download {x}")
+        return(NULL)
+      }, finally = {
+        # delete temp file
+        if (file.exists(temp_file)) unlink(temp_file, recursive = TRUE, force = TRUE)
       })
+      return(result)
     } else {
       # Read from local cache
-      this_file <- file.path(get_cache_folder(), x)
-      if (!file.exists(this_file)) {
-        cli::cli_abort("File missing locally: {this_file}")
-      } else {
-        temp <- readRDS(this_file)
+      local_file <- file.path(get_cache_folder(), x)
+      if (!file.exists(local_file)) {
+        cli::cli_abort("File missing locally: {local_file}")
       }
+      return(readRDS(local_file))
     }
+  }
 
+  # Read haul data
+  haul <- map_dfr(f_haul, function(x) {
+    temp <- read_rds_file(x)
     if (!is.null(temp)) {
       temp$region <- gsub("([a-z]+)-[a-z]+.rds", "\\1", x)
       if (is.character(temp$event_id)) temp$event_id <- as.numeric(temp$event_id)
       temp$performance <- as.character(temp$performance)
       temp$year <- as.integer(lubridate::year(temp$date))
       temp$date <- as.character(lubridate::as_date(temp$date))
+      # Flip longitude if entered incorrectly
       temp$lon_start <- ifelse(temp$lon_start > 0, temp$lon_start * -1, temp$lon_start)
       temp$lon_end <- ifelse(temp$lon_end > 0, temp$lon_end * -1, temp$lon_end)
       if (temp$region[1] == "pbs") {
@@ -254,22 +272,9 @@ load_sql_data <- function() {
     temp
   })
 
+  # Read catch data
   catch <- map_dfr(f_catch, function(x) {
-    if (in_ci) {
-      url <- paste0("https://github.com/DFO-NOAA-Pacific/surveyjoin-data/raw/main/", x)
-      cli::cli_alert_info("Downloading catch data from: {url}")
-      temp <- tryCatch(readRDS(url(url)), error = function(e) {
-        cli::cli_abort("Failed to download: {x}")
-      })
-    } else {
-      this_file <- file.path(get_cache_folder(), x)
-      if (!file.exists(this_file)) {
-        cli::cli_abort("File missing locally: {this_file}")
-      } else {
-        temp <- readRDS(this_file)
-      }
-    }
-
+    temp <- read_rds_file(x)
     if (!is.null(temp)) {
       temp$region <- gsub("([a-z]+)-[a-z]+.rds", "\\1", x)
     }
