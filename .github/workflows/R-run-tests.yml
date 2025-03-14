@@ -27,7 +27,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          Rscript -e 'install.packages(c("pak"))'
+          Rscript -e 'install.packages(c("pak", "testthat"))'
 
       - name: Install surveyjoin
         run: |
@@ -35,7 +35,7 @@ jobs:
 
       - name: Run testthat tests
         run: |
-          Rscript -e 'testthat::test_dir("tests")'
+          Rscript -e 'testthat::test_check("surveyjoin")'
 
       - name: Check SQLite database file
         run: |
