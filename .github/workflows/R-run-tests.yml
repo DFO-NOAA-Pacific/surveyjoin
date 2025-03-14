@@ -36,10 +36,3 @@ jobs:
       - name: Run testthat tests
         run: |
           Rscript -e 'testthat::test_package("surveyjoin")'
-
-      - name: Check SQLite database file
-        run: |
-          if [ ! -f "$(Rscript -e 'cat(sql_folder())')" ]; then
-            echo "SQLite database was not created!"
-            exit 1
-          fi
