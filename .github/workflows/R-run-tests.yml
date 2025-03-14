@@ -35,7 +35,7 @@ jobs:
 
       - name: Run testthat tests
         run: |
-          Rscript -e 'testthat::test_check("surveyjoin")'
+          Rscript -e 'testthat::test_package("surveyjoin")'
 
       - name: Check SQLite database file
         run: |
