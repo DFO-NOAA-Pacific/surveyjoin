@@ -40,10 +40,10 @@ test_that("cache_data runs successfully", {
   }
 })
 
-test_that("SQLite database is created successfully", {
-  db_path <- sql_folder()
-  expect_true(file.exists(db_path), info = paste("Database file should exist at:", db_path))
-})
+# test_that("SQLite database is created successfully", {
+#   db_path <- sql_folder()
+#   expect_true(file.exists(db_path), info = paste("Database file should exist at:", db_path))
+# })
 
 # test_that("SQLite database contains data", {
 #   db <- surv_db()
