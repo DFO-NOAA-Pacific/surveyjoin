@@ -24,6 +24,10 @@ jobs:
         run: |
           Rscript -e 'install.packages(c("remotes", "testthat", "dplyr", "cli", "purrr", "lubridate", "DBI", "RSQLite", "httr", "jsonlite"))'
 
+      - name: Install surveyjoin
+        run: |
+          Rscript -e 'remotes::install_github("DFO-NOAA-Pacific/surveyjoin")'
+
       - name: Run testthat tests
         run: |
           Rscript -e 'testthat::test_dir("tests")'
