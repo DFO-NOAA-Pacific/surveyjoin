@@ -22,11 +22,11 @@ jobs:
 
       - name: Install dependencies
         run: |
-          Rscript -e 'install.packages(c("remotes"))'
+          Rscript -e 'install.packages(c("pak"))'
 
       - name: Install surveyjoin
         run: |
-          Rscript -e 'remotes::install_github("DFO-NOAA-Pacific/surveyjoin")'
+          Rscript -e 'pak::pkg_install("DFO-NOAA-Pacific/surveyjoin")'
 
       - name: Run testthat tests
         run: |
