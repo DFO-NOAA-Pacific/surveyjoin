@@ -81,6 +81,13 @@ save_metadata <- function(metadata) {
 #' @importFrom cli cli_inform
 #' @importFrom utils download.file
 cache_files <- function() {
+
+  running_ci <- Sys.getenv("GITHUB_ACTIONS") == "true"
+  if (running_ci) {
+    cli_inform("Running in CI: Skipping cache_files() file downloads.")
+    return(NULL)  # skip this step, ignore rest of function
+  }
+
   files <- files_to_cache()
   metadata <- load_metadata()
   cache_folder <- get_cache_folder()
@@ -197,7 +204,7 @@ cache_data <- function(region = c("nwfsc", "pbs", "afsc")) {
 #' @importFrom rlang .data
 #' @importFrom dplyr %>%
 #' @importFrom purrr map_dfr
-#' @importFrom cli cli_alert_warning
+#' @importFrom cli cli_alert_warning cli_abort cli_alert_info
 #' @importFrom RSQLite dbWriteTable
 #'
 #' @examples
@@ -207,53 +214,85 @@ cache_data <- function(region = c("nwfsc", "pbs", "afsc")) {
 load_sql_data <- function() {
   f <- files_to_cache()
 
+  # Detect if running in CI
+  in_ci <- Sys.getenv("GITHUB_ACTIONS") == "true"
+
   f_haul <- sort(f[grepl("haul", f)])
   f_catch <- sort(f[grepl("catch", f)])
-  stopifnot(length(f_haul) == length(f_catch))
-  haul <- map_dfr(f_haul, function(x) {
-    # error handling if file doesn't exist -- largely for CI on Github
-    this_file <- file.path(get_cache_folder(), x)
-    if (!file.exists(this_file)) {
-      cli_inform(paste("File does not exist: ", this_file))
-      out <- NULL
+
+  # read and clean data
+  read_rds_file <- function(x) {
+    if (in_ci) {
+      # run in CI: download from GitHub w/o saving
+      url <- paste0("https://raw.githubusercontent.com/DFO-NOAA-Pacific/surveyjoin-data/main/", x)
+      cli::cli_alert_info("Reading remote file from GitHub: {url}")
+      # create tempfile
+      temp_file <- tempfile(fileext = ".rds")
+
+      result <- tryCatch({
+        # Download to temp file and read in file
+        download.file(url, destfile = temp_file, mode = "wb", quiet = TRUE)
+        data <- readRDS(temp_file)
+        return(data)
+      }, error = function(e) {
+        cli::cli_alert_warning("Failed to download {x}")
+        return(NULL)
+      }, finally = {
+        # delete temp file
+        if (file.exists(temp_file)) unlink(temp_file, recursive = TRUE, force = TRUE)
+      })
+      return(result)
     } else {
-      out <- readRDS(file.path(get_cache_folder(), x))
-      out$region <- gsub("([a-z]+)-[a-z]+.rds", "\\1", x)
-      if (is.character(out$event_id)) out$event_id <- as.numeric(out$event_id)
-      # out$event_id <- as.character(out$event_id)
-      out$performance <- as.character(out$performance)
-      out$year <- as.integer(lubridate::year(out$date))
-      out$date <- as.character(lubridate::as_date(out$date))
-      # FIXME: do this long before! Alaska
-      out$lon_start <- ifelse(out$lon_start > 0, out$lon_start * -1, out$lon_start)
-      out$lon_end <- ifelse(out$lon_end > 0, out$lon_end * -1, out$lon_end)
-      if (out$region[1] == "pbs") {
-        # Fix me earlier!
-        out <- dplyr::rename(out, bottom_temp_c = .data$temperature_C) %>%
-          dplyr::select(-.data$do_mlpL, -.data$salinity_PSU)
+      # Read from local cache
+      local_file <- file.path(get_cache_folder(), x)
+      if (!file.exists(local_file)) {
+        cli::cli_abort("File missing locally: {local_file}")
       }
-      out
+      return(readRDS(local_file))
     }
-  })
-  catch <- map_dfr(f_catch, function(x) {
-    # error handling if file doesn't exist -- largely for CI on Github
-    this_file <- file.path(get_cache_folder(), x)
-    if (!file.exists(this_file)) {
-      cli_inform(paste("File does not exist: ", this_file))
-      out <- NULL
-    } else {
-      out <- readRDS(file.path(get_cache_folder(), x))
-      out$region <- gsub("([a-z]+)-[a-z]+.rds", "\\1", x)
-      out
+  }
+
+  # Read haul data
+  haul <- map_dfr(f_haul, function(x) {
+    temp <- read_rds_file(x)
+    if (!is.null(temp)) {
+      temp$region <- gsub("([a-z]+)-[a-z]+.rds", "\\1", x)
+      if (is.character(temp$event_id)) temp$event_id <- as.numeric(temp$event_id)
+      temp$performance <- as.character(temp$performance)
+      temp$year <- as.integer(lubridate::year(temp$date))
+      temp$date <- as.character(lubridate::as_date(temp$date))
+      # Flip longitude if entered incorrectly
+      temp$lon_start <- ifelse(temp$lon_start > 0, temp$lon_start * -1, temp$lon_start)
+      temp$lon_end <- ifelse(temp$lon_end > 0, temp$lon_end * -1, temp$lon_end)
+      if (temp$region[1] == "pbs") {
+        temp <- dplyr::rename(temp, bottom_temp_c = "temperature_C") %>%
+          dplyr::select(-"do_mlpL", -"salinity_PSU")
+      }
     }
+    temp
   })
 
-  if(nrow(catch) != 0) {
+  # Read catch data
+  catch <- map_dfr(f_catch, function(x) {
+    temp <- read_rds_file(x)
+    if (!is.null(temp)) {
+      temp$region <- gsub("([a-z]+)-[a-z]+.rds", "\\1", x)
+    }
+    temp
+  })
+
+  if (nrow(catch) != 0) {
     cli::cli_alert_success("Raw data read into memory")
     catch$scientific_name <- NULL
     catch <- dplyr::left_join(catch, surveyjoin::spp_dictionary, by = dplyr::join_by("itis"))
-    # stopifnot(sum(is.na(catch$scientific_name)) == 0L)
-    cli::cli_alert_success("Taxonomic data joined to catch data")
+
+    db_path <- sql_folder()
+
+    # See if database file exists -- if no, create an empty file
+    if (!file.exists(db_path)) {
+      cli::cli_alert_info("Database file does not exist. Creating an empty file at: {db_path}")
+      file.create(db_path)
+    }
 
     db <- dbConnect(RSQLite::SQLite(), dbname = sql_folder())
     on.exit(suppressWarnings(suppressMessages(DBI::dbDisconnect(db))))
@@ -262,13 +301,20 @@ load_sql_data <- function() {
 
     cli::cli_alert_success("SQLite database created")
   } else {
-    cli::cli_inform("There was a problem with loading cached files, SQLite database not created")
+    cli::cli_alert_warning("Data loading failed, SQLite database not created.")
   }
 }
 
 
 sql_folder <- function() {
-  file.path(get_cache_folder(), "surveyjoin.sqlite")
+  db_path <- file.path(get_cache_folder(), "surveyjoin.sqlite")
+  db_dir <- dirname(db_path) # directory minus filename
+
+  if (!dir.exists(db_dir)) {
+    cli::cli_alert_info("Creating missing database directory: {db_dir}")
+    dir.create(db_dir, recursive = TRUE, showWarnings = FALSE)
+  }
+  return(db_path)
 }
 
 #' Function to create a connection to the database
