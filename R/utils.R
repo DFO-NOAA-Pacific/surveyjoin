@@ -307,7 +307,14 @@ load_sql_data <- function() {
 
 
 sql_folder <- function() {
-  file.path(get_cache_folder(), "surveyjoin.sqlite")
+  db_path <- file.path(get_cache_folder(), "surveyjoin.sqlite")
+  db_dir <- dirname(db_path) # directory minus filename
+
+  if (!dir.exists(db_dir)) {
+    cli::cli_alert_info("Creating missing database directory: {db_dir}")
+    dir.create(db_dir, recursive = TRUE, showWarnings = FALSE)
+  }
+  return(db_path)
 }
 
 #' Function to create a connection to the database
