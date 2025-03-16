@@ -1,22 +1,3 @@
-test_that("load_sql_data runs successfully", {
-  # Don't skip on CI
-  if (Sys.getenv("GITHUB_ACTIONS") == "true") {
-    cli::cli_alert_info("Running load_sql_data() in CI...")
-  } else {
-    skip_on_cran()
-  }
-  # Changed to expect_no_error becasue load_sql_data throws warnings about pkg versions
-  db_path <- surveyjoin:::sql_folder()
-  cli::cli_alert_info("Database path: {db_path}")
-
-  load_sql_data()
-  #expect_no_error(load_sql_data())
-
-  # Check if database was created
-  db_path <- sql_folder()
-  expect_true(file.exists(db_path), info = paste("Database file should exist at:", db_path))
-})
-
 test_that("cache_data runs successfully", {
   # Don't skip on CI
   if (Sys.getenv("GITHUB_ACTIONS") == "true") {
@@ -40,20 +21,35 @@ test_that("cache_data runs successfully", {
   }
 })
 
-# test_that("SQLite database is created successfully", {
-#   db_path <- sql_folder()
-#   expect_true(file.exists(db_path), info = paste("Database file should exist at:", db_path))
-# })
+test_that("load_sql_data runs successfully", {
+  # Don't skip on CI
+  if (Sys.getenv("GITHUB_ACTIONS") == "true") {
+    cli::cli_alert_info("Running load_sql_data() in CI...")
+  } else {
+    skip_on_cran()
+  }
+  # Changed to expect_no_error becasue load_sql_data throws warnings about pkg versions
+  db_path <- surveyjoin:::sql_folder()
+  cli::cli_alert_info("Database path: {db_path}")
 
-# test_that("SQLite database contains data", {
-#   db <- surv_db()
-#   haul_count <- DBI::dbGetQuery(db, "SELECT COUNT(*) FROM haul")[[1]]
-#   catch_count <- DBI::dbGetQuery(db, "SELECT COUNT(*) FROM catch")[[1]]
-#   DBI::dbDisconnect(db)
-#
-#   expect_gt(haul_count, 0, info = "Haul data should have > 1 row")
-#   expect_gt(catch_count, 0, info = "Catch data should have > 1 row")
-# })
+  load_sql_data()
+
+  # Check if database was created
+  db_path <- sql_folder()
+  expect_true(file.exists(db_path), info = paste("Database file should exist at:", db_path))
+
+  # test that SQLite database contains data
+  g <- get_data(regions="pbs")
+  expect_gt(nrow(g), 300000)
+
+  # test data versioning
+  ver <- data_version()
+  expect_equal(nrow(ver), 6L)
+  expect_equal(names(ver), c("file", "last_updated"))
+  expect_equal(ver$file, c("pbs-catch.rds", "pbs-haul.rds",
+                           "afsc-catch.rds", "afsc-haul.rds",
+                           "nwfsc-catch.rds", "nwfsc-haul.rds"))
+})
 
 
 test_that("test metadata", {
@@ -90,12 +86,11 @@ test_that("get surveys", {
   expect_equal(nrow(g), 14L)
   expect_equal(names(g), c("survey", "region"))
 })
-
-test_that("data versioning", {
-  skip_on_ci()
-  g <- data_version()
-  expect_equal(nrow(g), 6L)
-  expect_equal(names(g), c("file", "last_updated"))
-})
+#
+# test_that("data versioning", {
+#   skip_on_ci()
+#   g <- data_version()
+#
+# })
 
 
