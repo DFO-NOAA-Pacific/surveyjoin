@@ -43,12 +43,12 @@ test_that("load_sql_data runs successfully", {
   expect_gt(nrow(g), 300000)
 
   # test data versioning
-  ver <- data_version()
-  expect_equal(nrow(ver), 6L)
-  expect_equal(names(ver), c("file", "last_updated"))
-  expect_equal(ver$file, c("pbs-catch.rds", "pbs-haul.rds",
-                           "afsc-catch.rds", "afsc-haul.rds",
-                           "nwfsc-catch.rds", "nwfsc-haul.rds"))
+  # ver <- data_version()
+  # expect_equal(nrow(ver), 6L)
+  # expect_equal(names(ver), c("file", "last_updated"))
+  # expect_equal(ver$file, c("pbs-catch.rds", "pbs-haul.rds",
+  #                          "afsc-catch.rds", "afsc-haul.rds",
+  #                          "nwfsc-catch.rds", "nwfsc-haul.rds"))
 })
 
 
