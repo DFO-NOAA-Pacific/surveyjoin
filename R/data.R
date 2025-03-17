@@ -8,8 +8,9 @@
 #' (WCBTS, "NWFSC.Combo") and triennial survey ("Triennial") collected by NOAA's
 #' Northwest Fisheries Science Center. Columns include the latitude and
 #' longitude in decimal degrees, area of each survey cell (in hectares), the
-#' survey name (`survey`) year of update (`survey_domain_year`) and
-#' depth (currently in meters)
+#' survey name (`survey`) year of update (`survey_domain_year`),
+#' depth (currently in meters), and `split_state` indicating whether the cell
+#' is in California, Oregon, or Washington
 #'
 #' @format A data frame.
 "nwfsc_grid"

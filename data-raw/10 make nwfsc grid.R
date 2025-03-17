@@ -63,7 +63,7 @@ grid_tri <- dplyr::rename(grid_df,
   dplyr::select(-area_km2_WCGBTS)
 
 nwfsc_grid <- rbind(grid_WCGBTS, grid_tri) |>
-  dplyr::select(lon, lat, area, depth_m, survey, survey_domain_year)
+  dplyr::select(lon, lat, area, depth_m, survey, survey_domain_year, split_state)
 nwfsc_grid$area <- nwfsc_grid$area * 100
 # convert to ha
 
