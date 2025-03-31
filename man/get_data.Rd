@@ -29,11 +29,10 @@ within region, so returning data from a region may return more than one
 survey. This is \code{NULL} by default, so that all surveys are returned.}
 
 \item{surveys}{A string, or vector of strings of common names for surveys.
-May be one or more of "Aleutian Islands Bottom Trawl Survey", "Eastern
-Bering Sea Crab/Groundfish Bottom Trawl Survey", "Eastern Bering Sea Slope
-Bottom Trawl Survey", "Gulf of Alaska Bottom Trawl Survey", "Northern
-Bering Sea Crab/Groundfish Survey - Eastern Bering Sea Shelf Survey
-Extension", "NWFSC.Combo", "NWFSC.Shelf", "NWFSC.Hypoxia", "Triennial",
+May be one or more of "Aleutian Islands",
+"Bering Sea Slope", "eastern Bering Sea",
+"Gulf of Alaska", "northern Bering Sea",
+"NWFSC.Combo", "NWFSC.Shelf", "NWFSC.Slope", "NWFSC.Hypoxia", "Triennial",
 "SYN QCS", "SYN HS", "SYN WCVI", "SYN WCHG". If \code{NULL}, all are returned.}
 
 \item{years}{a vector of years, e.g. \code{year = 2013:2018}. If \code{NULL}, all are
