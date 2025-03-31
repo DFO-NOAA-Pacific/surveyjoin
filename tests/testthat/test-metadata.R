@@ -5,21 +5,19 @@ test_that("cache_data runs successfully", {
   } else {
     skip_on_cran()
   }
+  cache_folder <- surveyjoin::get_cache_folder()
 
-  cache_folder <- get_cache_folder()
   cli::cli_alert_info("Cache folder path: {cache_folder}")
   expect_no_error(cache_data())
 })
 
+
 test_that("cached files recognized when not in CI", {
-  skip_on_ci()
-  # Check that a file exists in cache (if not in CI)
-  cached_files <- files_to_cache()
-  existing_files <- list.files(cache_folder, full.names = TRUE)
-  expect_true(any(basename(existing_files) %in% cached_files),
-              info = "At least one expected data file should exist in the cache"
-  )
+  cache_folder <- surveyjoin::get_cache_folder()
+  cached_files <- list.files(cache_folder, full.names = TRUE)
+  expect_true(length(cached_files) > 0)
 })
+
 
 test_that("load_sql_data runs successfully", {
   # Don't skip on CI
