@@ -71,5 +71,10 @@ test_that("get surveys", {
   expect_equal(names(g), c("survey", "region"))
 })
 
-
-
+test_that("data version", {
+  skip_on_ci()
+  df <- data_version()
+  expect_s3_class(df, "data.frame")
+  expect_equal(colnames(df), c("file", "last_updated"))
+  expect_equal(nrow(df), length(files_to_cache()))
+})
