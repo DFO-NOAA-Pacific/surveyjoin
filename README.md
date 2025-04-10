@@ -20,6 +20,8 @@ collected by Fisheries and Oceans Canada (DFO) in the waters of British
 Columbia, and surveys conducted by the Alaska Fisheries Science Center
 (AFSC) in Alaska.
 
+![Plot of survey domains.](https://github.com/DFO-NOAA-Pacific/surveyjoin/blob/main/data-raw/img/survey_coverage_map.png)
+
 There are 55 species included in the initial version of the package,
 focusing on species that are occurring in multiple regions.
 
