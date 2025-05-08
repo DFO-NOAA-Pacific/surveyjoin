@@ -2,7 +2,7 @@ library(dplyr)
 
 data_source <- "foss" # set to "foss" (public) or "oracle" (permissions needed)
 
-# Load data from oracle via internal NOAA-NMFS-AFSC connection
+# Load data from oracle via internal NOAA-NMFS-AFSC connection ----
 if (data_source == "oracle") {
   library(RODBC)
   library(getPass)
@@ -31,7 +31,7 @@ if (data_source == "oracle") {
   # join with catch_spp to get ITIS
   surveyjoin:::save_raw_data(afsc_specimen, "afsc-specimen")
 
-} else if (data_source == "foss") { # Load data from FOSS public data API
+} else if (data_source == "foss") { # Load data from FOSS public data API ----
   # adatapted from https://afsc-gap-products.github.io/gap_products/content/foss-api-r.html#haul-data
   # September 26, 2024 by Emily Markowitz
 
@@ -39,7 +39,7 @@ if (data_source == "oracle") {
   library(jsonlite)
   options(scipen = 999)
 
-  # Load Haul Data -------------------------------------------------------------
+  ## Load Haul Data ------------------------------------------------------------
 
   dat <- data.frame()
   for (i in seq(0, 500000, 10000)){
@@ -65,7 +65,7 @@ if (data_source == "oracle") {
                                         format = "%Y-%m-%dT%H:%M:%S",
                                         tz = Sys.timezone()))
 
-  # Load Species Data ------------------------------------------------------------
+  ## Load Species Data ---------------------------------------------------------
 
   res <- httr::GET(url = paste0('https://apps-st.fisheries.noaa.gov/ods/foss/afsc_groundfish_survey_species/',
                                 "?offset=0&limit=10000", '&q={"species_code":{"$lt":32000}}'))
@@ -75,7 +75,7 @@ if (data_source == "oracle") {
   catch_spp <- data$items  %>%
     dplyr::select(-links) # necessary for API accounting, but not part of the dataset
 
-  # Load Catch Data ------------------------------------------------------------
+  ## Load Catch Data -----------------------------------------------------------
 
   dat <- data.frame()
   for (i in seq(0, 1000000, 10000)){
@@ -100,7 +100,7 @@ if (data_source == "oracle") {
 
   catch <- dat
 
-  # # Zero-Filled Data -----------------------------------------------------------
+  ## Zero-Filled Data ----------------------------------------------------------
   #
   # dat <- dplyr::full_join(
   #   afsc_haul,
@@ -183,8 +183,7 @@ catchjoin$scientific_name <- tolower(catchjoin$scientific_name)
 
 spp <- readRDS("data-raw/joined_list.rds")
 
-afsc_catch <- catchjoin %>%
-  dplyr::filter(scientific_name %in% spp$scientific_name) %>%
+afsc_catch_all <- catchjoin %>%
   dplyr::select(
     event_id = hauljoin,
     itis,
@@ -198,9 +197,12 @@ afsc_catch <- catchjoin %>%
     catch_weight = as.numeric(catch_weight)
   )
 
-surveyjoin:::save_raw_data(afsc_catch, "afsc-catch")
+afsc_catch <- dplyr::filter(scientific_name %in% spp$scientific_name)
 
-# # custom filter to most prevalent species, by category ----
+surveyjoin:::save_raw_data(afsc_catch_all, "afsc-catch-all") # all species
+surveyjoin:::save_raw_data(afsc_catch, "afsc-catch") # filtered species
+
+# custom filter to most prevalent species, by fish or invert category ----
 # catch <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.FOSS_CATCH")
 # catch_spp <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.FOSS_SPECIES")
 # catchjoin <- left_join(catch, catch_spp)
@@ -291,7 +293,7 @@ if (test == TRUE) {
   catch_foss <- catch; haul_foss <- haul; afsc_catch_foss<-afsc_catch; afsc_haul_foss <- afsc_haul
   catch_oracle <- catch; haul_oracle <- haul; afsc_catch_oracle<-afsc_catch; afsc_haul_oracle <- afsc_haul
 
-  # Input catch and haul tables ------------------------------------------------
+  ## Input catch and haul tables -----------------------------------------------
 
   check_diff <- function(bb, bbb){
     whoisaproblem <- c()
@@ -341,3 +343,69 @@ if (test == TRUE) {
   check_diff(bb = afsc_catch_foss, bbb = afsc_catch_oracle)
 }
 
+# Design-based indices, length- and age-comps ----------------------------------
+
+if (data_source == "oracle") {
+
+  #TODO: if we need these products for other taxa, supply AFSC species codes
+  gapindex_data <- gapindex::get_data(
+    year_set = 1982:2024,
+    survey_set = c("GOA", "AI", "EBS", "NBS", "BSS"),
+    spp_codes = NULL, # all species and species groups used for stock assessment
+    haul_type = 3,
+    abundance_haul = "Y",
+    remove_na_strata = TRUE, # FALSE is default
+    channel = channel,
+    pull_lengths = TRUE
+  )
+
+  ## Fill in zeros and calculate CPUE
+  cpue <- gapindex::calc_cpue(gapdata = gapindex_data)
+
+  ## Calculate stratum-level biomass, population abundance, mean CPUE and
+  ## associated variances
+  biomass_stratum <- gapindex::calc_biomass_stratum(
+    gapdata = gapindex_data,
+    cpue = cpue)
+
+  ## Calculate aggregated biomass and population abundance across subareas,
+  ## management areas, and regions
+  biomass_subareas <- gapindex::calc_biomass_subarea(
+    gapdata = gapindex_data,
+    biomass_stratum = biomass_stratum)
+
+  ## Calculate size composition by stratum. See ?gapindex::calc_sizecomp_stratum
+  ## for details on arguments
+  size_comp_stratum <- gapindex::calc_sizecomp_stratum(
+    gapdata = gapindex_data,
+    cpue = cpue,
+    abundance_stratum = biomass_stratum,
+    spatial_level = "stratum")
+
+  ## Calculate aggregated size composition across subareas, management areas, and
+  ## regions
+  size_comp_subareas <- gapindex::calc_sizecomp_subarea(
+    gapdata = gapindex_data,
+    sizecomp_stratum = size_comp_stratum)
+
+  ## Calculate age-length key. See ?gapindex::calc_ALK for details on arguments
+  alk <- gapindex::calc_alk(gapdata = gapindex_data,
+                            unsex = "all",
+                            global = F)
+
+  ## Calculate age composition by stratum
+  age_comp_stratum <- gapindex::calc_agecomp_stratum(
+    gapdata = gapindex_data,
+    alk = alk,
+    sizecomp_stratum = size_comp_stratum)
+
+  ## Calculate aggregated age compositon across regions
+  age_comp_region <- gapindex::calc_agecomp_region(
+    gapdata = gapindex_data,
+    agecomp_stratum = age_comp_stratum)
+
+  surveyjoin:::save_raw_data(gapindex_data, "afsc-product-data")
+  surveyjoin:::save_raw_data(size_comp_subareas, "afsc-length-comps")
+  surveyjoin:::save_raw_data(age_comp_region, "afsc-age-comps")
+  surveyjoin:::save_raw_data(biomass_subareas, "afsc-biomass-indices")
+}
