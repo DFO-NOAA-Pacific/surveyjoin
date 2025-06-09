@@ -137,6 +137,26 @@ pbs_catch <- dplyr::distinct(pbs_catch)
 
 save_raw_data(pbs_catch, "pbs-catch")
 
+# start with full dataset instead:
+dat <- gfdata::get_all_survey_sets(species = NULL, ssid = c(1, 3, 4, 16))
+saveRDS(dat, "data-raw/pbs-all-trawl-catches.rds")
+dat <- readRDS("data-raw/pbs-all-trawl-catches.rds")
+sum(is.na(dat$usability_code))
+select(dat, usability_code, usability_desc) |> distinct() |> arrange(usability_code)
+names(dat)
+# dat <- filter(dat, usability_code %in% c(0, 1, 2, 6, 22)) ## 22 adds redefinition of grid
+dat <- filter(dat, usability_code %in% c(0, 1, 2, 6))
+pbs_catch_all <- data.frame(
+  event_id = dat$fishing_event_id, 
+  catch_numbers = dat$catch_count, 
+  catch_weight = dat$catch_weight, 
+  species_code = dat$species_code, 
+  species_common_name = dat$species_common_name, 
+  species_science_name = dat$species_science_name
+)
+glimpse(pbs_catch_all)
+saveRDS(pbs_catch_all, "data-raw/data/pbs-catch-all.rds")
+
 ## extra: composition data
 
 dat_samp_list <- purrr::map(seq_len(nrow(spp)), function(i) {
@@ -199,6 +219,7 @@ dat_samp$length_type <- tolower(dat_samp$length_type)
 saveRDS(dat_samp, "data-raw/data/pbs-bio-samples.rds")
 
 if (FALSE) {
+  system("cp data-raw/data/pbs-catch-all.rds ~/src/surveyjoin-data/pbs-catch-all.rds")
   system("cp data-raw/data/pbs-catch.rds ~/src/surveyjoin-data/pbs-catch.rds")
   system("cp data-raw/data/pbs-haul.rds ~/src/surveyjoin-data/pbs-haul.rds")
 }
