@@ -1,6 +1,6 @@
 library(dplyr)
 
-data_source <- "foss" # set to "foss" (public) or "oracle" (permissions needed)
+data_source <- "oracle" # set to "foss" (public) or "oracle" (permissions needed)
 
 # Load data from oracle via internal NOAA-NMFS-AFSC connection ----
 if (data_source == "oracle") {
@@ -26,9 +26,11 @@ if (data_source == "oracle") {
   afsc_specimen <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.AKFIN_SPECIMEN
                          WHERE SPECIES_CODE < 32000")
   names(afsc_specimen) <- tolower(names(afsc_specimen))
+  afsc_specimen <- dplyr::rename(afsc_specimen, event_id = hauljoin)
+  # join with catch_spp to get ITIS and WORMS
+  afsc_specimen <- left_join(afsc_specimen, catch_spp, by = 'species_code')
 
   # TODO: process specimen data once common standards are determined,
-  # join with catch_spp to get ITIS
   surveyjoin:::save_raw_data(afsc_specimen, "afsc-specimen")
 
 } else if (data_source == "foss") { # Load data from FOSS public data API ----
