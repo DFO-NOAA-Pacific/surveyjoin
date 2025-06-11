@@ -13,7 +13,14 @@ if (data_source == "oracle") {
   haul <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.FOSS_HAUL")
   names(haul) <- tolower(names(haul))
 
-  # get catch data for fishes only, then filter to combined species list
+  # get catch data for all species, then fishes only, then filter to combined species list
+  catch_all <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.FOSS_CATCH")
+  names(catch_all) <- tolower(names(catch_all))
+
+  catch_all_spp <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.FOSS_SPECIES")
+  names(catch_all_spp) <- tolower(names(catch_all_spp))
+
+  # fish only
   catch <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.FOSS_CATCH
                          WHERE SPECIES_CODE < 32000")
   names(catch) <- tolower(names(catch))
@@ -180,10 +187,13 @@ afsc_haul <- haul %>%
 
 surveyjoin:::save_raw_data(afsc_haul, "afsc-haul")
 
-catchjoin <- left_join(catch, catch_spp)
-catchjoin$scientific_name <- tolower(catchjoin$scientific_name)
-
 spp <- readRDS("data-raw/joined_list.rds")
+afsc_catch <- dplyr::filter(scientific_name %in% spp$scientific_name)
+surveyjoin:::save_raw_data(afsc_catch, "afsc-catch") # filtered species
+
+# all species, including inverts
+catchjoin <- left_join(catch_all, catch_all_spp)
+catchjoin$scientific_name <- tolower(catchjoin$scientific_name)
 
 afsc_catch_all <- catchjoin %>%
   dplyr::select(
@@ -198,11 +208,8 @@ afsc_catch_all <- catchjoin %>%
     catch_numbers = as.numeric(catch_numbers),
     catch_weight = as.numeric(catch_weight)
   )
-
-afsc_catch <- dplyr::filter(scientific_name %in% spp$scientific_name)
-
 surveyjoin:::save_raw_data(afsc_catch_all, "afsc-catch-all") # all species
-surveyjoin:::save_raw_data(afsc_catch, "afsc-catch") # filtered species
+
 
 # custom filter to most prevalent species, by fish or invert category ----
 # catch <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.FOSS_CATCH")
