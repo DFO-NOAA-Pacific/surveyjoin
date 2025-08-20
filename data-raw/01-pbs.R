@@ -1,9 +1,7 @@
-devtools::load_all()
 library(dplyr)
 
 dir.create("data-raw/data", showWarnings = FALSE)
 dir.create("data-raw/pbs-cache", showWarnings = FALSE)
-ssids <- c(1, 3, 4, 16)
 
 # Catch data set ------------------------------------------------------
 
@@ -65,35 +63,25 @@ pbs_haul$event_id <- as.integer(pbs_haul$event_id)
 
 # Environmental data addition -----------------------------------------
 
-## start environmental data
 if (FALSE) {
   d <- gfdata::get_sensor_data_trawl(c(1, 3, 4, 16))
   saveRDS(d, "data-raw/data/pbs-env-data-raw.rds")
 }
 d <- readRDS("data-raw/data/pbs-env-data-raw.rds")
-lu <- dat[[1]] |>
-  filter(year > 2005) |>
-  select(survey_series_id, survey_abbrev) |>
-  distinct() |>
-  rename(ssid = survey_series_id, survey_name = survey_abbrev)
-d <- left_join(d, lu)
-d <- select(d, year, survey_name, event_id = fishing_event_id, attribute, value = avg)
+d <- select(d, event_id = fishing_event_id, attribute, value = avg)
 d <- d |>
-  group_by(year, survey_name, event_id, attribute) |>
+  group_by(event_id, attribute) |>
   summarise(value = mean(value), .groups = "drop")
 d <- tidyr::pivot_wider(d,
-  id_cols = c(year, survey_name, event_id),
+  id_cols = c(event_id),
   names_from = attribute, values_from = value
 ) |>
   select(-depth_m) |>
   rename(temperature_C = `temperature_(¿C)`)
-pbs_haul <- left_join(pbs_haul, d, by = join_by(survey_name, event_id))
-## end environmental data
+pbs_haul <- left_join(pbs_haul, d, by = join_by(event_id))
 
 sum(duplicated(pbs_haul))
 sum(duplicated(select(pbs_haul, event_id, date)))
-
-# pbs_haul <- distinct(pbs_haul)
 
 saveRDS(pbs_haul, "data-raw/data/pbs-haul.rds")
 
