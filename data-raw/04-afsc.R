@@ -14,30 +14,27 @@ if (data_source == "oracle") {
   names(haul) <- tolower(names(haul))
 
   # get catch data for all species, then fishes only, then filter to combined species list
-  catch_all <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.FOSS_CATCH")
-  names(catch_all) <- tolower(names(catch_all))
-
-  catch_all_spp <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.FOSS_SPECIES")
-  names(catch_all_spp) <- tolower(names(catch_all_spp))
-
-  # fish only
-  catch <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.FOSS_CATCH
-                         WHERE SPECIES_CODE < 32000")
+  catch <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.FOSS_CATCH")
   names(catch) <- tolower(names(catch))
 
-  catch_spp <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.FOSS_SPECIES
-                         WHERE SPECIES_CODE < 32000")
+  catch_spp <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.FOSS_SPECIES")
   names(catch_spp) <- tolower(names(catch_spp))
 
-  # get specimen data for fishes only (not available in public FOSS repo)
+  # fish only
+  # catch <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.FOSS_CATCH
+  #                        WHERE SPECIES_CODE < 32000")
+  # names(catch) <- tolower(names(catch))
+  # catch_fish_spp <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.FOSS_SPECIES
+  #                        WHERE SPECIES_CODE < 32000")
+  # names(catch_fish_spp) <- tolower(names(catch_fish_spp))
+
+  # get specimen data (not available in public FOSS repo)
   afsc_specimen <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.AKFIN_SPECIMEN
                          WHERE SPECIES_CODE < 32000")
   names(afsc_specimen) <- tolower(names(afsc_specimen))
   afsc_specimen <- dplyr::rename(afsc_specimen, event_id = hauljoin)
   # join with catch_spp to get ITIS and WORMS
   afsc_specimen <- left_join(afsc_specimen, catch_spp, by = 'species_code')
-
-  # TODO: process specimen data once common standards are determined,
   surveyjoin:::save_raw_data(afsc_specimen, "afsc-specimen")
 
 } else if (data_source == "foss") { # Load data from FOSS public data API ----
@@ -77,7 +74,7 @@ if (data_source == "oracle") {
   ## Load Species Data ---------------------------------------------------------
 
   res <- httr::GET(url = paste0('https://apps-st.fisheries.noaa.gov/ods/foss/afsc_groundfish_survey_species/',
-                                "?offset=0&limit=10000", '&q={"species_code":{"$lt":32000}}'))
+                                "?offset=0&limit=10000")) #, '&q={"species_code":{"$lt":32000}}'
 
   ## convert from JSON format
   data <- jsonlite::fromJSON(base::rawToChar(res$content))
@@ -87,12 +84,12 @@ if (data_source == "oracle") {
   ## Load Catch Data -----------------------------------------------------------
 
   dat <- data.frame()
-  for (i in seq(0, 1000000, 10000)){
+  for (i in seq(0, 100000000, 10000)){
     ## find how many iterations it takes to cycle through the data
     print(i)
     ## query the API link
     res <- httr::GET(url = paste0("https://apps-st.fisheries.noaa.gov/ods/foss/afsc_groundfish_survey_catch/",
-                                  "?offset=",i,"&limit=10000", '&q={"species_code":{"$lt":32000}}'))
+                                  "?offset=",i,"&limit=10000"))#, '&q={"species_code":{"$lt":32000}}'
     ## convert from JSON format
     data <- jsonlite::fromJSON(base::rawToChar(res$content))
 
@@ -109,19 +106,13 @@ if (data_source == "oracle") {
 
   catch <- dat
 
-  ## Zero-Filled Data ----------------------------------------------------------
+  ## Joined Data ----------------------------------------------------------
   #
-  # dat <- dplyr::full_join(
-  #   afsc_haul,
-  #   afsc_catch) %>%
+  # dat_join <- dplyr::full_join(
+  #   haul,
+  #   catch) %>%
   #   dplyr::full_join(
-  #     afsc_species)  %>%
-  #   # modify zero-filled rows
-  #   dplyr::mutate(
-  #     cpue_kgkm2 = ifelse(is.na(cpue_kgkm2), 0, cpue_kgkm2),
-  #     cpue_nokm2 = ifelse(is.na(cpue_nokm2), 0, cpue_nokm2),
-  #     count = ifelse(is.na(count), 0, count),
-  #     weight_kg = ifelse(is.na(weight_kg), 0, weight_kg))
+  #     catch_spp)
 
 }
 
@@ -182,18 +173,17 @@ afsc_haul <- haul %>%
     stratum,
     year,
     bottom_temp_c
-  ) %>%
-  tidyr::drop_na(lat_end, lon_end)
+  ) #%>%
+  #tidyr::drop_na(lat_end, lon_end)
 
 surveyjoin:::save_raw_data(afsc_haul, "afsc-haul")
 
-spp <- readRDS("data-raw/joined_list.rds")
-afsc_catch <- dplyr::filter(scientific_name %in% spp$scientific_name)
-surveyjoin:::save_raw_data(afsc_catch, "afsc-catch") # filtered species
-
-# all species, including inverts
-catchjoin <- left_join(catch_all, catch_all_spp)
+# catch for all species, including inverts
+catchjoin <- left_join(catch, catch_spp)
 catchjoin$scientific_name <- tolower(catchjoin$scientific_name)
+
+# correct missing ITIS for big skate
+catchjoin$itis[catchjoin$common_name == "big skate"] <- 160848
 
 afsc_catch_all <- catchjoin %>%
   dplyr::select(
@@ -210,6 +200,10 @@ afsc_catch_all <- catchjoin %>%
   )
 surveyjoin:::save_raw_data(afsc_catch_all, "afsc-catch-all") # all species
 
+# catch for only fish species from joined list of species common among regions
+load("data/spp_dictionary.rda")
+afsc_catch <- dplyr::filter(afsc_catch_all, itis %in% spp_dictionary$itis)
+surveyjoin:::save_raw_data(afsc_catch, "afsc-catch") # filtered species
 
 # custom filter to most prevalent species, by fish or invert category ----
 # catch <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.FOSS_CATCH")
