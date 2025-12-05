@@ -189,7 +189,7 @@ afsc_catch_all <- catchjoin %>%
   dplyr::select(
     event_id = hauljoin,
     itis,
-    scientific_name,
+    #scientific_name,
     catch_numbers = count,
     catch_weight = weight_kg
   ) %>%
