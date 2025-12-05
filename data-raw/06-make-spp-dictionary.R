@@ -40,7 +40,6 @@ make_itis_spp_table <- function() {
   lu$common_name <- tolower(unname(com))
 
   missing <- filter(lu, is.na(common_name))
-  missing$scientific_name[missing$scientific_name == "Lepidopsetta"] <- "Lepidopsetta bilineata"
 
   common2 <- taxize::sci2comm(missing$scientific_name, db = "itis")
   com2 <- purrr::map_chr(common2, ~ .[1])
@@ -55,12 +54,13 @@ make_itis_spp_table <- function() {
   lu$itis <- as.integer(lu$itis)
   lu$common_name <- tolower(lu$common_name)
   lu$common_name[lu$common_name == "puget sound dogfish"] <- "pacific spiny dogfish"
-  lu$common_name[lu$common_name == "sandpaper skate"] <- "bering skate"
+  lu$common_name[lu$scientific_name == "Bathyraja interrupta"] <- "bering skate"
+  lu$common_name[lu$scientific_name == "Lepidopsetta bilineata"] <- "southern rock sole"
   # lu$common_name <- stringr::str_to_title(lu$common_name)
   lu$scientific_name <- tolower(lu$scientific_name)
 
   spp_dictionary <- lu
-  spp_dictionary <- dplyr::distinct(spp_dictionary) # rock sole twice!?
+  spp_dictionary <- dplyr::distinct(spp_dictionary)
   usethis::use_data(spp_dictionary, overwrite = TRUE)
 }
 
