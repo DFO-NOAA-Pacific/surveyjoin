@@ -23,6 +23,7 @@ make_itis_spp_table <- function() {
   catch <- bind_rows(afsc_dir) |>
     bind_rows(nwfsc_dir) |>
     bind_rows(pbs_dir)
+  catch <- dplyr::filter(catch, itis != 96979) # remove spot shrimp
 
   itis <- catch |>
     select(itis) |>
@@ -54,6 +55,7 @@ make_itis_spp_table <- function() {
   lu$itis <- as.integer(lu$itis)
   lu$common_name <- tolower(lu$common_name)
   lu$common_name[lu$common_name == "puget sound dogfish"] <- "pacific spiny dogfish"
+  lu$common_name[lu$common_name == "yellowtain rockfish"] <- "yellowtail rockfish"
   lu$common_name[lu$scientific_name == "Bathyraja interrupta"] <- "bering skate"
   lu$common_name[lu$scientific_name == "Lepidopsetta bilineata"] <- "southern rock sole"
   # lu$common_name <- stringr::str_to_title(lu$common_name)
