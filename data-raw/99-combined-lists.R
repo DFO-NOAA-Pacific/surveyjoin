@@ -35,5 +35,10 @@ get_itis <- function(spp) {
 }
 df$itis <- get_itis(df$scientific_name)
 
+# assign itis to big skate (listed as Raja binoculata in nwfsc and ITIS)
+df$itis[df$scientific_name == "beringraja binoculata"] <- 160848
+# remove unidentified sp group and invertebrate
+df <- dplyr::filter(df, scientific_name != "lepidopsetta sp.", # rock sole unid.
+                        itis != 96979) # spot shrimp
 
 saveRDS(df, "data-raw/joined_list.rds")
