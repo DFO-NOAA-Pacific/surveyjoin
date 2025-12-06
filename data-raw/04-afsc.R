@@ -201,8 +201,8 @@ afsc_catch_all <- catchjoin %>%
 surveyjoin:::save_raw_data(afsc_catch_all, "afsc-catch-all") # all species
 
 # catch for only fish species from joined list of species common among regions
-load("data/spp_dictionary.rda")
-afsc_catch <- dplyr::filter(afsc_catch_all, itis %in% spp_dictionary$itis)
+joined_list <- readRDS("data-raw/joined_list.rds")
+afsc_catch <- dplyr::filter(afsc_catch_all, itis %in% joined_list$itis)
 surveyjoin:::save_raw_data(afsc_catch, "afsc-catch") # filtered species
 
 # custom filter to most prevalent species, by fish or invert category ----
