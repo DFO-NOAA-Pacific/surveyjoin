@@ -108,16 +108,29 @@ get_data <- function(common = NULL, scientific = NULL, itis_id = NULL, regions =
     dsub$itis <- ids$itis[1]
     dsub$common_name <- ids$common_name[1]
     dsub$scientific_name <- ids$scientific_name[1]
+
+    # Check if species was recorded in each year
+    # Only zero-fill years where the species was being identified
+    years_with_data <- dsub |>
+      dplyr::filter(!is.na(.data$catch_weight) | !is.na(.data$catch_numbers)) |>
+      dplyr::pull(.data$year) |>
+      unique()
+
+    # Only replace NAs with 0s for years where species was identified
+    dsub <- dsub |>
+      dplyr::mutate(
+        # if the species is identified in this year, catch = 0, otherwise NA
+        catch_weight = ifelse(.data$year %in% years_with_data & is.na(.data$catch_weight), 0, .data$catch_weight),
+        catch_numbers = ifelse(.data$year %in% years_with_data & is.na(.data$catch_numbers), 0, .data$catch_numbers)
+      )
+
+    # This logic was just below the loop before -- result is the same placing it here
+    dsub$catch_weight <- ifelse(dsub$catch_numbers > 0 & dsub$catch_weight == 0, NA, dsub$catch_weight)
+    dsub$catch_numbers <- ifelse(dsub$catch_weight > 0 & dsub$catch_numbers == 0, NA, dsub$catch_numbers)
+
     d[[i]] <- dsub
   }
   d <- dplyr::bind_rows(d)
-
-  # Replace NAs with 0s
-  d$catch_weight[is.na(d$catch_weight)] <- 0
-  d$catch_numbers[is.na(d$catch_numbers)] <- 0
-  # Correct false 0s
-  d$catch_weight <- ifelse(d$catch_numbers > 0 & d$catch_weight == 0, NA, d$catch_weight)
-  d$catch_numbers <- ifelse(d$catch_weight > 0 & d$catch_numbers == 0, NA, d$catch_numbers)
 
   if (!is.null(years)) {
     d <- d |>
