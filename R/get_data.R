@@ -44,6 +44,7 @@
 #'   \item \strong{year}: Calendar year corresponding to the haul.
 #' }
 #' @importFrom DBI dbDisconnect
+#' @importFrom cli cli_abort
 #' @importFrom dplyr tbl filter collect left_join summarize
 #' @export
 #'
@@ -56,7 +57,14 @@ get_data <- function(common = NULL, scientific = NULL, itis_id = NULL, regions =
     cli::cli_alert_info("Database file not found. Loading SQL data...")
     load_sql_data()
   }
-  db <- surv_db() # create connection to database; need error checking
+
+  db <- tryCatch(
+    surv_db(),
+    error = function(e) {
+      cli::cli_abort("Failed to connect to database: {e$message}")
+    }
+  )
+
   catch <- tbl(db, "catch")
   haul <- tbl(db, "haul")
 
@@ -113,7 +121,7 @@ get_data <- function(common = NULL, scientific = NULL, itis_id = NULL, regions =
 
   if (!is.null(years)) {
     d <- d |>
-      filter(.data$year %in% years)
+      dplyr::filter(.data$year %in% years)
   }
   if (!is.null(regions)) {
     d <- d |>

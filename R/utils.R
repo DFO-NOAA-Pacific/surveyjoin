@@ -32,14 +32,12 @@ get_cache_folder <- function(name = "surveyjoin") {
 }
 
 #' Function to get the metadata file path
-#' @return NULL
 get_metadata_file <- function() {
   file.path(get_cache_folder(), "data_metadata.json")
 }
 
 #' Function to load metadata
 #' @importFrom jsonlite fromJSON
-#' @return NULL
 load_metadata <- function() {
   metadata_file <- get_metadata_file()
 
@@ -202,7 +200,6 @@ cache_data <- function(region = c("nwfsc", "pbs", "afsc")) {
 #' @return Nothing; data is inserted into a local SQLite database.
 #' @export
 #' @importFrom rlang .data
-#' @importFrom dplyr %>%
 #' @importFrom purrr map_dfr
 #' @importFrom cli cli_alert_warning cli_abort cli_alert_info
 #' @importFrom RSQLite dbWriteTable
@@ -265,7 +262,7 @@ load_sql_data <- function() {
       temp$lon_start <- ifelse(temp$lon_start > 0, temp$lon_start * -1, temp$lon_start)
       temp$lon_end <- ifelse(temp$lon_end > 0, temp$lon_end * -1, temp$lon_end)
       if (temp$region[1] == "pbs") {
-        temp <- dplyr::rename(temp, bottom_temp_c = "temperature_C") %>%
+        temp <- dplyr::rename(temp, bottom_temp_c = "temperature_C") |>
           dplyr::select(-"do_mlpL", -"salinity_PSU")
       }
     }
