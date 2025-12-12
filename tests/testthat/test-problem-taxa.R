@@ -146,7 +146,7 @@ test_that("big skate and bering skate are working properly in Alaska", {
     dplyr::arrange(year)
   bigskate_years <- bigskate_years$year
 
-  beringskate_years <- northern |>
+  beringskate_years <- beringskate |>
     dplyr::filter(catch_weight > 0) |>  # Only actual catches
     dplyr::group_by(year) |>
     dplyr::summarise(
