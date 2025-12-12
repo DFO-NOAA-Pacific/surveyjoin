@@ -161,9 +161,9 @@ test_that("big skate and bering skate are working properly in Alaska", {
   earliest_year <- min(c(bigskate_years, beringskate_years))
   expect_equal(earliest_year, 1983)
   expect_equal(min(bigskate_years), 1983)
-  expect_equal(min(beringskate_years), 1996)
+  expect_equal(min(beringskate_years), 1999)
 
   # Check if there's a period where both are being reported
   overlap_years <- intersect(bigskate_years, beringskate_years)
-  expect_equal(overlap_years, c(1996:2019, 2021:as.integer(format(Sys.Date(), "%Y"))))
+  expect_equal(overlap_years, c(1999:2019, 2021:as.integer(format(Sys.Date(), "%Y"))))
 })
