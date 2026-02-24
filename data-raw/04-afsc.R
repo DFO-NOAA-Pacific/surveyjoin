@@ -13,7 +13,7 @@ if (data_source == "oracle") {
   haul <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.FOSS_HAUL")
   names(haul) <- tolower(names(haul))
 
-  # get catch data for all species, then fishes only, then filter to combined species list
+  # get catch data for all species, later filter to combined species list ----
   catch <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.FOSS_CATCH")
   names(catch) <- tolower(names(catch))
 
@@ -28,7 +28,7 @@ if (data_source == "oracle") {
   #                        WHERE SPECIES_CODE < 32000")
   # names(catch_fish_spp) <- tolower(names(catch_fish_spp))
 
-  # get specimen data (not available in public FOSS repo)
+  # get specimen data (not available in public FOSS repo) ----
   afsc_specimen <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.AKFIN_SPECIMEN
                          WHERE SPECIES_CODE < 32000")
   names(afsc_specimen) <- tolower(names(afsc_specimen))
@@ -36,6 +36,14 @@ if (data_source == "oracle") {
   # join with catch_spp to get ITIS and WORMS
   afsc_specimen <- left_join(afsc_specimen, catch_spp, by = 'species_code')
   surveyjoin:::save_raw_data(afsc_specimen, "afsc-specimen")
+
+  # get length composition ----
+  afsc_specimen <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.AKFIN_LENGTH")
+  names(afsc_length) <- tolower(names(afsc_length))
+  afsc_length <- dplyr::rename(afsc_length, event_id = hauljoin)
+  # join with catch_spp to get ITIS and WORMS
+  afsc_length <- left_join(afsc_length, catch_spp, by = 'species_code')
+  surveyjoin:::save_raw_data(afsc_length, "afsc-length")
 
 } else if (data_source == "foss") { # Load data from FOSS public data API ----
   # adatapted from https://afsc-gap-products.github.io/gap_products/content/foss-api-r.html#haul-data
