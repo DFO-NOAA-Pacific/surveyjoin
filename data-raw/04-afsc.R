@@ -1,355 +1,315 @@
-library(dplyr)
+#---- Via Oracle internal server (requires credentials)
 
-data_source <- "oracle" # set to "foss" (public) or "oracle" (permissions needed)
+PKG <- unique(
+  "dplyr",
+  "RODBC",
+  "rstudioapi")
 
-# Load data from oracle via internal NOAA-NMFS-AFSC connection ----
-if (data_source == "oracle") {
-  library(RODBC)
-  library(getPass)
-  library(gapindex)
-
-  channel <- gapindex::get_connected()
-
-  haul <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.FOSS_HAUL")
-  names(haul) <- tolower(names(haul))
-
-  # get catch data for all species, later filter to combined species list ----
-  catch <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.FOSS_CATCH")
-  names(catch) <- tolower(names(catch))
-
-  catch_spp <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.FOSS_SPECIES")
-  names(catch_spp) <- tolower(names(catch_spp))
-
-  # fish only
-  # catch <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.FOSS_CATCH
-  #                        WHERE SPECIES_CODE < 32000")
-  # names(catch) <- tolower(names(catch))
-  # catch_fish_spp <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.FOSS_SPECIES
-  #                        WHERE SPECIES_CODE < 32000")
-  # names(catch_fish_spp) <- tolower(names(catch_fish_spp))
-
-  # get specimen data (not available in public FOSS repo) ----
-  afsc_specimen <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.AKFIN_SPECIMEN
-                         WHERE SPECIES_CODE < 32000")
-  names(afsc_specimen) <- tolower(names(afsc_specimen))
-  afsc_specimen <- dplyr::rename(afsc_specimen, event_id = hauljoin)
-  # join with catch_spp to get ITIS and WORMS
-  afsc_specimen <- left_join(afsc_specimen, catch_spp, by = 'species_code')
-  surveyjoin:::save_raw_data(afsc_specimen, "afsc-specimen")
-
-  # get length composition ----
-  afsc_specimen <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.AKFIN_LENGTH")
-  names(afsc_length) <- tolower(names(afsc_length))
-  afsc_length <- dplyr::rename(afsc_length, event_id = hauljoin)
-  # join with catch_spp to get ITIS and WORMS
-  afsc_length <- left_join(afsc_length, catch_spp, by = 'species_code')
-  surveyjoin:::save_raw_data(afsc_length, "afsc-length")
-
-} else if (data_source == "foss") { # Load data from FOSS public data API ----
-  # adatapted from https://afsc-gap-products.github.io/gap_products/content/foss-api-r.html#haul-data
-  # September 26, 2024 by Emily Markowitz
-
-  library(httr)
-  library(jsonlite)
-  options(scipen = 999)
-
-  ## Load Haul Data ------------------------------------------------------------
-
-  dat <- data.frame()
-  for (i in seq(0, 500000, 10000)){
-    # print(i)
-    ## query the API link
-    res <- httr::GET(url = paste0('https://apps-st.fisheries.noaa.gov/ods/foss/afsc_groundfish_survey_haul/',
-                                  "?offset=",i,"&limit=10000"))
-    ## convert from JSON format
-    data <- jsonlite::fromJSON(base::rawToChar(res$content))
-
-    ## if there are no data, stop the loop
-    if (is.null(nrow(data$items))) {
-      break
-    }
-
-    ## bind sub-pull to dat data.frame
-    dat <- dplyr::bind_rows(dat,
-                            data$items %>%
-                              dplyr::select(-links)) # necessary for API accounting, but not part of the dataset)
+for (p in PKG) {
+  if(!require(p, character.only = TRUE)) {
+    install.packages(p)
   }
-  haul <- dat %>%
-    dplyr::mutate(date_time = as.POSIXct(date_time,
-                                        format = "%Y-%m-%dT%H:%M:%S",
-                                        tz = Sys.timezone()))
-
-  ## Load Species Data ---------------------------------------------------------
-
-  res <- httr::GET(url = paste0('https://apps-st.fisheries.noaa.gov/ods/foss/afsc_groundfish_survey_species/',
-                                "?offset=0&limit=10000")) #, '&q={"species_code":{"$lt":32000}}'
-
-  ## convert from JSON format
-  data <- jsonlite::fromJSON(base::rawToChar(res$content))
-  catch_spp <- data$items  %>%
-    dplyr::select(-links) # necessary for API accounting, but not part of the dataset
-
-  ## Load Catch Data -----------------------------------------------------------
-
-  dat <- data.frame()
-  for (i in seq(0, 100000000, 10000)){
-    ## find how many iterations it takes to cycle through the data
-    print(i)
-    ## query the API link
-    res <- httr::GET(url = paste0("https://apps-st.fisheries.noaa.gov/ods/foss/afsc_groundfish_survey_catch/",
-                                  "?offset=",i,"&limit=10000"))#, '&q={"species_code":{"$lt":32000}}'
-    ## convert from JSON format
-    data <- jsonlite::fromJSON(base::rawToChar(res$content))
-
-    ## if there are no data, stop the loop
-    if (is.null(nrow(data$items))) {
-      break
-    }
-
-    ## bind sub-pull to dat data.frame
-    dat <- dplyr::bind_rows(dat,
-                            data$items %>%
-                              dplyr::select(-links)) # necessary for API accounting, but not part of the dataset)
-  }
-
-  catch <- dat
-
-  ## Joined Data ----------------------------------------------------------
-  #
-  # dat_join <- dplyr::full_join(
-  #   haul,
-  #   catch) %>%
-  #   dplyr::full_join(
-  #     catch_spp)
-
+  require(p, character.only = TRUE)
 }
 
+channel <- odbcConnect(dsn = "AFSC",
+                       uid = rstudioapi::showPrompt(title = "Username",
+                                                    message = "Oracle Username", default = ""),
+                       pwd = rstudioapi::askForPassword("Enter Password"),
+                       believeNRows = FALSE)
+# channel <- gapindex::get_connected()
+# source("Z:/Projects/ConnectToOracle.R"); channel <- channel_products # for em pulls :)
 
-# mostly for testing, but also nice to have it organized
-catch <- catch[order(catch$species_code), ]
-catch <- catch[order(catch$hauljoin), ]
-haul <- haul[order(haul$hauljoin), ]
+# Pull data from GAP_PRODUCTS --------------------------------------------------
 
-afsc_haul <- haul %>%
-  dplyr::select(
-    survey_name = survey, # or = survey_name for full description if beyond trawl
-    event_id = hauljoin,
-    date = date_time,
-    vessel = vessel_name,
-    lat_start = latitude_dd_start,
-    lon_start = longitude_dd_start,
-    lat_end = latitude_dd_end,
-    lon_end = longitude_dd_end,
-    depth_m,
-    performance,
-    stratum,
-    area_swept_km2,
-    bottom_temp_c = bottom_temperature_c
-  ) %>%
-  dplyr::mutate(
-    event_id = as.numeric(event_id),
-    date = as.POSIXct(date,
-                      format = "%m/%d/%Y %H:%M:%S",
-                      tz = Sys.timezone()),
-    pass = NA_integer_,
-    lat_start = as.numeric(lat_start),
-    lon_start = as.numeric(lon_start),
-    lat_end = as.numeric(lat_end),
-    lon_end = as.numeric(lon_end),
-    depth_m = as.numeric(depth_m),
-    effort = as.numeric(area_swept_km2 * 100), # convert to ha
-    effort_units = "ha",
-    performance = as.integer(performance),
-    stratum = as.numeric(stratum),
-    year = as.integer(format(date, format="%Y")),
-    bottom_temp_c = as.numeric(bottom_temp_c)
-  ) %>%
-  dplyr::select(
-    survey_name,
-    event_id,
-    date,
-    pass,
-    vessel,
-    lat_start,
-    lon_start,
-    lat_end,
-    lon_end,
-    depth_m,
-    effort,
-    effort_units,
-    performance,
-    stratum,
-    year,
-    bottom_temp_c
-  ) #%>%
-  #tidyr::drop_na(lat_end, lon_end)
+locations <- c(
+  "GAP_PRODUCTS.AKFIN_AGECOMP",
+  # "GAP_PRODUCTS.AKFIN_AREA",
+  "GAP_PRODUCTS.AKFIN_BIOMASS",
+  "GAP_PRODUCTS.AKFIN_CATCH",
+  "GAP_PRODUCTS.AKFIN_CRUISE",
+  "GAP_PRODUCTS.AKFIN_HAUL",
+  "GAP_PRODUCTS.AKFIN_CPUE",
+  "GAP_PRODUCTS.AKFIN_METADATA_COLUMN",
+  "GAP_PRODUCTS.AKFIN_SIZECOMP",
+  "GAP_PRODUCTS.AKFIN_SPECIMEN",
+  "GAP_PRODUCTS.SAMPLESIZE"#, # For for collecting number of length, age, and otolith samples
+  # "GAP_PRODUCTS.AKFIN_STRATUM_GROUPS",
+  # "GAP_PRODUCTS.AKFIN_SURVEY_DESIGN",
+  # "GAP_PRODUCTS.AKFIN_TAXONOMIC_CLASSIFICATION",
+  # "GAP_PRODUCTS.SPECIES_YEAR"
+)
 
-surveyjoin:::save_raw_data(afsc_haul, "afsc-haul")
+print(Sys.Date())
 
-# catch for all species, including inverts
-catchjoin <- left_join(catch, catch_spp)
-catchjoin$scientific_name <- tolower(catchjoin$scientific_name)
+error_loading <- c()
+for (i in 1:length(locations)){
+  print(locations[i])
 
-# correct missing ITIS for big skate
-catchjoin$itis[catchjoin$common_name == "big skate"] <- 160848
+  a <- RODBC::sqlQuery(channel = channel,
+                       query = paste0("SELECT *
+    FROM ", locations[i], "
+    FETCH FIRST 1 ROWS ONLY;"))
 
-afsc_catch_all <- catchjoin %>%
-  dplyr::select(
-    event_id = hauljoin,
-    itis,
-    #scientific_name,
-    catch_numbers = count,
-    catch_weight = weight_kg
-  ) %>%
-  dplyr::mutate(
-    event_id = as.numeric(event_id),
-    catch_numbers = as.numeric(catch_numbers),
-    catch_weight = as.numeric(catch_weight)
-  )
-surveyjoin:::save_raw_data(afsc_catch_all, "afsc-catch-all") # all species
-
-# catch for only fish species from joined list of species common among regions
-joined_list <- readRDS("data-raw/joined_list.rds")
-afsc_catch <- dplyr::filter(afsc_catch_all, itis %in% joined_list$itis)
-surveyjoin:::save_raw_data(afsc_catch, "afsc-catch") # filtered species
-
-# custom filter to most prevalent species, by fish or invert category ----
-# catch <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.FOSS_CATCH")
-# catch_spp <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.FOSS_SPECIES")
-# catchjoin <- left_join(catch, catch_spp)
-# names(catchjoin) <- tolower(names(catchjoin))
-#
-# afsc_catch <- catchjoin %>%
-#   filter(scientific_name %in% spp$scientific_name) %>%
-#   select(
-#     event_id = hauljoin,
-#     itis,
-#     scientific_name,
-#     catch_numbers = count,
-#     catch_weight = weight_kg,
-#     id_rank,
-#     species_code
-#   ) %>%
-#   mutate(
-#     event_id = as.numeric(event_id),
-#     catch_numbers = as.numeric(catch_numbers),
-#     catch_weight = as.numeric(catch_weight)
-#   )
-#
-# afsc_catch_fish <- afsc_catch %>%
-#   filter(species_code < 32000) %>%
-#   filter(id_rank == "species")
-# afsc_catch_sfi <- afsc_catch %>%
-#   filter(species_code %in% c(41000:45000, 91000:91999, 99981:99988)) # corals and sponges
-# afsc_catch_inv <- afsc_catch %>%
-#   filter(species_code %in% c(40000:40999, 45001:90999, 92000:99981)) # other inverts
-#
-# # filter by frequency of occurrence and catch weights
-# fish_high <- group_by(afsc_catch_fish, scientific_name) |>
-#   summarise(freq = n() / nrow(afsc_haul), total_weight = sum(catch_weight), itis = itis[1]) |>
-#   filter(total_weight > 1000) |> # freq > 0.01 gives 79 species vs 94
-#   arrange(-freq)
-# nrow(fish_high)
-#
-# fish_low <- group_by(afsc_catch_fish, scientific_name) |>
-#   summarise(freq = n() / nrow(afsc_haul), total_weight = sum(catch_weight), itis = itis[1]) |>
-#   filter(total_weight > 1000, freq > 0.1) |>
-#   arrange(-freq)
-# nrow(fish_low)
-#
-# sfi_high <- group_by(afsc_catch_sfi, scientific_name) |>
-#   summarise(freq = n() / nrow(afsc_haul), total_weight = sum(catch_weight), itis = itis[1]) |>
-#   filter(total_weight > 500) |>
-#   arrange(-freq)
-# nrow(sfi_high)
-#
-# sfi_low <- group_by(afsc_catch_sfi, scientific_name) |>
-#   summarise(freq = n() / nrow(afsc_haul), total_weight = sum(catch_weight), itis = itis[1]) |>
-#   filter(total_weight > 500, freq > 0.02) |>
-#   arrange(-freq)
-# nrow(sfi_low)
-#
-# inv_high <- group_by(afsc_catch_inv, scientific_name) |>
-#   summarise(freq = n() / nrow(afsc_haul), total_weight = sum(catch_weight), itis = itis[1]) |>
-#   filter(total_weight > 500, freq > 0.05) |>
-#   arrange(-freq)
-# nrow(inv_high)
-#
-# inv_low <- group_by(afsc_catch_inv, scientific_name) |>
-#   summarise(freq = n() / nrow(afsc_haul), total_weight = sum(catch_weight), itis = itis[1]) |>
-#   filter(total_weight > 500, freq > 0.15) |>
-#   arrange(-freq)
-# nrow(inv_low)
-#
-# afsc_catch <- select(afsc_catch, -scientific_name, - species_code, -id_rank)
-#
-# afsc_catch_fish_h <- semi_join(afsc_catch, select(fish_high, itis), by = join_by(itis))
-# afsc_catch_fish_l <- semi_join(afsc_catch, select(fish_low, itis), by = join_by(itis))
-# afsc_catch_sfi_h <- semi_join(afsc_catch, select(sfi_high, itis), by = join_by(itis))
-# afsc_catch_sfi_l <- semi_join(afsc_catch, select(sfi_low, itis), by = join_by(itis))
-# afsc_catch_inv_h <- semi_join(afsc_catch, select(inv_high, itis), by = join_by(itis))
-# afsc_catch_inv_l <- semi_join(afsc_catch, select(inv_low, itis), by = join_by(itis))
-#
-# save_raw_data(afsc_catch_fish_h, "afsc-catch-fish-h")
-# save_raw_data(afsc_catch_fish_l, "afsc-catch-fish-l")
-# save_raw_data(afsc_catch_sfi_h, "afsc-catch-sfi-h")
-# save_raw_data(afsc_catch_sfi_l, "afsc-catch-sfi-l")
-# save_raw_data(afsc_catch_inv_h, "afsc-catch-inv-h")
-# save_raw_data(afsc_catch_inv_l, "afsc-catch-inv-l")
-
-
-# TEST similarities between foss and oracle tables -----------------------------
-test <- FALSE
-if (test == TRUE) {
-  catch_foss <- catch; haul_foss <- haul; afsc_catch_foss<-afsc_catch; afsc_haul_foss <- afsc_haul
-  catch_oracle <- catch; haul_oracle <- haul; afsc_catch_oracle<-afsc_catch; afsc_haul_oracle <- afsc_haul
-
-  ## Input catch and haul tables -----------------------------------------------
-
-  check_diff <- function(bb, bbb){
-    whoisaproblem <- c()
-    for (i in names(bb)) {
-      aa <- bb[,i]
-      aa[is.na(aa)] <- 0
-      aaa <- bbb[,i]
-      aaa[is.na(aaa)] <- 0
-      a <- (aa != aaa)
-      whoisaproblem <- dplyr::bind_rows(
-        whoisaproblem,
-        data.frame(column = i,
-                   issues = sum(a)) )
-      if (sum(a)>0) {
-        print(data.frame("col" = i, "foss" = aa[which(a)], "oracle" = aaa[which(a)], "diff" = aa[which(a)]-aaa[which(a)]))
-      }
-    }
-    print(whoisaproblem)
+  end0 <- c()
+  if ("SURVEY_DEFINITION_ID" %in% names(a)) {
+    end0 <- c(end0, "SURVEY_DEFINITION_ID IN (143, 98, 52, 78, 47)")
+  }
+  if ("SPECIES_CODE" %in% names(a)) {
+    end0 <- c(end0, "SPECIES_CODE < 32000")
   }
 
-  dim(catch_oracle)
-  dim(catch_foss)
-  dim(haul_oracle)
-  dim(haul_foss)
+  end0 <- ifelse(is.null(end0), "", paste0(" WHERE ", paste0(end0, collapse = " AND ")))
 
-  str(catch_oracle)
-  str(catch_foss)
-  str(haul_oracle)
-  str(haul_foss)
+  start0 <- ifelse(!("START_TIME" %in% names(a)),
+                   "*",
+                   paste0(paste0(names(a)[names(a) != "START_TIME"], sep = ",", collapse = " "),
+                          " TO_CHAR(START_TIME,'MM/DD/YYYY HH24:MI:SS') START_TIME "))
 
-  check_diff(bb = haul_foss, bbb = haul_oracle)
-  check_diff(bb = catch_foss, bbb = catch_oracle)
+  a <- RODBC::sqlQuery(channel, paste0("SELECT ", start0, " FROM ", locations[i], end0, "; "))
 
-  # Final catch and haul tables ------------------------------------------------
+  if (is.null(nrow(a))) { # if (sum(grepl(pattern = "SQLExecDirect ", x = a))>1) {
+    error_loading <- c(error_loading, locations[i])
+  } else {
+    filename0 <- tolower(locations[i])
+    filename0 <- gsub(pattern = '.', replacement = "_", x = filename0, fixed = TRUE)
+    filename0 <- gsub(pattern = "gap_products_", replacement = "", x = filename0, fixed = TRUE)
+    filename0 <- gsub(pattern = "akfin_", replacement = "", x = filename0, fixed = TRUE)
 
-  dim(afsc_catch_oracle)
-  dim(afsc_catch_foss)
-  dim(afsc_haul_oracle)
-  dim(afsc_haul_foss)
+    assign(value = a, x = filename0) # assign this data with the name of the file so we can check it out below
 
-  str(afsc_catch_oracle)
-  str(afsc_catch_foss)
-  str(afsc_haul_oracle)
-  str(afsc_haul_foss)
+    filename0 <- paste0("afsc-", filename0)
+    save(a, file = here::here("data-raw", paste0(filename0, ".rds")))
+  }
+  remove(a)
+}
+error_loading
 
-  check_diff(bb = afsc_haul_foss, bbb = afsc_haul_oracle)
-  check_diff(bb = afsc_catch_foss, bbb = afsc_catch_oracle)
+
+if (FALSE) {
+
+  # mostly for testing, but also nice to have it organized
+  catch <- catch[order(catch$species_code), ]
+  catch <- catch[order(catch$hauljoin), ]
+  haul <- haul[order(haul$hauljoin), ]
+
+  afsc_haul <- haul %>%
+    dplyr::select(
+      survey_name = survey, # or = survey_name for full description if beyond trawl
+      event_id = hauljoin,
+      date = date_time,
+      vessel = vessel_name,
+      lat_start = latitude_dd_start,
+      lon_start = longitude_dd_start,
+      lat_end = latitude_dd_end,
+      lon_end = longitude_dd_end,
+      depth_m,
+      performance,
+      area_swept_km2,
+      bottom_temp_c = bottom_temperature_c
+    ) %>%
+    dplyr::mutate(
+      event_id = as.numeric(event_id),
+      date = as.POSIXct(date,
+                        format = "%m/%d/%Y %H:%M:%S",
+                        tz = Sys.timezone()),
+      # date = as.POSIXct(date,
+      #                   format = ifelse(data_source == "oracle",
+      #                                   "%m/%d/%Y %H:%M:%S", # oracle
+      #                                   "%Y-%m-%dT%H:%M:%S"), # foss
+      #                   tz = Sys.timezone()),
+      # date = as.POSIXct(date, format = "%m/%d/%Y %H:%M:%S", tz = Sys.timezone()),
+      pass = NA_integer_,
+      lat_start = as.numeric(lat_start),
+      lon_start = as.numeric(lon_start),
+      lat_end = as.numeric(lat_end),
+      lon_end = as.numeric(lon_end),
+      depth_m = as.numeric(depth_m),
+      effort = as.numeric(area_swept_km2 * 100), # convert to ha
+      effort_units = "ha",
+      performance = as.integer(performance),
+      bottom_temp_c = as.numeric(bottom_temp_c)
+    ) %>%
+    dplyr::select(
+      survey_name,
+      event_id,
+      date,
+      pass,
+      vessel,
+      lat_start,
+      lon_start,
+      lat_end,
+      lon_end,
+      depth_m,
+      effort,
+      effort_units,
+      performance,
+      bottom_temp_c
+    ) %>%
+    tidyr::drop_na(lat_end, lon_end)
+
+  surveyjoin:::save_raw_data(afsc_haul, "afsc-haul")
+
+  catchjoin <- left_join(catch, catch_spp)
+  catchjoin$scientific_name <- tolower(catchjoin$scientific_name)
+
+  spp <- readRDS("data-raw/joined_list.rds")
+
+  afsc_catch <- catchjoin %>%
+    dplyr::filter(scientific_name %in% spp$scientific_name) %>%
+    dplyr::select(
+      event_id = hauljoin,
+      itis,
+      scientific_name,
+      catch_numbers = count,
+      catch_weight = weight_kg
+    ) %>%
+    dplyr::mutate(
+      event_id = as.numeric(event_id),
+      catch_numbers = as.numeric(catch_numbers),
+      catch_weight = as.numeric(catch_weight)
+    )
+
+  surveyjoin:::save_raw_data(afsc_catch, "afsc-catch")
+
+  # # custom filter to most prevalent species, by category ----
+  # catch <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.FOSS_CATCH")
+  # catch_spp <- RODBC::sqlQuery(channel, "SELECT * FROM GAP_PRODUCTS.FOSS_SPECIES")
+  # catchjoin <- left_join(catch, catch_spp)
+  # names(catchjoin) <- tolower(names(catchjoin))
+  #
+  # afsc_catch <- catchjoin %>%
+  #   filter(scientific_name %in% spp$scientific_name) %>%
+  #   select(
+  #     event_id = hauljoin,
+  #     itis,
+  #     scientific_name,
+  #     catch_numbers = count,
+  #     catch_weight = weight_kg,
+  #     id_rank,
+  #     species_code
+  #   ) %>%
+  #   mutate(
+  #     event_id = as.numeric(event_id),
+  #     catch_numbers = as.numeric(catch_numbers),
+  #     catch_weight = as.numeric(catch_weight)
+  #   )
+  #
+  # afsc_catch_fish <- afsc_catch %>%
+  #   filter(species_code < 32000) %>%
+  #   filter(id_rank == "species")
+  # afsc_catch_sfi <- afsc_catch %>%
+  #   filter(species_code %in% c(41000:45000, 91000:91999, 99981:99988)) # corals and sponges
+  # afsc_catch_inv <- afsc_catch %>%
+  #   filter(species_code %in% c(40000:40999, 45001:90999, 92000:99981)) # other inverts
+  #
+  # # filter by frequency of occurrence and catch weights
+  # fish_high <- group_by(afsc_catch_fish, scientific_name) |>
+  #   summarise(freq = n() / nrow(afsc_haul), total_weight = sum(catch_weight), itis = itis[1]) |>
+  #   filter(total_weight > 1000) |> # freq > 0.01 gives 79 species vs 94
+  #   arrange(-freq)
+  # nrow(fish_high)
+  #
+  # fish_low <- group_by(afsc_catch_fish, scientific_name) |>
+  #   summarise(freq = n() / nrow(afsc_haul), total_weight = sum(catch_weight), itis = itis[1]) |>
+  #   filter(total_weight > 1000, freq > 0.1) |>
+  #   arrange(-freq)
+  # nrow(fish_low)
+  #
+  # sfi_high <- group_by(afsc_catch_sfi, scientific_name) |>
+  #   summarise(freq = n() / nrow(afsc_haul), total_weight = sum(catch_weight), itis = itis[1]) |>
+  #   filter(total_weight > 500) |>
+  #   arrange(-freq)
+  # nrow(sfi_high)
+  #
+  # sfi_low <- group_by(afsc_catch_sfi, scientific_name) |>
+  #   summarise(freq = n() / nrow(afsc_haul), total_weight = sum(catch_weight), itis = itis[1]) |>
+  #   filter(total_weight > 500, freq > 0.02) |>
+  #   arrange(-freq)
+  # nrow(sfi_low)
+  #
+  # inv_high <- group_by(afsc_catch_inv, scientific_name) |>
+  #   summarise(freq = n() / nrow(afsc_haul), total_weight = sum(catch_weight), itis = itis[1]) |>
+  #   filter(total_weight > 500, freq > 0.05) |>
+  #   arrange(-freq)
+  # nrow(inv_high)
+  #
+  # inv_low <- group_by(afsc_catch_inv, scientific_name) |>
+  #   summarise(freq = n() / nrow(afsc_haul), total_weight = sum(catch_weight), itis = itis[1]) |>
+  #   filter(total_weight > 500, freq > 0.15) |>
+  #   arrange(-freq)
+  # nrow(inv_low)
+  #
+  # afsc_catch <- select(afsc_catch, -scientific_name, - species_code, -id_rank)
+  #
+  # afsc_catch_fish_h <- semi_join(afsc_catch, select(fish_high, itis), by = join_by(itis))
+  # afsc_catch_fish_l <- semi_join(afsc_catch, select(fish_low, itis), by = join_by(itis))
+  # afsc_catch_sfi_h <- semi_join(afsc_catch, select(sfi_high, itis), by = join_by(itis))
+  # afsc_catch_sfi_l <- semi_join(afsc_catch, select(sfi_low, itis), by = join_by(itis))
+  # afsc_catch_inv_h <- semi_join(afsc_catch, select(inv_high, itis), by = join_by(itis))
+  # afsc_catch_inv_l <- semi_join(afsc_catch, select(inv_low, itis), by = join_by(itis))
+  #
+  # save_raw_data(afsc_catch_fish_h, "afsc-catch-fish-h")
+  # save_raw_data(afsc_catch_fish_l, "afsc-catch-fish-l")
+  # save_raw_data(afsc_catch_sfi_h, "afsc-catch-sfi-h")
+  # save_raw_data(afsc_catch_sfi_l, "afsc-catch-sfi-l")
+  # save_raw_data(afsc_catch_inv_h, "afsc-catch-inv-h")
+  # save_raw_data(afsc_catch_inv_l, "afsc-catch-inv-l")
+
+
+  # TEST similarities between foss and oracle tables -----------------------------
+  if (FALSE) {
+    # catch_foss <- catch; haul_foss <- haul; afsc_catch_foss<-afsc_catch; afsc_haul_foss <- afsc_haul
+    # catch_oracle <- catch; haul_oracle <- haul; afsc_catch_oracle<-afsc_catch; afsc_haul_oracle <- afsc_haul
+
+    # Input catch and haul tables ------------------------------------------------
+
+    check_diff <- function(bb, bbb){
+      whoisaproblem <- c()
+      for (i in names(bb)) {
+        aa <- bb[,i]
+        aa[is.na(aa)] <- 0
+        aaa <- bbb[,i]
+        aaa[is.na(aaa)] <- 0
+        a <- (aa != aaa)
+        whoisaproblem <- dplyr::bind_rows(
+          whoisaproblem,
+          data.frame(column = i,
+                     issues = sum(a)) )
+        if (sum(a)>0) {
+          print(data.frame("col" = i, "foss" = aa[which(a)], "oracle" = aaa[which(a)], "diff" = aa[which(a)]-aaa[which(a)]))
+        }
+      }
+      print(whoisaproblem)
+    }
+
+    dim(catch_oracle)
+    dim(catch_foss)
+    dim(haul_oracle)
+    dim(haul_foss)
+
+    str(catch_oracle)
+    str(catch_foss)
+    str(haul_oracle)
+    str(haul_foss)
+
+    check_diff(bb = haul_foss, bbb = haul_oracle)
+    check_diff(bb = catch_foss, bbb = catch_oracle)
+
+    # Final catch and haul tables ------------------------------------------------
+
+    dim(afsc_catch_oracle)
+    dim(afsc_catch_foss)
+    dim(afsc_haul_oracle)
+    dim(afsc_haul_foss)
+
+    str(afsc_catch_oracle)
+    str(afsc_catch_foss)
+    str(afsc_haul_oracle)
+    str(afsc_haul_foss)
+
+    check_diff(bb = afsc_haul_foss, bbb = afsc_haul_oracle)
+    check_diff(bb = afsc_catch_foss, bbb = afsc_catch_oracle)
+  }
+
 }
