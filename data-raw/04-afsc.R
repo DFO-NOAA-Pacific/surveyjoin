@@ -1,6 +1,6 @@
 #---- Via Oracle internal server (requires credentials)
 
-PKG <- unique(
+PKG <- c(
   "dplyr",
   "RODBC",
   "rstudioapi")
