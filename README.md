@@ -186,6 +186,7 @@ resulted in the following list of 55 species:
 |:----------------------|:------------------------------------|
 | Aleutian Skate        | *Bathyraja aleutica*                |
 | Arrowtooth Flounder   | *Atheresthes stomias*               |
+| Bering Skate          | *Bathyraja interrupta*              |
 | Big Skate             | *Raja binoculata*                   |
 | Bigfin Eelpout        | *Lycodes cortezianus*               |
 | Bigmouth Sculpin      | *Hemitripterus bolini*              |
@@ -219,16 +220,15 @@ resulted in the following list of 55 species:
 | Petrale Sole          | *Eopsetta jordani*                  |
 | Redbanded Rockfish    | *Sebastes babcocki*                 |
 | Rex Sole              | *Glyptocephalus zachirus*           |
-| Rock Sole             | *Lepidopsetta bilineata*            |
 | Rosethorn Rockfish    | *Sebastes helvomaculatus*           |
 | Sablefish             | *Anoplopoma fimbria*                |
-| Sandpaper Skate       | *Bathyraja interrupta*              |
 | Sawback Poacher       | *Sarritor frenatus*                 |
 | Searcher              | *Bathymaster signatus*              |
 | Sharpchin Rockfish    | *Sebastes zacentrus*                |
 | Shortfin Eelpout      | *Lycodes brevipes*                  |
 | Shortspine Thornyhead | *Sebastolobus alascanus*            |
 | Slender Sole          | *Lyopsetta exilis*                  |
+| Southern Rock Sole    | *Lepidopsetta bilineata*            |
 | Spinyhead Sculpin     | *Dasycottus setiger*                |
 | Splitnose Rockfish    | *Sebastes diploproa*                |
 | Spotted Ratfish       | *Hydrolagus colliei*                |
