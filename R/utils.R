@@ -133,6 +133,7 @@ cache_files <- function() {
     }
   }
 
+  save_metadata(metadata)
 }
 
 
