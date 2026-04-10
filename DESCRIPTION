@@ -19,7 +19,7 @@ Description: This package combines data from fish surveys in multiple
     regions.  The data are cached locally in a SQLite database.
 License: GPL-3
 Depends:
-    R (>= 4.0.0)
+    R (>= 4.1.0)
 Imports:
     checkmate,
     cli,
