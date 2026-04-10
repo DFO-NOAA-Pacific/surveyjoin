@@ -1,7 +1,7 @@
 Type: Package
 Package: surveyjoin
 Title: Combine Data from Northeast Pacific Ocean Fish Surveys
-Version: 0.0.4
+Version: 0.0.5
 Authors@R: c(
     person(c("Eric", "J."), "Ward", , "eric.ward@noaa.gov", role = c("aut", "cre")),
     person(c("Sean", "C."), "Anderson", , "sean.anderson@dfo-mpo.gc.ca", role = "aut"),
