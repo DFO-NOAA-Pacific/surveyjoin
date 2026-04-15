@@ -133,6 +133,7 @@ cache_files <- function() {
     }
   }
 
+  save_metadata(metadata)
 }
 
 
@@ -262,8 +263,7 @@ load_sql_data <- function() {
       temp$lon_start <- ifelse(temp$lon_start > 0, temp$lon_start * -1, temp$lon_start)
       temp$lon_end <- ifelse(temp$lon_end > 0, temp$lon_end * -1, temp$lon_end)
       if (temp$region[1] == "pbs") {
-        temp <- dplyr::rename(temp, bottom_temp_c = "temperature_C") |>
-          dplyr::select(-"do_mlpL", -"salinity_PSU")
+        temp <- dplyr::rename(temp, bottom_temp_c = "temperature_C", bottom_oxygen_mlpl = do_mlpL, bottom_salinity_psu = salinity_PSU)
       }
     }
     temp

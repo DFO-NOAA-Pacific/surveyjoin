@@ -1,7 +1,7 @@
 Type: Package
 Package: surveyjoin
 Title: Combine Data from Northeast Pacific Ocean Fish Surveys
-Version: 0.0.4
+Version: 0.0.5
 Authors@R: c(
     person(c("Eric", "J."), "Ward", , "eric.ward@noaa.gov", role = c("aut", "cre")),
     person(c("Sean", "C."), "Anderson", , "sean.anderson@dfo-mpo.gc.ca", role = "aut"),
@@ -19,7 +19,7 @@ Description: This package combines data from fish surveys in multiple
     regions.  The data are cached locally in a SQLite database.
 License: GPL-3
 Depends:
-    R (>= 4.0.0)
+    R (>= 4.1.0)
 Imports:
     checkmate,
     cli,

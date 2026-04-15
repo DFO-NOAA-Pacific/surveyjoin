@@ -77,13 +77,46 @@ d <- tidyr::pivot_wider(d,
   names_from = attribute, values_from = value
 ) |>
   select(-depth_m) |>
-  rename(temperature_C = `temperature_(¿C)`)
+  rename(temperature_C = `temperature_(¿C)`, do_mlpL = do_mlpL, salinity_PSU = salinity_PSU)
 pbs_haul <- left_join(pbs_haul, d, by = join_by(event_id))
 
 sum(duplicated(pbs_haul))
 sum(duplicated(select(pbs_haul, event_id, date)))
 
 saveRDS(pbs_haul, "data-raw/data/pbs-haul.rds")
+
+library(ggplot2)
+pbs_haul |>
+  mutate(year = lubridate::year(date)) |>
+  ggplot(aes(lon_start, lat_start, colour = temperature_C)) + geom_point() +
+  facet_wrap(~year) +
+  scale_colour_viridis_c()
+
+pbs_haul |>
+  mutate(year = lubridate::year(date)) |>
+  group_by(year) |>
+  summarize(mean_temp = mean(temperature_C, na.rm = T), mean_do = mean(do_mlpL, na.rm = T)) |> 
+  ggplot(aes(year, mean_temp)) + geom_point()
+
+pbs_haul |>
+  mutate(year = lubridate::year(date)) |>
+  group_by(year) |>
+  summarize(mean_temp = mean(temperature_C, na.rm = T), mean_do = mean(do_mlpL, na.rm = T)) |> 
+  ggplot(aes(year, mean_do)) + geom_point()
+
+pbs_haul |>
+  mutate(year = lubridate::year(date)) |>
+  ggplot(aes(lon_start, lat_start, colour = do_mlpL)) + geom_point() +
+  facet_wrap(~year) +
+  scale_colour_viridis_c()
+
+pbs_haul |>
+  mutate(year = lubridate::year(date)) |>
+  ggplot(aes(lon_start, lat_start, colour = salinity_PSU)) + geom_point() +
+  facet_wrap(~year) +
+  scale_colour_viridis_c()
+
+glimpse(pbs_haul)
 
 if (FALSE) {
   system("cp data-raw/data/pbs-catch-all.rds ~/src/surveyjoin-data/pbs-catch-all.rds")

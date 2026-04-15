@@ -4,3 +4,15 @@
 .Ruserdata
 .DS_Store
 inst/doc
+data-raw/data
+data-raw/data-itis-filtered
+data-raw/pbs-cache
+data-raw/pbs-all-trawl-catches-2025-06-09.rds
+data-raw/pbs-all-trawl-catches.rds
+data-raw/pbs-catch-all.rds
+data-raw/pbs-catch.rds
+data-raw/pbs-env-data-raw.rds
+inst/authors2.txt
+local-data
+abstract.txt
+inst/species-list-bc.R

@@ -62,6 +62,8 @@ a data frame of joined haul and catch data
 \item \strong{performance}: Optional performance indicator for each haul, not used for all surveys. If not
 indicated, assume performance is satisfactory
 \item \strong{bottom_temp_c}: Bottom temperature recorded at the gear, in degrees Celsius.
+\item \strong{bottom_oxygen_mlpl}: Bottom dissolved oxygen recorded at the gear, in ml per L.
+\item \strong{bottom_salinity_psu}: Bottom salinity recorded at the gear, in practical salinity units.
 \item \strong{year}: Calendar year corresponding to the haul.
 }
 }

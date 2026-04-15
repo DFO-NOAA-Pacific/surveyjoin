@@ -4,17 +4,21 @@
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/DFO-NOAA-Pacific/surveyjoin/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/DFO-NOAA-Pacific/surveyjoin/actions/workflows/R-CMD-check.yaml)
-[![DOI](https://zenodo.org/badge/484561620.svg)](https://zenodo.org/doi/10.5281/zenodo.10031852)
+[![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.10031852.svg)](https://zenodo.org/doi/10.5281/zenodo.10031852)
 
 <!-- badges: end -->
 
-This is a repository for combining trawl survey datasets from NOAA and
+This is a package for combining trawl survey datasets from NOAA and
 Fisheries and Oceans Canada in the Northeast Pacific Ocean.
 
-A pkgdown site is available
-[here](https://dfo-noaa-pacific.github.io/surveyjoin/).
+The package is described in Ward et al. 2025:  
+Ward EJ, English PA, Rooper CN, Ferriss BE, Whitmire CE, Wetzel CR, 
+Barnett LAK, Anderson SC, Thorson JT, Johnson KF, Indivero J, 
+Markowitz EH. 2025. surveyjoin: a standardized database of scientific 
+trawl surveys in the Northeast Pacific Ocean. 
+PeerJ 13:e19964 https://doi.org/10.7717/peerj.19964
 
-This data includes surveys conducted by the Northwest Fisheries Science
+These data include surveys conducted by the Northwest Fisheries Science
 Center (NWFSC) off the west coast of the United States, surveys
 collected by Fisheries and Oceans Canada (DFO) in the waters of British
 Columbia, and surveys conducted by the Alaska Fisheries Science Center
@@ -103,9 +107,9 @@ dplyr::glimpse(d, width = 72)
 
 ### Citations
 
-Citing the `surveyjoin` package can be done with the DOI linked above,
-though more detailed citations may be needed for specific surveys or
-methodology. Some recent citations are:
+Citing the `surveyjoin` package can be done with the package DOI linked 
+above, and/or by citing the paper. More detailed citations may be needed 
+for specific surveys or methodology. Some recent citations are:
 
 <u>Aleutian Islands Bottom Trawl Survey</u>
 
@@ -122,14 +126,11 @@ methodology. Some recent citations are:
 <u>Eastern & Northern Bering Sea Crab/Groundfish Bottom Trawl
 Surveys</u>
 
-- Zacher LS, Richar JI, Fedewa EJ, Ryznar ER, Litzow MA. 2023. The 2023
-  Eastern Bering Sea Continental Shelf Trawl Survey: Results for
-  Commercial Crab Species. U.S. Dep. Commer, 213 p.
-
-- Markowitz EH, Dawson EJ, Wassermann S, Anderson AB, Rohan SK,
-  Charriere BK, Stevenson DE. 2024. Results of the 2023 eastern and
-  northern Bering Sea continental shelf bottom trawl survey of
-  groundfish and invertebrate fauna. U.S. Dep. Commer.
+- Markowitz, E. H., Wassermann, S., Rohan, S. K., Charriere, B. K.,
+  Anderson, C. B., and Stevenson, D. E. (2025). Results of the 2024
+  eastern and northern Bering Sea continental shelf bottom trawl survey
+  of groundfish and invertebrate fauna (NOAA Tech. Memo. NMFS-AFSC-499;
+  p. 203). U.S. Dep. Commer. DOI: 10.25923/8qa3-x785
 
 <u>Eastern Bering Sea Slope Bottom Trawl Survey</u>
 
@@ -186,6 +187,7 @@ resulted in the following list of 55 species:
 |:----------------------|:------------------------------------|
 | Aleutian Skate        | *Bathyraja aleutica*                |
 | Arrowtooth Flounder   | *Atheresthes stomias*               |
+| Bering Skate          | *Bathyraja interrupta*              |
 | Big Skate             | *Raja binoculata*                   |
 | Bigfin Eelpout        | *Lycodes cortezianus*               |
 | Bigmouth Sculpin      | *Hemitripterus bolini*              |
@@ -219,16 +221,15 @@ resulted in the following list of 55 species:
 | Petrale Sole          | *Eopsetta jordani*                  |
 | Redbanded Rockfish    | *Sebastes babcocki*                 |
 | Rex Sole              | *Glyptocephalus zachirus*           |
-| Rock Sole             | *Lepidopsetta bilineata*            |
 | Rosethorn Rockfish    | *Sebastes helvomaculatus*           |
 | Sablefish             | *Anoplopoma fimbria*                |
-| Sandpaper Skate       | *Bathyraja interrupta*              |
 | Sawback Poacher       | *Sarritor frenatus*                 |
 | Searcher              | *Bathymaster signatus*              |
 | Sharpchin Rockfish    | *Sebastes zacentrus*                |
 | Shortfin Eelpout      | *Lycodes brevipes*                  |
 | Shortspine Thornyhead | *Sebastolobus alascanus*            |
 | Slender Sole          | *Lyopsetta exilis*                  |
+| Southern Rock Sole    | *Lepidopsetta bilineata*            |
 | Spinyhead Sculpin     | *Dasycottus setiger*                |
 | Splitnose Rockfish    | *Sebastes diploproa*                |
 | Spotted Ratfish       | *Hydrolagus colliei*                |

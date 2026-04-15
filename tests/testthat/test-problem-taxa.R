@@ -31,7 +31,6 @@ test_that("kamchatka flounder not zero-filled in years before identification", {
 
 
 test_that("arrowtooth and kamchatka not both zero-filled in early Bering/Aleutian years", {
-
   # Get both species for Aleutian Islands and Bering Sea regions
   arrowtooth <- get_data(
     scientific = "atheresthes stomias",
@@ -68,15 +67,15 @@ test_that("arrowtooth and kamchatka not both zero-filled in early Bering/Aleutia
 
   # Early years should have one or the other, not both
   earliest_year <- min(c(arrowtooth_years, kamchatka_years))
+  last_year <- max(c(arrowtooth_years, kamchatka_years))
   expect_equal(earliest_year, 1992)
 
   # Check if there's a period where both are being reported
   overlap_years <- intersect(arrowtooth_years, kamchatka_years)
-  expect_equal(overlap_years, c(earliest_year:2019, 2021:as.integer(format(Sys.Date(), "%Y"))))
+  expect_equal(overlap_years, c(earliest_year:2019, 2021:last_year))
 })
 
 test_that("northern rock sole and southern rock sole working properly in Alaska", {
-
   # Get both species for Aleutian Islands and Bering Sea regions
   southern <- get_data(
     common = "southern rock sole",
@@ -113,16 +112,16 @@ test_that("northern rock sole and southern rock sole working properly in Alaska"
 
   # Early years should have one or the other, not both
   earliest_year <- min(c(southern_years, northern_years))
+  last_year <- max(c(southern_years, northern_years))
   expect_equal(earliest_year, 1996)
 
   # Check if there's a period where both are being reported
   overlap_years <- intersect(southern_years, northern_years)
-  expect_equal(overlap_years, c(earliest_year:2019, 2021:as.integer(format(Sys.Date(), "%Y"))))
+  expect_equal(overlap_years, c(earliest_year:2019, 2021:last_year))
 })
 
 
 test_that("big skate and bering skate are working properly in Alaska", {
-
   # Get both species for Aleutian Islands and Bering Sea regions
   bigskate <- get_data(
     common = "big skate",
@@ -159,11 +158,12 @@ test_that("big skate and bering skate are working properly in Alaska", {
 
   # Early years should have one or the other, not both
   earliest_year <- min(c(bigskate_years, beringskate_years))
+  last_year <- max(c(bigskate_years, beringskate_years))
   expect_equal(earliest_year, 1983)
   expect_equal(min(bigskate_years), 1983)
   expect_equal(min(beringskate_years), 1999)
 
   # Check if there's a period where both are being reported
   overlap_years <- intersect(bigskate_years, beringskate_years)
-  expect_equal(overlap_years, c(1999:2019, 2021:as.integer(format(Sys.Date(), "%Y"))))
+  expect_equal(overlap_years, c(1999:2019, 2021:last_year))
 })
