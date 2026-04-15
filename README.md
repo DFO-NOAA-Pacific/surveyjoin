@@ -4,7 +4,7 @@
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/DFO-NOAA-Pacific/surveyjoin/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/DFO-NOAA-Pacific/surveyjoin/actions/workflows/R-CMD-check.yaml)
-[![DOI](https://zenodo.org/badge/484561620.svg)](https://zenodo.org/doi/10.5281/zenodo.10031852)
+[![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.10031852.svg)](https://zenodo.org/doi/10.5281/zenodo.10031852)
 
 <!-- badges: end -->
 
