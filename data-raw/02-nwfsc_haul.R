@@ -48,7 +48,9 @@ haul <- dplyr::rename(haul,
   "lon_end" = "vessel_end_longitude_dd",
   "depth_m" = "depth_hi_prec_m",
   "event_id" = "trawl_id",
-  "bottom_temp_c" = "temperature_at_gear_c_der"
+  "bottom_temp_c" = "temperature_at_gear_c_der",
+  "do_mlpL" = "o2_at_gear_ml_per_l_der",
+  "salinity_PSU" = "salinity_at_gear_psu_der"
 )
 haul$effort_units <- "ha"
 
@@ -68,7 +70,9 @@ nwfsc_haul <- dplyr::select(
   effort_units,
   performance,
   bottom_temp_c,
-  year
+  year,
+  do_mlpL,
+  salinity_PSU
 )
 
 # enforce types for dates, consistent with afsc / pbs

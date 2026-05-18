@@ -16,8 +16,10 @@ library(nwfscSurvey)
 catch_nwfsc_combo <- nwfscSurvey::pull_catch(survey = "NWFSC.Combo")
 # remove hake, and re-query
 catch_nwfsc_combo <- dplyr::filter(catch_nwfsc_combo, Common_name != "Pacific hake")
-catch_nwfsc_combo_hake <- nwfscSurvey::pull_catch(survey = "NWFSC.Combo", common_name = "Pacific hake",
-                                             sample_types = c("NA", NA, "Life Stage", "Size"))
+catch_nwfsc_combo_hake <- nwfscSurvey::pull_catch(
+  survey = "NWFSC.Combo", common_name = "Pacific hake",
+  sample_types = c("NA", NA, "Life Stage", "Size")
+)
 catch_nwfsc_combo_hake <- nwfscSurvey::combine_tows(catch_nwfsc_combo_hake)
 # join hake back in
 catch_nwfsc_combo <- rbind(catch_nwfsc_combo, catch_nwfsc_combo_hake)
@@ -72,7 +74,7 @@ get_itis <- function(spp) {
 spp <- sort(unique(catch$scientific_name))
 itis_codes <- get_itis(spp)
 spp_df <- tibble(scientific_name = spp, itis = itis_codes)
-catch <- dplyr::left_join(catch, spp_df)
+catch <- dplyr::left_join(catch, spp_dictionary)
 # bring in the common name
 # nwfsc_catch <- dplyr::left_join(catch, spp_dictionary) #%>%
 # dplyr::select(-common_name)
